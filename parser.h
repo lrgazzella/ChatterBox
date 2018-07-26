@@ -30,3 +30,4 @@ void RemoveSpaces(char* source);
 int initParseCheck(char * nomeFile, config * configs);
 int check(config * configs);
 void init(config * configs);
+void FreeConfig(config * configs);

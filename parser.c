@@ -48,11 +48,8 @@ int parse(char * nomeFile, config * configs){
     char * save = NULL;
     int ok = 0;
 
-    fd = fopen(nomeFile, "r");
-    if(fd == NULL) {
-        perror("Errore apertura file di configurazione");
-        return errno;
-    }
+
+    ec_null_return(fd = fopen(nomeFile, "r"), "Errore apertura file di configurazione");
     errno = 0;
     while (((read = getline(&line, &len, fd)) != -1) && (ok == 0)) { //in line ci sarà la una riga del file conf
         RemoveSpaces(line);
@@ -73,6 +70,11 @@ int parse(char * nomeFile, config * configs){
     return errno; //se non ci sono stati errori, torna 0, altrimenti il codice di errore
 }
 
+void FreeConfig(config * configs){
+  free(configs->UnixPath);
+  free(configs->DirName);
+  free(configs->StatFileName);
+}
 //Se ci sono due parametri uguali nello stesso file di configurazione, verrà preso il valore dell'ultimo
 int makeConfig(char * parametro, char * value, config * configs){
     if(strcmp(parametro, "UnixPath") == 0)

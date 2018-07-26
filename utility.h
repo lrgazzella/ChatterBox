@@ -8,7 +8,7 @@
     exit(EXIT_FAILURE);\
 }
 /* controlla NULL; stampa errore e  termina la funzione   */
-#define ec_null(s,m) if ((s) == NULL) {\
+#define ec_null_return(s,m) if ((s) == NULL) {\
     perror(m);\
     return -1;\
 }
@@ -22,4 +22,3 @@
     perror(m);\
     c;\
 }
-
