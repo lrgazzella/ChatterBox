@@ -18,14 +18,14 @@ int initParseCheck(char * nomeFile, config * configs){
 }
 
 int check(config * configs){
-    if(configs->UnixPath == NULL) return -1;
+    if(configs->UnixPath == NULL || strlen(configs->UnixPath) == 0) return -1;
     if(configs->MaxConnections <= 0) return -1;
     if(configs->ThreadsInPool <= 0) return -1;
     if(configs->MaxMsgSize <= 0) return -1;
     if(configs->MaxFileSize <= 0) return -1;
     if(configs->MaxHistMsgs <= 0) return -1;
-    if(configs->DirName == NULL) return -1;
-    if(configs->StatFileName == NULL) return -1;
+    if(configs->DirName == NULL || strlen(configs->DirName) == 0) return -1;
+    if(configs->StatFileName == NULL || strlen(configs->StatFileName) == 0) return -1;
     return 0;
 }
 
@@ -59,6 +59,8 @@ int parse(char * nomeFile, config * configs){
         if(line[0] != '#' && strlen(line) != 0){ //è un commento o una riga vuota, li ignoro
             char * parametro = strtok_r(line, "=", &save);
             char * value = strdup(save);
+            //printf("Parametro: |%s|\n", parametro);
+            //printf("Value: |%s|\n", value);
             ok = makeConfig(parametro, value, configs);
             //free(parametro); //TODO perchè non funziona se metto le free?
             free(value);
@@ -76,7 +78,7 @@ int makeConfig(char * parametro, char * value, config * configs){
     if(strcmp(parametro, "UnixPath") == 0)
         configs->UnixPath = strdup(value);
     else if(strcmp(parametro, "MaxConnections") == 0)
-        configs->MaxConnections = atoi(value);
+        configs->MaxConnections = atoi(value); // atoi con stringa vuota ritorna 0
     else if(strcmp(parametro, "ThreadsInPool") == 0)
         configs->ThreadsInPool = atoi(value);
     else if(strcmp(parametro, "MaxMsgSize") == 0)

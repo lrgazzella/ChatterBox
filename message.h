@@ -3,15 +3,15 @@
  *
  * Dipartimento di Informatica Università di Pisa
  * Docenti: Prencipe, Torquati
- * 
+ *
  */
 #ifndef MESSAGE_H_
 #define MESSAGE_H_
 
 #include <assert.h>
 #include <string.h>
-#include <config.h>
-#include <ops.h>
+#include "config.h"
+#include "ops.h"
 
 /**
  * @file  message.h
@@ -21,13 +21,13 @@
 
 /**
  *  @struct header
- *  @brief header del messaggio 
+ *  @brief header del messaggio
  *
  *  @var op tipo di operazione richiesta al server
- *  @var sender nickname del mittente 
+ *  @var sender nickname del mittente
  */
 typedef struct {
-    op_t     op;   
+    op_t     op;
     char sender[MAX_NAME_LENGTH+1];
 } message_hdr_t;
 
@@ -40,12 +40,12 @@ typedef struct {
  */
 typedef struct {
     char receiver[MAX_NAME_LENGTH+1];
-    unsigned int   len;  
+    unsigned int   len;
 } message_data_hdr_t;
 
 /**
  *  @struct data
- *  @brief body del messaggio 
+ *  @brief body del messaggio
  *
  *  @var hdr header della parte dati
  *  @var buf buffer dati
@@ -57,7 +57,7 @@ typedef struct {
 
 /**
  *  @struct messaggio
- *  @brief tipo del messaggio 
+ *  @brief tipo del messaggio
  *
  *  @var hdr header
  *  @var data dati
@@ -90,7 +90,7 @@ static inline void setHeader(message_hdr_t *hdr, op_t op, char *sender) {
  *
  * @param msg puntatore al body del messaggio
  * @param rcv nickname o groupname del destinatario
- * @param buf puntatore al buffer 
+ * @param buf puntatore al buffer
  * @param len lunghezza del buffer
  */
 static inline void setData(message_data_t *data, char *rcv, const char *buf, unsigned int len) {
