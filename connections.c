@@ -11,11 +11,11 @@
 #include "config.h"
 #include "utility.h"
 
-static inline int readn(long fd, void *buf, size_t size);
-static inline int writen(long fd, void *buf, size_t size);
+
 
 int openConnection(char* path, unsigned int ntimes, unsigned int secs){
-    int fd_skt = socket(AF_UNIX, SOCK_STREAM, 0); // creo la socket
+    int fd_skt;
+    ec_meno1_return(socket(AF_UNIX, SOCK_STREAM, 0), "Errore creazione socket"); // creo la socket
 
     struct sockaddr_un sa;
     strncpy(sa.sun_path, path, UNIX_PATH_MAX);
@@ -66,36 +66,4 @@ int sendRequest(long fd, message_t *msg){
   ec_meno1_return(writen(fd, &(msg->hdr), sizeof(message_hdr_t)), "Errore scrittura header");
   ec_meno1_return(sendData(fd, &(msg->data)), "Errore scrittura body");
   return 0;
-}
-
-static inline int readn(long fd, void *buf, size_t size) {
-    size_t left = size;
-    int r;
-    char *bufptr = (char*)buf;
-    while(left>0) {
-    	if ((r=read((int)fd , bufptr,left)) == -1) {
-    	    if (errno == EINTR) continue;
-    	    return -1;
-    	}
-    	if (r == 0) return 0;   // gestione chiusura socket
-      left    -= r;
-    	bufptr  += r;
-    }
-    return size;
-}
-
-static inline int writen(long fd, void *buf, size_t size) {
-    size_t left = size;
-    int r;
-    char *bufptr = (char*)buf;
-    while(left>0) {
-	     if ((r=write((int)fd ,bufptr,left)) == -1) {
-         if (errno == EINTR) continue;
-         return -1;
-       }
-       if (r == 0) return 0;
-          left -= r;
-	        bufptr  += r;
-    }
-    return 1;
 }

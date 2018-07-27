@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <stdio.h>
-#include <queue.h>
+#include "queue.h"
 
 static pthread_mutex_t qlock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t  qcond = PTHREAD_COND_INITIALIZER;
@@ -25,9 +25,9 @@ Queue_t *initQueue() {
     if (!q) return NULL;
     q->head = allocNode();
     if (!q->head) return NULL;
-    q->head->data = NULL; 
+    q->head->data = NULL;
     q->head->next = NULL;
-    q->tail = q->head;    
+    q->tail = q->head;
     q->qlen = 0;
     return q;
 }
@@ -45,7 +45,7 @@ void deleteQueue(Queue_t *q) {
 int push(Queue_t *q, void *data) {
     assert(data != NULL);
     Node_t *n = allocNode();
-    n->data = data; 
+    n->data = data;
     n->next = NULL;
     LockQueue();
     q->tail->next = n;
@@ -55,7 +55,7 @@ int push(Queue_t *q, void *data) {
     return 0;
 }
 
-void *pop(Queue_t *q) {        
+void *pop(Queue_t *q) {
     LockQueue();
     while(q->head == q->tail) {
 	UnlockQueueAndWait();
@@ -70,7 +70,7 @@ void *pop(Queue_t *q) {
     UnlockQueue();
     freeNode(n);
     return data;
-} 
+}
 
 // accesso in sola lettura non in mutua esclusione
 unsigned long length(Queue_t *q) {
