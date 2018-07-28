@@ -3,7 +3,7 @@
  *
  * Dipartimento di Informatica Università di Pisa
  * Docenti: Prencipe, Torquati
- * 
+ *
  */
 /**
  * @file config.h
@@ -15,7 +15,8 @@
 
 #define MAX_NAME_LENGTH                  32
 
-/* aggiungere altre define qui */
+#define HASHSIZE 1000
+#define HASHGROUPSIZE 250
 
 
 

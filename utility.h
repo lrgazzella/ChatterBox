@@ -23,6 +23,11 @@
     c;\
 }
 
+#define ec_null_return_null(s,m) if ((s) == NULL) {\
+    perror(m);\
+    return NULL;\
+}
+
 #include <errno.h>
 #include <unistd.h>
 

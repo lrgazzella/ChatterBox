@@ -67,7 +67,7 @@ int parse(char * nomeFile, config * configs){
     free(line);
     fclose(fd);
     if(ok != 0) return ok; // se c'è stato un errore nella makeConfig ritorno
-    return errno; //se non ci sono stati errori, torna 0, altrimenti il codice di errore
+    return -1; //se non ci sono stati errori, torna 0, altrimenti il codice di errore
 }
 
 void FreeConfig(config * configs){
