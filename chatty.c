@@ -27,6 +27,7 @@
 #include <sys/select.h>
 #include <string.h>
 #include <pthread.h>
+#include <getopt.h>
 #include "./lib/GestioneQueue/queue.h"
 #include "./lib/GestioneListe/linklist.h"
 #include "./lib/GestioneHashTable/icl_hash.h"
@@ -42,12 +43,14 @@ int aggiorna(fd_set * set, int max);
 int isPipe(int fd);
 static void * listener(void * arg);
 static void * pool(void * arg);
+static void * segnali(void * arg);
 void initHashLock();
 
 /* Variabili globali */
 static Queue_t * richieste;
 static config configurazione;
 static int nSocketUtenti = 0;
+static pthread_mutex_t nSocketUtenti_m = PTHREAD_MUTEX_INITIALIZER;
 static linked_list_t * utentiConnessi;
 static pthread_mutex_t hashLock[HASHSIZE / HASHGROUPSIZE];
 /*
@@ -90,8 +93,24 @@ static void usage(const char *progname) {
 
 
 int main(int argc, char *argv[]) {
-
-    char pathFileConf[] = "./DATA/chatty.conf1";
+    /* Prendo il file di configurazione */
+    int optc;
+    const char optstring[] = "f:";
+    char * pathFileConf = NULL;// TODO va deallocata?
+    while ((optc = getopt(argc, argv, optstring)) != -1) {
+        switch (optc) {
+            case 'f':
+                pathFileConf = optarg;
+            break;
+            default:
+                usage(argv[0]);
+                return -1;
+        }
+    }
+    if(pathFileConf == NULL){
+        usage(argv[0]);
+        return -1;
+    }
     int i;
 
     /* Inizializzazione */
@@ -100,13 +119,9 @@ int main(int argc, char *argv[]) {
     utentiRegistrati = icl_hash_create(HASHSIZE, ulong_hash_function, ulong_key_compare);
     utentiConnessi = list_create();
     initHashLock();
-    printf("Fine init\n");
-    strcpy(configurazione.UnixPath, "./mysock");
 
     /* Creazione pipe */
-    /*int (*pfds)[2];
-    pfds = malloc(sizeof(*pfds) * configurazione.ThreadsInPool); //TODO da capire*/
-    int **pfds = malloc(sizeof(int *) * configurazione.ThreadsInPool);
+    int ** pfds = malloc(sizeof(int *) * configurazione.ThreadsInPool);
     for(i=0; i<configurazione.ThreadsInPool; i++){
         pfds[i] = malloc(sizeof(int) * 2);
         if(pipe(pfds[i]) == -1){ //TODO gestione errore
@@ -115,7 +130,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    printf("Pipe create\n");
     /* Gestione segnali */
 
     /* Avvio listener */
@@ -135,9 +149,11 @@ int main(int argc, char *argv[]) {
     for(i=0; i<configurazione.ThreadsInPool; i++){
         pthread_join(pool_id[i], (void **)&ret_pool);
     }
-
+    free(pathFileConf);
     return 0;
 }
+
+
 
 void initHashLock(){
     int i=0;
@@ -152,49 +168,61 @@ static void * pool(void * arg){
     message_t msg;
     while(1){
         fd = (int *)pop(richieste);
-        printf("Il pool ha preso FD: %d\n", *fd);
-        readMsg(*fd, &msg); //TODO controllare errori. Non necessita di lock fd dato che un utente può fare una richiesta alla volta che viene presa in gestione da un solo thread del pool
-        /*switch(msg.hdr.op){
-            case REGISTER_OP:
-                register_op(msg, utentiRegistrati, hashLock, utentiConnessi); //TODO controllare errori
-                break;
-            case CONNECT_OP:
-                connect_op(msg, utentiRegistrati, hashLock, utentiConnessi);
-                break;
-            case POSTTXT_OP:
-                posttxt_op(msg, utentiRegistrati, hashLock, utentiConnessi);
-                break;
-            case POSTTEXTALL_OP:
-                posttextall_op(msg, utentiRegistrati, hashLock, utentiConnessi);
-                break;
-            case POSTFILE_OP:
-                postfile_op(msg, utentiRegistrati, hashLock, utentiConnessi);
-                break;
-            case GETFILE_OP:
-                getfile_op(msg, utentiRegistrati, hashLock, utentiConnessi);
-                break;
-            case GETPREVMSGS_OP:
-                getprevmsgs_op(msg, utentiRegistrati, hashLock, utentiConnessi);
-                break;
-            case USRLIST_OP:
-                usrlist_op(msg, utentiRegistrati, hashLock, utentiConnessi);
-                break;
-            case UNREGISTER_OP:
-                unregister_op(msg, utentiRegistrati, hashLock, utentiConnessi);
-                break;
-            case DISCONNECT_OP:
-                disconnect_op(msg, utentiRegistrati, hashLock, utentiConnessi);
-                break;
-            default:
-                //TODO gestione errore
-        }*/
-        printf("RICEVUTA OP: %d\n", msg.hdr.op);
-        writen(pipe, fd, sizeof(int)); //TODO conrolla errori
+        int r = readMsg(*fd, &msg);
+        if(r == -1){ //TODO controllare errori. Non necessita di lock fd dato che un utente può fare una richiesta alla volta che viene presa in gestione da un solo thread del pool
+            perror("Errore readMsg");
+            exit(-1);
+        }else if(r == 0){// vuol dire che il client ha finito di comunicare, allora devo chiudere la connessione e decrementare nSocketUtenti
+            close(*fd);
+            pthread_mutex_lock(&nSocketUtenti_m);
+            nSocketUtenti --;
+            pthread_mutex_unlock(&nSocketUtenti_m);
+        }else{
+            /*switch(msg.hdr.op){
+                case REGISTER_OP:
+                    register_op(msg, utentiRegistrati, hashLock, utentiConnessi); //TODO controllare errori
+                    break;
+                case CONNECT_OP:
+                    connect_op(msg, utentiRegistrati, hashLock, utentiConnessi);
+                    break;
+                case POSTTXT_OP:
+                    posttxt_op(msg, utentiRegistrati, hashLock, utentiConnessi);
+                    break;
+                case POSTTEXTALL_OP:
+                    posttextall_op(msg, utentiRegistrati, hashLock, utentiConnessi);
+                    break;
+                case POSTFILE_OP:
+                    postfile_op(msg, utentiRegistrati, hashLock, utentiConnessi);
+                    break;
+                case GETFILE_OP:
+                    getfile_op(msg, utentiRegistrati, hashLock, utentiConnessi);
+                    break;
+                case GETPREVMSGS_OP:
+                    getprevmsgs_op(msg, utentiRegistrati, hashLock, utentiConnessi);
+                    break;
+                case USRLIST_OP:
+                    usrlist_op(msg, utentiRegistrati, hashLock, utentiConnessi);
+                    break;
+                case UNREGISTER_OP:
+                    unregister_op(msg, utentiRegistrati, hashLock, utentiConnessi);
+                    break;
+                case DISCONNECT_OP:
+                    disconnect_op(msg, utentiRegistrati, hashLock, utentiConnessi);
+                    break;
+                default:
+                    //TODO gestione errore
+            }*/
+            printf("RICEVUTA OP: %d\n", msg.hdr.op);
+            if(writen(pipe, fd, sizeof(int)) == -1){
+                perror("Errore writen");
+                exit(-1);//TODO controlla errori
+            }
+        }
+        free(fd);
     }
 }
 
 static void * listener(void * arg){
-    printf("Listener iniziato\n");
     int fd_skt, fd_num = 0;
     int i;
     fd_set rdset, set;
@@ -211,28 +239,29 @@ static void * listener(void * arg){
     }
     FD_SET(fd_skt,&set);
     if(fd_skt > fd_num) fd_num = fd_skt;
-    printf("Creata set\n");
     while (1) {
         rdset = set;
         if (select(fd_num+1,&rdset,NULL,NULL,NULL) == -1) {
             perror("Errore select");
             exit(-1); // TODO gestione errore
-        } else {printf("Arrivata select\n");
+        } else {
             int fd;
             for (fd = 0; fd<=fd_num;fd++) {
                 if (FD_ISSET(fd, &rdset)) {
                     if (fd == fd_skt) { /* sock connect pronto */
                         int fd_c = accept(fd_skt, NULL, 0);
                         //TODO lockare nSocketUtenti prima di utilizzarla
+                        pthread_mutex_lock(&nSocketUtenti_m);
                         if(nSocketUtenti >= configurazione.MaxConnections){
+                            pthread_mutex_unlock(&nSocketUtenti_m);
                             message_t m;
                             setHeader(&(m.hdr), OP_FAIL, "");
                             setData(&(m.data), "", "Troppi utenti collegati", 24);
                             sendRequest(fd_c, &m);
                             close(fd_c);
                         } else {
-                            printf("Un client si è connesso, FD: %d\n", fd_c);
                             nSocketUtenti ++;
+                            pthread_mutex_unlock(&nSocketUtenti_m);
                             FD_SET(fd_c, &set);
                             if (fd_c > fd_num) fd_num = fd_c;
                         }
@@ -244,12 +273,12 @@ static void * listener(void * arg){
                                 perror("Errore read su pipe");
                                 exit(-1);
                             }
-                            printf("FD: %d\n", fd_c);
                             FD_SET(fd_c, &set);
                             if (fd_c > fd_num) fd_num = fd_c;
                         }else if(p == 0){ // un client mi sta mandando una richiesta
-                            printf("Un client ha fatto una richiesta\n");
-                            if(push(richieste, &fd) == -1){ // TODO gestione errore
+                            int * toPush = malloc(sizeof(int));
+                            *toPush = fd;
+                            if(push(richieste, toPush) == -1){ // TODO gestione errore
                                 perror("Errore push");
                                 exit(-1);
                             }
@@ -267,6 +296,7 @@ static void * listener(void * arg){
     }
 }
 
+static void * segnali(void * arg){}
 /**
 * @return: -1 se ci sono stati errori
 *           1 se fd è una pipe

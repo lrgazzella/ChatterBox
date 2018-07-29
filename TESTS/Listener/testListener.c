@@ -8,11 +8,11 @@
 #include "../../ops.h"
 #include "../../message.h"
 #include "../../utility.h"
-#define SOCKNAME1 "./mysock"
+#define SOCKNAME1 "/tmp/chatty_socket"
 
 int main(int argc, char** argv) {
 
-    int fd, fd_c;
+    int fd;
     ec_meno1(fd = openConnection(SOCKNAME1, 10, 1), "Errore openConnection");
     printf("Client connesso\n");
     message_t m1;
@@ -25,5 +25,5 @@ int main(int argc, char** argv) {
     m1.data.buf = str;
     ec_meno1(sendRequest(fd, &m1), "Errore sendRequest");
     free(str);
-    sleep(3);
+    close(fd);
 }

@@ -15,7 +15,7 @@
 
 int openConnection(char* path, unsigned int ntimes, unsigned int secs){
     int fd_skt;
-    ec_meno1_return(socket(AF_UNIX, SOCK_STREAM, 0), "Errore creazione socket"); // creo la socket
+    ec_meno1_return(fd_skt = socket(AF_UNIX, SOCK_STREAM, 0), "Errore creazione socket"); // creo la socket
 
     struct sockaddr_un sa;
     strncpy(sa.sun_path, path, UNIX_PATH_MAX);
@@ -40,30 +40,45 @@ int openConnection(char* path, unsigned int ntimes, unsigned int secs){
 }
 
 int readHeader(long connfd, message_hdr_t *hdr){ //message_hdr_t ha op e sender
-  ec_meno1_return(readn(connfd, hdr, sizeof(message_hdr_t)), "Errore lettura header");
-  return 0;
+    int r = readn(connfd, hdr, sizeof(message_hdr_t));
+    if(r <= 0){
+        return r;
+    }
+    return 1;
 }
 
 int readData(long fd, message_data_t *data){
-  ec_meno1_return(readn(fd, &(data->hdr), sizeof(message_data_hdr_t)), "Errore lettura header del body");
-  data->buf = malloc(sizeof(char) * (data->hdr.len + 1));
-  ec_meno1_return(readn(fd, data->buf, sizeof(char) * (data->hdr.len + 1)), "Errore lettura buffer");
-  return 0;
+    int r = readn(fd, &(data->hdr), sizeof(message_data_hdr_t));
+    if(r <= 0){
+        return r;
+    }
+    data->buf = malloc(sizeof(char) * (data->hdr.len + 1));
+    if(!data->buf) return -1;
+    r = readn(fd, data->buf, sizeof(char) * (data->hdr.len + 1));
+    if(r <= 0){
+        return r;
+    }
+    return 1;
 }
 
 int readMsg(long fd, message_t *msg){
-  ec_meno1_return(readHeader(fd, &(msg->hdr)), "Errore lettura header");
-  ec_meno1_return(readData(fd, &(msg->data)), "Errore lettura body");
+    int r = readHeader(fd, &(msg->hdr));
+    if(r <= 0) return r;
+    return readData(fd, &(msg->data));
 }
 
 int sendData(long fd, message_data_t *msg){
-  ec_meno1_return(writen(fd, &(msg->hdr), sizeof(message_data_hdr_t)), "Errore scrittura header del body");
-  ec_meno1_return(writen(fd, msg->buf, sizeof(char) * (msg->hdr.len + 1)), "Errore scrittura buffer");
-  return 0;
+    if(writen(fd, &(msg->hdr), sizeof(message_data_hdr_t)) == -1){
+        return -1;
+    }
+    if(writen(fd, msg->buf, sizeof(char) * (msg->hdr.len + 1)) == -1){
+        return -1;
+    }
+    return 1;
 }
 
 int sendRequest(long fd, message_t *msg){
-  ec_meno1_return(writen(fd, &(msg->hdr), sizeof(message_hdr_t)), "Errore scrittura header");
-  ec_meno1_return(sendData(fd, &(msg->data)), "Errore scrittura body");
-  return 0;
+    if(writen(fd, &(msg->hdr), sizeof(message_hdr_t)) == -1) return -1;
+    if(sendData(fd, &(msg->data)) == -1) return -1;
+    return 1;
 }
