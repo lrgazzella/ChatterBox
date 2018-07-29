@@ -63,6 +63,7 @@ static pthread_mutex_t hashLock[HASHSIZE / HASHGROUPSIZE];
   QUINDI:
       - lettura e scrittura in mutua esclusione
       - serve una cond? NO
+  OSS: utentiConnessi non sarà mai più grande delle socket attive (MaxConnections)
 */
 static icl_hash_t * utentiRegistrati;
 
@@ -126,7 +127,7 @@ int main(int argc, char *argv[]) {
         pfds[i] = malloc(sizeof(int) * 2);
         if(pipe(pfds[i]) == -1){ //TODO gestione errore
             perror("Errore pipe\n");
-            exit -1;
+            exit (-1);
         }
     }
 
@@ -169,11 +170,12 @@ static void * pool(void * arg){
     while(1){
         fd = (int *)pop(richieste);
         int r = readMsg(*fd, &msg);
-        if(r == -1){ //TODO controllare errori. Non necessita di lock fd dato che un utente può fare una richiesta alla volta che viene presa in gestione da un solo thread del pool
+        if(r < 0){ //TODO controllare errori. Non necessita di lock fd dato che un utente può fare una richiesta alla volta che viene presa in gestione da un solo thread del pool
+            free(fd);
             perror("Errore readMsg");
             exit(-1);
         }else if(r == 0){// vuol dire che il client ha finito di comunicare, allora devo chiudere la connessione e decrementare nSocketUtenti
-            close(*fd);
+            close(*fd); //TODO controllare errore
             pthread_mutex_lock(&nSocketUtenti_m);
             nSocketUtenti --;
             pthread_mutex_unlock(&nSocketUtenti_m);
@@ -256,7 +258,7 @@ static void * listener(void * arg){
                             pthread_mutex_unlock(&nSocketUtenti_m);
                             message_t m;
                             setHeader(&(m.hdr), OP_FAIL, "");
-                            setData(&(m.data), "", "Troppi utenti collegati", 24);
+                            setData(&(m.data), "", "Troppi utenti collegati", 23);
                             sendRequest(fd_c, &m);
                             close(fd_c);
                         } else {
@@ -316,21 +318,4 @@ int aggiorna(fd_set * set, int max){
         }
     }
     return r;
-}
-
-// legge file configurazione, eliminare l'eventuale socket vecchia e crea la socket del server
-int createSocket(){
-    if(remove(configurazione.UnixPath) == -1){
-        if(errno != ENOENT) {// Se errno == ENOENT vuol dire che non esiste un file con quel path
-            return -1;
-        }
-    }
-    int fd_skt;
-    struct sockaddr_un sa;
-    strncpy(sa.sun_path, configurazione.UnixPath, UNIX_PATH_MAX);
-    sa.sun_family = AF_UNIX;
-    ec_meno1_return(fd_skt = socket(AF_UNIX,SOCK_STREAM,0), "Errore socket");
-    ec_meno1_return(bind(fd_skt,(struct sockaddr *)&sa, sizeof(sa)), "Errore bind");
-    ec_meno1_return(listen(fd_skt, SOMAXCONN), "Errore listen");
-    return fd_skt;
 }

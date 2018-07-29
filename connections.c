@@ -68,17 +68,19 @@ int readMsg(long fd, message_t *msg){
 }
 
 int sendData(long fd, message_data_t *msg){
-    if(writen(fd, &(msg->hdr), sizeof(message_data_hdr_t)) == -1){
-        return -1;
+    int r = writen(fd, &(msg->hdr), sizeof(message_data_hdr_t));
+    if(r <= 0){
+        return r;
     }
-    if(writen(fd, msg->buf, sizeof(char) * (msg->hdr.len + 1)) == -1){
-        return -1;
+    r = writen(fd, msg->buf, sizeof(char) * (msg->hdr.len + 1));
+    if(r <= 0){
+        return r;
     }
     return 1;
 }
 
 int sendRequest(long fd, message_t *msg){
-    if(writen(fd, &(msg->hdr), sizeof(message_hdr_t)) == -1) return -1;
-    if(sendData(fd, &(msg->data)) == -1) return -1;
-    return 1;
+    int r = writen(fd, &(msg->hdr), sizeof(message_hdr_t));
+    if(r <= 0) return r;
+    return sendData(fd, &(msg->data));
 }
