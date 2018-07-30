@@ -19,7 +19,7 @@ typedef struct BQueue {
 } BQueue_t;
 
 
-/** Alloca ed inizializza una coda di dimensione \param n. 
+/** Alloca ed inizializza una coda di dimensione \param n.
  *  Deve essere chiamata da un solo thread (tipicamente il thread main).
  *
  *   \retval NULL se si sono verificati problemi nell'allocazione (errno settato)
@@ -29,24 +29,24 @@ BQueue_t *initBQueue(size_t n);
 
 /** Cancella una coda allocata con initQueue. Deve essere chiamata da
  *  da un solo thread (tipicamente il thread main).
- *  
+ *
  *   \param q puntatore alla coda da cancellare
  */
 void deleteBQueue(BQueue_t *q, void (*F)(void*));
 
 /** Inserisce un dato nella coda.
  *   \param data puntatore al dato da inserire
- *  
+ *
  *   \retval 0 se successo
  *   \retval -1 se errore (errno settato opportunamente)
  */
-int    push(BQueue_t *q, void *data);
+int    push_BQueue(BQueue_t *q, void *data);
 
 /** Estrae un dato dalla coda.
  *
  *  \retval data puntatore al dato estratto.
  */
-void  *pop(BQueue_t *q);
+void  *pop_BQueue(BQueue_t *q);
 
 void shutdownBQueue(BQueue_t *q);
 

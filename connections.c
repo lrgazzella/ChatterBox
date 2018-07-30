@@ -67,6 +67,12 @@ int readMsg(long fd, message_t *msg){
     return readData(fd, &(msg->data));
 }
 
+int sendHeader(long fd, message_hdr_t *msg){
+    int r = writen(fd, msg, sizeof(message_hdr_t));
+    if(r <= 0) return r;
+    return 1;
+}
+
 int sendData(long fd, message_data_t *msg){
     int r = writen(fd, &(msg->hdr), sizeof(message_data_hdr_t));
     if(r <= 0){
@@ -80,7 +86,8 @@ int sendData(long fd, message_data_t *msg){
 }
 
 int sendRequest(long fd, message_t *msg){
-    int r = writen(fd, &(msg->hdr), sizeof(message_hdr_t));
+    int r = sendHeader(fd, &(msg->hdr));
     if(r <= 0) return r;
-    return sendData(fd, &(msg->data));
+    r = sendData(fd, &(msg->data));
+    return r;
 }

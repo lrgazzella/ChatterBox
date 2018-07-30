@@ -1,6 +1,6 @@
 #ifndef UTILITY_H_
 #define UTILITY_H_
-#endif /* UTILIY_H */
+
 
 /* controlla -1; stampa errore e termina */
 #define ec_meno1(s,m)  if ((s) == - 1) {\
@@ -63,3 +63,5 @@ static inline int writen(long fd, void *buf, size_t size) {
     }
     return 1;
 }
+
+#endif /* UTILIY_H */

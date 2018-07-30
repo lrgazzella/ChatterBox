@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include <errno.h>
 #include <stdio.h>
-#include <boundedqueue.h>
+#include "boundedqueue.h"
 
 /**
  * @file boundedqueue.c
@@ -50,7 +50,7 @@ BQueue_t *initBQueue(size_t n) {
     q->qsize = n;
     return q;
  error:
-    if (!q) return NULL; 
+    if (!q) return NULL;
     int myerrno = errno;
     if (q->buf) free(q->buf);
     if (&q->m) pthread_mutex_destroy(&q->m);
@@ -71,10 +71,10 @@ void deleteBQueue(BQueue_t *q, void (*F)(void*)) {
     if (!q) {
 	errno = EINVAL;
 	return;
-    }   
+    }
     if (F) {
 	void *data=NULL;
-	while((data = pop(q))) F(data);
+	while((data = pop_BQueue(q))) F(data);
     }
     if (q->buf) free(q->buf);
     if (&q->m) pthread_mutex_destroy(&q->m);
@@ -83,7 +83,7 @@ void deleteBQueue(BQueue_t *q, void (*F)(void*)) {
     free(q);
 }
 
-int push(BQueue_t *q, void *data) {
+int push_BQueue(BQueue_t *q, void *data) {
     if (!q || !data) {
 	errno = EINVAL;
 	return -1;
@@ -94,16 +94,16 @@ int push(BQueue_t *q, void *data) {
     q->buf[q->tail] = data;
     q->tail += (q->tail+1 >= q->qsize) ? (1-q->qsize) : 1;
     q->qlen += 1;
-    /* Invece di fare sempre la signal, si puo' contare il n. di 
-     * consumer in attesa e fare la signal solo se tale numero 
+    /* Invece di fare sempre la signal, si puo' contare il n. di
+     * consumer in attesa e fare la signal solo se tale numero
      * e' > 0
      */
-    SignalConsumer(q);   
+    SignalConsumer(q);
     UnlockQueue(q);
     return 0;
 }
 
-void *pop(BQueue_t *q) {
+void * pop_BQueue(BQueue_t *q) {
     if (!q) {
 	errno = EINVAL;
 	return NULL;
@@ -113,8 +113,8 @@ void *pop(BQueue_t *q) {
     void *data = q->buf[q->head];
     q->buf[q->head] = NULL;
     q->head += (q->head+1 >= q->qsize) ? (1-q->qsize) : 1;
-    /* Invece di fare sempre la signal, si puo' contare il n. di 
-     * producer in attesa e fare la signal solo se tale numero 
+    /* Invece di fare sempre la signal, si puo' contare il n. di
+     * producer in attesa e fare la signal solo se tale numero
      * e' > 0
      */
     SignalProducer(q);
@@ -122,5 +122,4 @@ void *pop(BQueue_t *q) {
     assert(q->qlen>=0);
     UnlockQueue(q);
     return data;
-} 
-
+}

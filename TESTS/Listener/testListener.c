@@ -16,14 +16,15 @@ int main(int argc, char** argv) {
     ec_meno1(fd = openConnection(SOCKNAME1, 10, 1), "Errore openConnection");
     printf("Client connesso\n");
     message_t m1;
-    m1.hdr.op = POSTTXT_OP;
+    m1.hdr.op = CONNECT_OP;
     strcpy(m1.hdr.sender, "Gianni");
-    strcpy(m1.data.hdr.receiver, "Paolo");
     char * str = malloc(sizeof(char) * 5);
     strcpy(str, "ciao");
     m1.data.hdr.len = 5;
     m1.data.buf = str;
     ec_meno1(sendRequest(fd, &m1), "Errore sendRequest");
+    ec_meno1(readHeader(fd, &(m1.hdr)), "Errore readHeader");
+    printf("Il server risponde con OP: %d\n", m1.hdr.op);
     free(str);
     close(fd);
 }

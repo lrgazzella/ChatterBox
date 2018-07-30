@@ -1,6 +1,6 @@
 #ifndef PARSER_H_
 #define PARSER_H_
-#endif /* PARSER_H */
+
 
 typedef struct config_s{
     char * UnixPath;
@@ -31,3 +31,5 @@ int initParseCheck(char * nomeFile, config * configs);
 int check(config * configs);
 void init(config * configs);
 void FreeConfig(config * configs);
+
+#endif 

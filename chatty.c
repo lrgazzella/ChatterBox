@@ -28,13 +28,16 @@
 #include <string.h>
 #include <pthread.h>
 #include <getopt.h>
+#include "./parser.h"
 #include "./lib/GestioneQueue/queue.h"
 #include "./lib/GestioneListe/linklist.h"
 #include "./lib/GestioneHashTable/icl_hash.h"
+#include "./lib/GestioneBoundedQueue/boundedqueue.h"
+#include "./struttureCondivise.h"
 #include "./utility.h"
 #include "./connections.h"
-#include "./parser.h"
 #include "./config.h"
+#include "./gestioneRichieste.h"
 
 
 /* Definizione funzioni */
@@ -46,29 +49,10 @@ static void * pool(void * arg);
 static void * segnali(void * arg);
 void initHashLock();
 
-/* Variabili globali */
-static Queue_t * richieste;
-static config configurazione;
-static int nSocketUtenti = 0;
-static pthread_mutex_t nSocketUtenti_m = PTHREAD_MUTEX_INITIALIZER;
-static linked_list_t * utentiConnessi;
-static pthread_mutex_t hashLock[HASHSIZE / HASHGROUPSIZE];
-/*
-  utenti connessi a cosa serve?
-  ogni volta che un utente mi fa una CONNECT_OP lo devo aggiungere alla lista.
-  quando farà una richiesta in cui serve essere connessi, dovrò controllare se è presente
-  quando un altro utente invia un messaggio a un client devo verificare se è connesso, semmai glielo posso mandare.
-    In ogni caso devo aggiungere il messaggio nella history del ricevente
-  quando un utente registrato  si disconnette dovrò toglierlo dalla lista
-  QUINDI:
-      - lettura e scrittura in mutua esclusione
-      - serve una cond? NO
-  OSS: utentiConnessi non sarà mai più grande delle socket attive (MaxConnections)
-*/
-static icl_hash_t * utentiRegistrati;
+
 
 /* Funzione di hash */
-static inline unsigned int fnv_hash_function( void *key, int len ) {
+/*static inline */unsigned int fnv_hash_function( void *key, int len ) {
     unsigned char *p = (unsigned char*)key;
     unsigned int h = 2166136261u;
     int i;
@@ -76,12 +60,12 @@ static inline unsigned int fnv_hash_function( void *key, int len ) {
         h = ( h * 16777619 ) ^ p[i];
     return h;
 }
-static inline unsigned int ulong_hash_function( void *key ) {
+/*static inline */unsigned int ulong_hash_function( void *key ) {
     int len = strlen((char *)(key));
     unsigned int hashval = fnv_hash_function( key, len );
     return hashval;
 }
-static inline int ulong_key_compare( void *key1, void *key2  ) {
+/*static inline */int ulong_key_compare( void *key1, void *key2  ) {
     return !strcmp((char *) key1, (char *) key2);
 }
 
@@ -117,9 +101,10 @@ int main(int argc, char *argv[]) {
     /* Inizializzazione */
     initParseCheck(pathFileConf, &configurazione);//TODO controllare errori
     richieste = initQueue();
-    utentiRegistrati = icl_hash_create(HASHSIZE, ulong_hash_function, ulong_key_compare);
-    utentiConnessi = list_create();
+    ec_null_return(utentiRegistrati = icl_hash_create(HASHSIZE, ulong_hash_function, ulong_key_compare), "Errore creazione hash");
+    ec_null_return(utentiConnessi = list_create(), "Errore creazione lista");
     initHashLock();
+    
 
     /* Creazione pipe */
     int ** pfds = malloc(sizeof(int *) * configurazione.ThreadsInPool);
@@ -159,7 +144,7 @@ int main(int argc, char *argv[]) {
 void initHashLock(){
     int i=0;
     for(i=0; i<(HASHSIZE / HASHGROUPSIZE); i++){
-        pthread_mutex_init(&(hashLock[i]), NULL);
+        pthread_mutex_init(&(hash_m[i]), NULL);
     }
 }
 
@@ -169,7 +154,9 @@ static void * pool(void * arg){
     message_t msg;
     while(1){
         fd = (int *)pop(richieste);
+        printf("FD: %d è stata presa in carico dalla PIPE: %d\n", *fd, pipe);
         int r = readMsg(*fd, &msg);
+        printf("PIPE: %d riceve da FD: %d un messaggio con OP: %d\n", pipe, *fd, msg.hdr.op);
         if(r < 0){ //TODO controllare errori. Non necessita di lock fd dato che un utente può fare una richiesta alla volta che viene presa in gestione da un solo thread del pool
             free(fd);
             perror("Errore readMsg");
@@ -180,14 +167,14 @@ static void * pool(void * arg){
             nSocketUtenti --;
             pthread_mutex_unlock(&nSocketUtenti_m);
         }else{
-            /*switch(msg.hdr.op){
+            switch(msg.hdr.op){
                 case REGISTER_OP:
-                    register_op(msg, utentiRegistrati, hashLock, utentiConnessi); //TODO controllare errori
+                    register_op(*fd, msg); //TODO controllare errori
                     break;
                 case CONNECT_OP:
-                    connect_op(msg, utentiRegistrati, hashLock, utentiConnessi);
+                    connect_op(*fd, msg);
                     break;
-                case POSTTXT_OP:
+                /*case POSTTXT_OP:
                     posttxt_op(msg, utentiRegistrati, hashLock, utentiConnessi);
                     break;
                 case POSTTEXTALL_OP:
@@ -201,19 +188,19 @@ static void * pool(void * arg){
                     break;
                 case GETPREVMSGS_OP:
                     getprevmsgs_op(msg, utentiRegistrati, hashLock, utentiConnessi);
-                    break;
+                    break;*/
                 case USRLIST_OP:
-                    usrlist_op(msg, utentiRegistrati, hashLock, utentiConnessi);
+                    usrlist_op(*fd, msg);
                     break;
-                case UNREGISTER_OP:
+                /*case UNREGISTER_OP:
                     unregister_op(msg, utentiRegistrati, hashLock, utentiConnessi);
                     break;
                 case DISCONNECT_OP:
                     disconnect_op(msg, utentiRegistrati, hashLock, utentiConnessi);
-                    break;
-                default:
+                    break;*/
+                default: printf("Errore default\n");
                     //TODO gestione errore
-            }*/
+            }
             printf("RICEVUTA OP: %d\n", msg.hdr.op);
             if(writen(pipe, fd, sizeof(int)) == -1){
                 perror("Errore writen");
@@ -252,6 +239,7 @@ static void * listener(void * arg){
                 if (FD_ISSET(fd, &rdset)) {
                     if (fd == fd_skt) { /* sock connect pronto */
                         int fd_c = accept(fd_skt, NULL, 0);
+                        printf("CONNESSO CLIENT\n");
                         //TODO lockare nSocketUtenti prima di utilizzarla
                         pthread_mutex_lock(&nSocketUtenti_m);
                         if(nSocketUtenti >= configurazione.MaxConnections){
@@ -278,6 +266,7 @@ static void * listener(void * arg){
                             FD_SET(fd_c, &set);
                             if (fd_c > fd_num) fd_num = fd_c;
                         }else if(p == 0){ // un client mi sta mandando una richiesta
+                            printf("Un client sta mandando una richiesta\n");
                             int * toPush = malloc(sizeof(int));
                             *toPush = fd;
                             if(push(richieste, toPush) == -1){ // TODO gestione errore
@@ -318,4 +307,21 @@ int aggiorna(fd_set * set, int max){
         }
     }
     return r;
+}
+
+// legge file configurazione, eliminare l'eventuale socket vecchia e crea la socket del server
+int createSocket(){
+    if(remove(configurazione.UnixPath) == -1){
+        if(errno != ENOENT) {// Se errno == ENOENT vuol dire che non esiste un file con quel path
+            return -1;
+        }
+    }
+    int fd_skt;
+    struct sockaddr_un sa;
+    strncpy(sa.sun_path, configurazione.UnixPath, UNIX_PATH_MAX);
+    sa.sun_family = AF_UNIX;
+    ec_meno1_return(fd_skt = socket(AF_UNIX,SOCK_STREAM,0), "Errore socket");
+    ec_meno1_return(bind(fd_skt,(struct sockaddr *)&sa, sizeof(sa)), "Errore bind");
+    ec_meno1_return(listen(fd_skt, SOMAXCONN), "Errore listen");
+    return fd_skt;
 }
