@@ -41,6 +41,7 @@ int openConnection(char* path, unsigned int ntimes, unsigned int secs){
 
 int readHeader(long connfd, message_hdr_t *hdr){ //message_hdr_t ha op e sender
     int r = readn(connfd, hdr, sizeof(message_hdr_t));
+    printf("R: %d\n", r);
     if(r <= 0){
         return r;
     }
@@ -52,9 +53,9 @@ int readData(long fd, message_data_t *data){
     if(r <= 0){
         return r;
     }
-    data->buf = malloc(sizeof(char) * (data->hdr.len + 1));
+    data->buf = malloc(sizeof(char) * data->hdr.len);
     if(!data->buf) return -1;
-    r = readn(fd, data->buf, sizeof(char) * (data->hdr.len + 1));
+    r = readn(fd, data->buf, sizeof(char) * data->hdr.len);
     if(r <= 0){
         return r;
     }
@@ -78,7 +79,7 @@ int sendData(long fd, message_data_t *msg){
     if(r <= 0){
         return r;
     }
-    r = writen(fd, msg->buf, sizeof(char) * (msg->hdr.len + 1));
+    r = writen(fd, msg->buf, sizeof(char) * msg->hdr.len);
     if(r <= 0){
         return r;
     }
@@ -87,7 +88,8 @@ int sendData(long fd, message_data_t *msg){
 
 int sendRequest(long fd, message_t *msg){
     int r = sendHeader(fd, &(msg->hdr));
-    if(r <= 0) return r;
+    if(r <= 0) return -1;
     r = sendData(fd, &(msg->data));
+    if(r<=-1) return -1;
     return r;
 }

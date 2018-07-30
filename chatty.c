@@ -28,16 +28,27 @@
 #include <string.h>
 #include <pthread.h>
 #include <getopt.h>
+#include "./struttureCondivise.h"
 #include "./parser.h"
 #include "./lib/GestioneQueue/queue.h"
 #include "./lib/GestioneListe/linklist.h"
 #include "./lib/GestioneHashTable/icl_hash.h"
 #include "./lib/GestioneBoundedQueue/boundedqueue.h"
-#include "./struttureCondivise.h"
+
 #include "./utility.h"
 #include "./connections.h"
 #include "./config.h"
 #include "./gestioneRichieste.h"
+
+
+/* Variabili globali */
+Queue_t * richieste;
+config configurazione;
+int nSocketUtenti;// = 0;
+pthread_mutex_t nSocketUtenti_m;// = PTHREAD_MUTEX_INITIALIZER;
+linked_list_t * utentiConnessi;
+pthread_mutex_t hash_m[HASHSIZE / HASHGROUPSIZE];
+icl_hash_t * utentiRegistrati;
 
 
 /* Definizione funzioni */
@@ -52,7 +63,7 @@ void initHashLock();
 
 
 /* Funzione di hash */
-/*static inline */unsigned int fnv_hash_function( void *key, int len ) {
+static inline unsigned int fnv_hash_function( void *key, int len ) {
     unsigned char *p = (unsigned char*)key;
     unsigned int h = 2166136261u;
     int i;
@@ -60,12 +71,12 @@ void initHashLock();
         h = ( h * 16777619 ) ^ p[i];
     return h;
 }
-/*static inline */unsigned int ulong_hash_function( void *key ) {
+static inline unsigned int ulong_hash_function( void *key ) {
     int len = strlen((char *)(key));
     unsigned int hashval = fnv_hash_function( key, len );
     return hashval;
 }
-/*static inline */int ulong_key_compare( void *key1, void *key2  ) {
+static inline int ulong_key_compare( void *key1, void *key2  ) {
     return !strcmp((char *) key1, (char *) key2);
 }
 
@@ -101,10 +112,12 @@ int main(int argc, char *argv[]) {
     /* Inizializzazione */
     initParseCheck(pathFileConf, &configurazione);//TODO controllare errori
     richieste = initQueue();
-    ec_null_return(utentiRegistrati = icl_hash_create(HASHSIZE, ulong_hash_function, ulong_key_compare), "Errore creazione hash");
+    nSocketUtenti = 0;
+    pthread_mutex_init(&(nSocketUtenti_m), NULL);
+    ec_null_return(utentiRegistrati = icl_hash_create(HASHSIZE, NULL/*ulong_hash_function*/, ulong_key_compare), "Errore creazione hash");
     ec_null_return(utentiConnessi = list_create(), "Errore creazione lista");
     initHashLock();
-    
+
 
     /* Creazione pipe */
     int ** pfds = malloc(sizeof(int *) * configurazione.ThreadsInPool);
@@ -152,6 +165,7 @@ static void * pool(void * arg){
     int * fd;
     int pipe = *((int *)arg);
     message_t msg;
+    msg.hdr.op = 0;
     while(1){
         fd = (int *)pop(richieste);
         printf("FD: %d è stata presa in carico dalla PIPE: %d\n", *fd, pipe);
@@ -202,6 +216,7 @@ static void * pool(void * arg){
                     //TODO gestione errore
             }
             printf("RICEVUTA OP: %d\n", msg.hdr.op);
+
             if(writen(pipe, fd, sizeof(int)) == -1){
                 perror("Errore writen");
                 exit(-1);//TODO controlla errori
@@ -246,7 +261,7 @@ static void * listener(void * arg){
                             pthread_mutex_unlock(&nSocketUtenti_m);
                             message_t m;
                             setHeader(&(m.hdr), OP_FAIL, "");
-                            setData(&(m.data), "", "Troppi utenti collegati", 23);
+                            setData(&(m.data), "", "Troppi utenti collegati", 24);
                             sendRequest(fd_c, &m);
                             close(fd_c);
                         } else {

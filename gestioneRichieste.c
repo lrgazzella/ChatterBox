@@ -6,22 +6,26 @@
 
 /* per tutte le funzioni: 0 successo, -1 errore */
 
-int register_op(long fd, message_t m){ // TODO devo limitare la size del nickname?
+int register_op(long fd, message_t m){
     /*
         controllo se esiste un utente con quel nickname
         se non esiste creo un nuovo utente (struct e quindi devo allocare un array circolare)
         Invio la lista degli utenti
     */
-    // Devo lockare la hashtable
-    int hash_val = (*(utentiRegistrati->hash_function))(m.hdr.sender) % utentiRegistrati->nbuckets;
+
+    void * nickname = malloc(sizeof(char) * (MAX_NAME_LENGTH + 1));
+    strcpy((char *) nickname, m.hdr.sender);
+    unsigned int (*hash)(void*) = (* utentiRegistrati->hash_function);
+    int hash_val = hash(nickname) % utentiRegistrati->nbuckets; //(utentiRegistrati->hash_function(nickname)) % utentiRegistrati->nbuckets;
+
     int indiceLock = hash_val % (HASHSIZE/HASHGROUPSIZE);
+
     message_hdr_t r;
-    printf("Hash calcolato\n");
     pthread_mutex_lock(&hash_m[indiceLock]);
-    if(icl_hash_find(utentiRegistrati, (void *)m.hdr.sender) == NULL){
+    if(icl_hash_find(utentiRegistrati, (void *)nickname) == NULL){
         // Non esiste un utente con quel nickname, allora lo creo
         BQueue_t * history = initBQueue(configurazione.MaxHistMsgs);
-        if(icl_hash_insert(utentiRegistrati, (void *)m.hdr.sender, (void *)history) == NULL){
+        if(icl_hash_insert(utentiRegistrati, (void *)nickname, (void *)history) == NULL){
             pthread_mutex_unlock(&hash_m[indiceLock]);
             setHeader(&r, OP_FAIL, "");
             sendHeader(fd, &r);
@@ -39,18 +43,15 @@ int register_op(long fd, message_t m){ // TODO devo limitare la size del nicknam
 }
 
 int connect_op(long fd, message_t m){
-    printf("Config: %d\n", configurazione.MaxConnections);
-    void * nickname = (void *)&(m.hdr.sender);
-    printf("NBUCKETS: %d\n", utentiRegistrati->nbuckets);
-    //unsigned int (*hash)(void*) = (* utentiRegistrati->hash_function);
+    void * nickname = (void *)(m.hdr.sender);
+    unsigned int (*hash)(void*) = (* utentiRegistrati->hash_function);
 
-    printf("NICKNAME: %s\n", (char *)nickname);
-    int hash_val = 10; //hash(nickname); //(utentiRegistrati->hash_function(nickname)) % utentiRegistrati->nbuckets;
+    int hash_val = hash(nickname) % utentiRegistrati->nbuckets; //(utentiRegistrati->hash_function(nickname)) % utentiRegistrati->nbuckets;
     int indiceLock = hash_val % (HASHSIZE/HASHGROUPSIZE);
 
     message_hdr_t r;
     pthread_mutex_lock(&hash_m[indiceLock]);
-    if(icl_hash_find(utentiRegistrati, (void *)m.hdr.sender) == NULL){
+    if(icl_hash_find(utentiRegistrati, (void *)nickname) == NULL){
         // Non esiste, restituisco un messaggio di errore OP_NICK_UNKNOWN
         pthread_mutex_unlock(&hash_m[indiceLock]);
         setHeader(&r, OP_NICK_UNKNOWN, "");
@@ -61,11 +62,20 @@ int connect_op(long fd, message_t m){
            Altrimenti se client1 facesse una richiesta UNREGISTER_OP per clientCorrente,
            il client1 non vedrebbe che clientCorrente è dentro la lista degli utenti connessi, quindi non lo eliminerebbe
            e resterebbe per sempre nella lista*/
-        utente_connesso_s nuovoUtente;
-        strncpy(nuovoUtente.nickname, m.hdr.sender, MAX_NAME_LENGTH); //TODO MAX_NAME_LENGTH o MAX_NAME_LENGTH+1?
-        nuovoUtente.fd = fd;
-        pthread_mutex_init(&(nuovoUtente.fd_m), NULL); //TODO controllare che l'utente non sia già connesso
-        if(list_push_value(utentiConnessi, (void *)(&nuovoUtente)) == -1){
+        if(list_foreach_value(utentiConnessi, find, nickname) < list_count(utentiConnessi)){
+            //Trovato
+            pthread_mutex_unlock(&hash_m[indiceLock]);
+            setHeader(&r, OP_FAIL, "");
+            sendHeader(fd, &r);
+            return -1;
+        }
+
+        utente_connesso_s * nuovoUtente = malloc(sizeof(utente_connesso_s));
+
+        strncpy(nuovoUtente->nickname, nickname, MAX_NAME_LENGTH + 1);
+        nuovoUtente->fd = fd;
+        pthread_mutex_init(&(nuovoUtente->fd_m), NULL);
+        if(list_push_value(utentiConnessi, (void *)nuovoUtente) == -1){
             setHeader(&r, OP_FAIL, "");
             sendHeader(fd, &r);
             pthread_mutex_unlock(&hash_m[indiceLock]);
@@ -81,7 +91,7 @@ int connect_op(long fd, message_t m){
 int usrlist_op(long fd, message_t m){
     message_t r;
     setHeader(&(r.hdr), OP_OK, "");
-    setData(&(r.data), "", "GianniMarioLuigi", 16);
+    setData(&(r.data), "", "GianniMarioLuigi", 17);
     sendRequest(fd, &r);
     return 0;
     /*toFind_s * f;

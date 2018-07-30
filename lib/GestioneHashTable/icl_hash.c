@@ -5,7 +5,7 @@
  *
  * This simple hash table implementation should be easy to drop into
  * any other peice of code, it does not depend on anything else :-)
- * 
+ *
  * @author Jakub Kurzak
  */
 /* $Id: icl_hash.c 2838 2011-11-22 04:25:02Z mfaverge $ */
@@ -53,7 +53,7 @@ hash_pjw(void* key)
     return (hash_value);
 }
 
-static int string_compare(void* a, void* b) 
+static int string_compare(void* a, void* b)
 {
     return (strcmp( (char*)a, (char*)b ) == 0);
 }
@@ -111,11 +111,10 @@ icl_hash_find(icl_hash_t *ht, void* key)
     if(!ht || !key) return NULL;
 
     hash_val = (* ht->hash_function)(key) % ht->nbuckets;
-
-    for (curr=ht->buckets[hash_val]; curr != NULL; curr=curr->next)
+    for (curr=ht->buckets[hash_val]; curr != NULL; curr=curr->next){
         if ( ht->hash_key_compare(curr->key, key))
             return(curr->data);
-
+    }
     return NULL;
 }
 
@@ -138,7 +137,7 @@ icl_hash_insert(icl_hash_t *ht, void* key, void *data)
     if(!ht || !key) return NULL;
 
     hash_val = (* ht->hash_function)(key) % ht->nbuckets;
-
+    printf("Hash val insert: %d\n", hash_val);
     for (curr=ht->buckets[hash_val]; curr != NULL; curr=curr->next)
         if ( ht->hash_key_compare(curr->key, key))
             return(NULL); /* key already exists */
@@ -257,5 +256,3 @@ icl_hash_dump(FILE* stream, icl_hash_t* ht)
 
     return 0;
 }
-
-

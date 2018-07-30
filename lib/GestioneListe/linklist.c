@@ -1226,10 +1226,11 @@ slice_foreach_value(slice_t *slice, int (*item_handler)(void *item, size_t idx, 
     size_t idx = 0;
     list_entry_t *e = pick_entry(list, slice->offset);
     while(e && idx < slice->length) {
-        int rc = item_handler(e->value, idx++, user);
+        int rc = item_handler(e->value, idx, user);
         if (rc == 0) {
             break;
         } else if (rc == -1 || rc == -2) {
+            idx++;
             list_entry_t *d = e;
             e = e->next;
             if (list->head == list->tail && list->tail == d) {

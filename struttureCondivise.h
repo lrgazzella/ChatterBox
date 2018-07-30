@@ -9,7 +9,7 @@
 #include "./config.h"
 #include "./parser.h"
 
-#define THREAD_SAFE 1 // Serve per la libreeria delle liste
+#define THREAD_SAFE 1 // Serve per la libreria delle liste
 
 typedef struct utente_connesso{
     char nickname[MAX_NAME_LENGTH];
@@ -17,18 +17,14 @@ typedef struct utente_connesso{
     pthread_mutex_t fd_m;
 } utente_connesso_s;
 
-typedef struct toFind{
-    char nickname[MAX_NAME_LENGTH];
-    int trovato;
-} toFind_s;
 
 /* Variabili globali */
-static Queue_t * richieste;
-static config configurazione;
-static int nSocketUtenti = 0;
-static pthread_mutex_t nSocketUtenti_m = PTHREAD_MUTEX_INITIALIZER;
-static linked_list_t * utentiConnessi;
-static pthread_mutex_t hash_m[HASHSIZE / HASHGROUPSIZE];
+extern Queue_t * richieste;
+extern config configurazione;
+extern int nSocketUtenti;// = 0;
+extern pthread_mutex_t nSocketUtenti_m;// = PTHREAD_MUTEX_INITIALIZER;
+extern linked_list_t * utentiConnessi;
+extern pthread_mutex_t hash_m[HASHSIZE / HASHGROUPSIZE];
 /*
   utenti connessi a cosa serve?
   ogni volta che un utente mi fa una CONNECT_OP lo devo aggiungere alla lista.
@@ -41,14 +37,14 @@ static pthread_mutex_t hash_m[HASHSIZE / HASHGROUPSIZE];
       - serve una cond? NO
   OSS: utentiConnessi non sarà mai più grande delle socket attive (MaxConnections)
 */
-static icl_hash_t * utentiRegistrati;
+extern icl_hash_t * utentiRegistrati;
 
 static int find(void *item, size_t idx, void *user) {
-    utente_connesso_s * u = (utente_connesso_s *)item;
-    toFind_s * f = (toFind_s *)user;
-    if(strcmp(u->nickname, f->nickname) == 0) {
-        f->trovato = 1;
+    utente_connesso_s * u1 = (utente_connesso_s *)item;
+    char * str = (char *)user;
+    if(strcmp(u1->nickname, str) == 0) {
         return 0;
     } else return 1;
 }
+
 #endif
