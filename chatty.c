@@ -63,20 +63,7 @@ void initHashLock();
 
 
 /* Funzione di hash */
-static inline unsigned int fnv_hash_function( void *key, int len ) {
-    unsigned char *p = (unsigned char*)key;
-    unsigned int h = 2166136261u;
-    int i;
-    for ( i = 0; i < len; i++ )
-        h = ( h * 16777619 ) ^ p[i];
-    return h;
-}
-static inline unsigned int ulong_hash_function( void *key ) {
-    int len = strlen((char *)(key));
-    unsigned int hashval = fnv_hash_function( key, len );
-    return hashval;
-}
-static inline int ulong_key_compare( void *key1, void *key2  ) {
+static inline int compareString( void *key1, void *key2  ) {
     return !strcmp((char *) key1, (char *) key2);
 }
 
@@ -114,7 +101,7 @@ int main(int argc, char *argv[]) {
     richieste = initQueue();
     nSocketUtenti = 0;
     pthread_mutex_init(&(nSocketUtenti_m), NULL);
-    ec_null_return(utentiRegistrati = icl_hash_create(HASHSIZE, NULL/*ulong_hash_function*/, ulong_key_compare), "Errore creazione hash");
+    ec_null_return(utentiRegistrati = icl_hash_create(HASHSIZE, NULL, compareString), "Errore creazione hash");
     ec_null_return(utentiConnessi = list_create(), "Errore creazione lista");
     initHashLock();
 
