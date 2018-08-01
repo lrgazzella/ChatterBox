@@ -30,6 +30,7 @@ typedef struct hash{
     pthread_mutex_t hash_m[HASHSIZE / HASHGROUPSIZE];
 } hash_s;
 
+
 /* Variabili globali */
 extern Queue_t * richieste;
 extern config configurazione;

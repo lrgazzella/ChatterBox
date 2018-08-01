@@ -20,8 +20,8 @@ int main(int argc, char** argv) {
 
     message_t m1, m2;
     m2.hdr.op = -1;
-    setHeader(&(m1.hdr), REGISTER_OP, "lorenzogazzellalorenzogazzellaaa"); // 32 caratteri: "provaprovaprovaprovaprovaprovaaa", ""
-    setData(&(m1.data), "", str, 4);
+    setHeader(&(m1.hdr), REGISTER_OP, "Lorenzo"); 
+    setData(&(m1.data), "", NULL, 0);
     sendRequest(fd, &m1);
     readMsg(fd, &m2);
     printf("Il server ha risposto con codice: %d\n", m2.hdr.op);

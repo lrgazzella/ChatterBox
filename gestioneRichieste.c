@@ -3,6 +3,7 @@
 #include "./message.h"
 #include "./connections.h"
 #include "./struttureCondivise.h"
+#include "./lib/GestioneHistory/history.h"
 
 void concat(char * str1, char * str2, int first);
 char * makeListUsr();
@@ -13,22 +14,7 @@ int getIndexLockHash(char * key){
     return hash_val % (HASHSIZE/HASHGROUPSIZE);
 }
 
-void freeElemBQueue(void * elem){
-    message_t * m = (message_t *)elem;
-    free(m->data.buf);
-    free(m);
-    /* Posso fare la free dell'intero messaggio dato che, in caso di POSTTEXTALL_OP,
-       io farei tante copie del messaggio e le aggiungerei ad ogni client.
-       Altrimenti se facessi un'unica copia del messaggio, dovrei vedere, prima di fare la free, se
-       ci sono altre history di altri utenti che hanno il riferimento attivo*/
-}
-void freeBQueue(void * queue){
-    BQueue_t * h = (BQueue_t *)queue;
-    deleteBQueue(queue, freeElemBQueue);
-}
-
 int register_op(long fd, message_t m){
-    printf("INIZIATA REGISTER\n");
     void * nickname = malloc(sizeof(char) * (MAX_NAME_LENGTH + 1));
     strcpy((char *) nickname, m.hdr.sender);
 
@@ -37,10 +23,11 @@ int register_op(long fd, message_t m){
     message_hdr_t r;
     pthread_mutex_lock(&(utentiRegistrati->hash_m[indiceLock]));
     if(icl_hash_find(utentiRegistrati->hash, (void *)nickname) == NULL){ // Non esiste un utente con quel nickname, allora lo creo
-        BQueue_t * history = initBQueue(configurazione.MaxHistMsgs);
-        if(icl_hash_insert(utentiRegistrati->hash, (void *)nickname, (void *)history) == NULL){ // Inserimento non andato a buon fine, allora rimuovo la coda che avevo creato per il nuovo utente
+        history_s * hist = initHistory();
+
+        if(icl_hash_insert(utentiRegistrati->hash, (void *)nickname, (void *)hist) == NULL){ // Inserimento non andato a buon fine, allora rimuovo la coda che avevo creato per il nuovo utente
             pthread_mutex_unlock(&(utentiRegistrati->hash_m[indiceLock]));
-            deleteBQueue(history, freeElemBQueue);
+            deleteHistory(hist);
             free(nickname);
             setHeader(&r, OP_FAIL, "");
             sendHeader(fd, &r);
@@ -50,7 +37,7 @@ int register_op(long fd, message_t m){
             if(connect_op(fd, m) == -1){ // La connect non è andata a buon fine, allora devo annullare la registrazione
                 pthread_mutex_lock(&(utentiRegistrati->hash_m[indiceLock])); // TODO controllare se nickname è ancora dentro la hash
                 if(icl_hash_find(utentiRegistrati->hash, (void *)nickname) != NULL){
-                    icl_hash_delete(utentiRegistrati->hash, nickname, free, freeBQueue); // Mi libera direttamente anche l'array circolare
+                    icl_hash_delete(utentiRegistrati->hash, nickname, free, deleteHistory); // Mi libera direttamente anche la history
                     free(nickname); // Se non è più nella hash table, vuol dire che un altro thread del pool lo ha eliminato e quindi ha pure liberato il nickname
                 }
                 pthread_mutex_unlock(&(utentiRegistrati->hash_m[indiceLock]));
@@ -153,6 +140,8 @@ int usrlist_op(long fd, message_t m){
         return -1;
     }
 }
+
+
 
 char * makeListUsr(){
     list_iterator_t *it = list_iterator_new(utentiConnessi->list, LIST_HEAD);
