@@ -31,7 +31,7 @@
 #include "./struttureCondivise.h"
 #include "./parser.h"
 #include "./lib/GestioneQueue/queue.h"
-#include "./lib/GestioneListe/linklist.h"
+#include "./lib/GestioneListe/list.h"
 #include "./lib/GestioneHashTable/icl_hash.h"
 #include "./lib/GestioneBoundedQueue/boundedqueue.h"
 
@@ -44,11 +44,9 @@
 /* Variabili globali */
 Queue_t * richieste;
 config configurazione;
-int nSocketUtenti;// = 0;
-pthread_mutex_t nSocketUtenti_m;// = PTHREAD_MUTEX_INITIALIZER;
-linked_list_t * utentiConnessi;
-pthread_mutex_t hash_m[HASHSIZE / HASHGROUPSIZE];
-icl_hash_t * utentiRegistrati;
+hash_s * utentiRegistrati;
+list_s * utentiConnessi;
+connessi_s * nSock;
 
 
 /* Definizione funzioni */
@@ -59,6 +57,8 @@ static void * listener(void * arg);
 static void * pool(void * arg);
 static void * segnali(void * arg);
 void initHashLock();
+int cmpElemList(void * a, void * b); // da settare quando si crea una nuova lista
+void freeElemList(void * a); // da settare quando si crea una nuova lista
 
 
 
@@ -99,12 +99,17 @@ int main(int argc, char *argv[]) {
     /* Inizializzazione */
     initParseCheck(pathFileConf, &configurazione);//TODO controllare errori
     richieste = initQueue();
-    nSocketUtenti = 0;
-    pthread_mutex_init(&(nSocketUtenti_m), NULL);
-    ec_null_return(utentiRegistrati = icl_hash_create(HASHSIZE, NULL, compareString), "Errore creazione hash");
-    ec_null_return(utentiConnessi = list_create(), "Errore creazione lista");
+    nSock = malloc(sizeof(connessi_s));
+    nSock->contatore = 0;
+    pthread_mutex_init(&(nSock->contatore_m), NULL);
+    utentiRegistrati = malloc(sizeof(hash_s));
+    ec_null_return(utentiRegistrati->hash = icl_hash_create(HASHSIZE, NULL, compareString), "Errore creazione hash");
+    utentiConnessi = malloc(sizeof(list_s));
+    ec_null_return(utentiConnessi->list = list_new(), "Errore creazione lista");
+    pthread_mutex_init(&(utentiConnessi->list_m), NULL);
+    utentiConnessi->list->free = freeElemList;
+    utentiConnessi->list->match = cmpElemList;
     initHashLock();
-
 
     /* Creazione pipe */
     int ** pfds = malloc(sizeof(int *) * configurazione.ThreadsInPool);
@@ -139,12 +144,21 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-
+int cmpElemList(void * a, void * b){
+    // a è una stringa (nickname)
+    // b è un utente_connesso_s
+    return !strcmp((char *)a, ((utente_connesso_s *)b)->nickname);
+}
+void freeElemList(void * a){
+    utente_connesso_s * aa = (utente_connesso_s *)a;
+    pthread_mutex_destroy(&(aa->fd_m));
+    free(aa);
+}
 
 void initHashLock(){
     int i=0;
     for(i=0; i<(HASHSIZE / HASHGROUPSIZE); i++){
-        pthread_mutex_init(&(hash_m[i]), NULL);
+        pthread_mutex_init(&(utentiRegistrati->hash_m[i]), NULL);
     }
 }
 
@@ -155,19 +169,19 @@ static void * pool(void * arg){
     msg.hdr.op = 0;
     while(1){
         fd = (int *)pop(richieste);
-        printf("FD: %d è stata presa in carico dalla PIPE: %d\n", *fd, pipe);
         int r = readMsg(*fd, &msg);
-        printf("PIPE: %d riceve da FD: %d un messaggio con OP: %d\n", pipe, *fd, msg.hdr.op);
+        printf("Sbloccato pool. R: %d\n", r);
         if(r < 0){ //TODO controllare errori. Non necessita di lock fd dato che un utente può fare una richiesta alla volta che viene presa in gestione da un solo thread del pool
             free(fd);
             perror("Errore readMsg");
             exit(-1);
         }else if(r == 0){// vuol dire che il client ha finito di comunicare, allora devo chiudere la connessione e decrementare nSocketUtenti
             close(*fd); //TODO controllare errore
-            pthread_mutex_lock(&nSocketUtenti_m);
-            nSocketUtenti --;
-            pthread_mutex_unlock(&nSocketUtenti_m);
+            pthread_mutex_lock(&(nSock->contatore_m));
+            nSock->contatore --;
+            pthread_mutex_unlock(&(nSock->contatore_m));
         }else{
+            printf("Ricevuta op: %d da: %s\n", msg.hdr.op, msg.hdr.sender);
             switch(msg.hdr.op){
                 case REGISTER_OP:
                     register_op(*fd, msg); //TODO controllare errori
@@ -202,7 +216,6 @@ static void * pool(void * arg){
                 default: printf("Errore default\n");
                     //TODO gestione errore
             }
-            printf("RICEVUTA OP: %d\n", msg.hdr.op);
 
             if(writen(pipe, fd, sizeof(int)) == -1){
                 perror("Errore writen");
@@ -241,19 +254,17 @@ static void * listener(void * arg){
                 if (FD_ISSET(fd, &rdset)) {
                     if (fd == fd_skt) { /* sock connect pronto */
                         int fd_c = accept(fd_skt, NULL, 0);
-                        printf("CONNESSO CLIENT\n");
-                        //TODO lockare nSocketUtenti prima di utilizzarla
-                        pthread_mutex_lock(&nSocketUtenti_m);
-                        if(nSocketUtenti >= configurazione.MaxConnections){
-                            pthread_mutex_unlock(&nSocketUtenti_m);
+                        pthread_mutex_lock(&(nSock->contatore_m));
+                        if(nSock->contatore >= configurazione.MaxConnections){
+                            pthread_mutex_unlock(&(nSock->contatore_m));
                             message_t m;
                             setHeader(&(m.hdr), OP_FAIL, "");
                             setData(&(m.data), "", "Troppi utenti collegati", 24);
                             sendRequest(fd_c, &m);
                             close(fd_c);
                         } else {
-                            nSocketUtenti ++;
-                            pthread_mutex_unlock(&nSocketUtenti_m);
+                            nSock->contatore ++;
+                            pthread_mutex_unlock(&(nSock->contatore_m));
                             FD_SET(fd_c, &set);
                             if (fd_c > fd_num) fd_num = fd_c;
                         }
@@ -268,7 +279,6 @@ static void * listener(void * arg){
                             FD_SET(fd_c, &set);
                             if (fd_c > fd_num) fd_num = fd_c;
                         }else if(p == 0){ // un client mi sta mandando una richiesta
-                            printf("Un client sta mandando una richiesta\n");
                             int * toPush = malloc(sizeof(int));
                             *toPush = fd;
                             if(push(richieste, toPush) == -1){ // TODO gestione errore

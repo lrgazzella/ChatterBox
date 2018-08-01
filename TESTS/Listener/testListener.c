@@ -14,22 +14,27 @@ int main(int argc, char** argv) {
 
     int fd;
     ec_meno1(fd = openConnection(SOCKNAME1, 10, 1), "Errore openConnection");
-    printf("Client connesso\n");
-    message_t m1;
-    m1.hdr.op = REGISTER_OP;
-    strcpy(m1.hdr.sender, "Gianni");
+
     char * str = malloc(sizeof(char) * 5);
     strcpy(str, "ciao");
-    m1.data.hdr.len = 5;
-    m1.data.buf = str;
-    ec_meno1(sendRequest(fd, &m1), "Errore sendRequest");
-    ec_meno1(readMsg(fd, &m1), "Errore readMsg");
-    printf("Il server risponde con OP: %d -> %s\n", m1.hdr.op, m1.data.buf);
-    m1.hdr.op = CONNECT_OP;
-    strcpy(m1.hdr.sender, "Gianni");
-    ec_meno1(sendRequest(fd, &m1), "Errore sendRequest");
-    ec_meno1(readHeader(fd, &(m1.hdr)), "Errore readHeader");
-    printf("Il server risponde con OP: %d\n", m1.hdr.op);
-    free(str);
+
+    message_t m1, m2;
+    m2.hdr.op = -1;
+    setHeader(&(m1.hdr), REGISTER_OP, "lorenzogazzellalorenzogazzellaaa"); // 32 caratteri: "provaprovaprovaprovaprovaprovaaa", ""
+    setData(&(m1.data), "", str, 4);
+    sendRequest(fd, &m1);
+    readMsg(fd, &m2);
+    printf("Il server ha risposto con codice: %d\n", m2.hdr.op);
+    int nusers = m2.data.hdr.len / (MAX_NAME_LENGTH+1);
+    assert(nusers > 0);
+    printf("Lista utenti online:\n");
+    for(int i=0,p=0;i<nusers; ++i, p+=(MAX_NAME_LENGTH+1)) {
+        printf(" %s\n", &m2.data.buf[p]);
+    }
+
+    printf("STRINGA: |");
+    for(int i=0; i<m2.data.hdr.len; i++)
+        printf("%c ", m2.data.buf[i]);
+    printf("|\n");
     close(fd);
 }

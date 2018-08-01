@@ -3,28 +3,41 @@
 
 #include <pthread.h>
 #include "./lib/GestioneQueue/queue.h"
-#include "./lib/GestioneListe/linklist.h"
+#include "./lib/GestioneListe/list.h"
 #include "./lib/GestioneHashTable/icl_hash.h"
 #include "./lib/GestioneBoundedQueue/boundedqueue.h"
 #include "./config.h"
 #include "./parser.h"
 
-#define THREAD_SAFE 1 // Serve per la libreria delle liste
-
 typedef struct utente_connesso{
-    char nickname[MAX_NAME_LENGTH];
+    char nickname[MAX_NAME_LENGTH + 1];
     long fd;
     pthread_mutex_t fd_m;
 } utente_connesso_s;
 
+typedef struct list_struct{
+    list_t * list;
+    pthread_mutex_t list_m;
+} list_s;
+
+typedef struct connessi{
+    int contatore;
+    pthread_mutex_t contatore_m;
+} connessi_s;
+
+typedef struct hash{
+    icl_hash_t * hash;
+    pthread_mutex_t hash_m[HASHSIZE / HASHGROUPSIZE];
+} hash_s;
 
 /* Variabili globali */
 extern Queue_t * richieste;
 extern config configurazione;
-extern int nSocketUtenti;// = 0;
-extern pthread_mutex_t nSocketUtenti_m;// = PTHREAD_MUTEX_INITIALIZER;
-extern linked_list_t * utentiConnessi;
-extern pthread_mutex_t hash_m[HASHSIZE / HASHGROUPSIZE];
+extern hash_s * utentiRegistrati;
+extern list_s * utentiConnessi;
+extern connessi_s * nSock;
+
+
 /*
   utenti connessi a cosa serve?
   ogni volta che un utente mi fa una CONNECT_OP lo devo aggiungere alla lista.
@@ -37,14 +50,6 @@ extern pthread_mutex_t hash_m[HASHSIZE / HASHGROUPSIZE];
       - serve una cond? NO
   OSS: utentiConnessi non sarà mai più grande delle socket attive (MaxConnections)
 */
-extern icl_hash_t * utentiRegistrati;
 
-static int find(void *item, size_t idx, void *user) {
-    utente_connesso_s * u1 = (utente_connesso_s *)item;
-    char * str = (char *)user;
-    if(strcmp(u1->nickname, str) == 0) {
-        return 0;
-    } else return 1;
-}
 
 #endif

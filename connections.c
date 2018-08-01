@@ -41,7 +41,7 @@ int openConnection(char* path, unsigned int ntimes, unsigned int secs){
 
 int readHeader(long connfd, message_hdr_t *hdr){ //message_hdr_t ha op e sender
     int r = readn(connfd, hdr, sizeof(message_hdr_t));
-    printf("R: %d\n", r);
+    //printf("R: %d\n", r);
     if(r <= 0){
         return r;
     }
