@@ -17,7 +17,8 @@ int add(history_s * h, message_t * m) {
     if(h->list[h->pos] != NULL)
         freeMsg(h->list[h->pos]);
     h->list[h->pos] = m;
-    h->pos ++;
+    if(h->pos + 1 == configurazione.MaxHistMsgs) h->pos = 0;
+    else h->pos ++; 
 }
 
 void freeMsg(message_t *elem){

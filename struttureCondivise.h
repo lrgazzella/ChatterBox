@@ -9,6 +9,8 @@
 #include "./config.h"
 #include "./parser.h"
 
+
+
 typedef struct utente_connesso{
     char nickname[MAX_NAME_LENGTH + 1];
     long fd;
@@ -37,6 +39,29 @@ extern config configurazione;
 extern hash_s * utentiRegistrati;
 extern list_s * utentiConnessi;
 extern connessi_s * nSock;
+
+static int getIndexLockHash(char * key){
+    int hash_val = (* utentiRegistrati->hash->hash_function)(key) % utentiRegistrati->hash->nbuckets;
+    return hash_val % (HASHSIZE/HASHGROUPSIZE);
+}
+
+static void LOCKHash (char * nick){
+    int indiceLock = getIndexLockHash(nick);
+    pthread_mutex_lock(&(utentiRegistrati->hash_m[indiceLock]));
+}
+
+static void UNLOCKHash (char * nick){
+    int indiceLock = getIndexLockHash(nick);
+    pthread_mutex_unlock(&(utentiRegistrati->hash_m[indiceLock]));
+}
+
+static void LOCKList (){
+    pthread_mutex_lock(&(utentiConnessi->list_m));
+}
+
+static void UNLOCKList (){
+    pthread_mutex_unlock(&(utentiConnessi->list_m));
+}
 
 
 /*

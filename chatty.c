@@ -59,7 +59,7 @@ static void * segnali(void * arg);
 void initHashLock();
 int cmpElemList(void * a, void * b); // da settare quando si crea una nuova lista
 void freeElemList(void * a); // da settare quando si crea una nuova lista
-
+void printRisOP(message_t m, int ok);
 
 
 /* Funzione di hash */
@@ -165,12 +165,11 @@ void initHashLock(){
 static void * pool(void * arg){
     int * fd;
     int pipe = *((int *)arg);
+    int ris, r;
     message_t msg;
-    msg.hdr.op = 0;
     while(1){
         fd = (int *)pop(richieste);
-        int r = readMsg(*fd, &msg);
-        printf("Sbloccato pool. R: %d\n", r);
+        r = readMsg(*fd, &msg);
         if(r < 0){ //TODO controllare errori. Non necessita di lock fd dato che un utente può fare una richiesta alla volta che viene presa in gestione da un solo thread del pool
             free(fd);
             perror("Errore readMsg");
@@ -184,10 +183,18 @@ static void * pool(void * arg){
             printf("Ricevuta op: %d da: %s\n", msg.hdr.op, msg.hdr.sender);
             switch(msg.hdr.op){
                 case REGISTER_OP:
-                    register_op(*fd, msg); //TODO controllare errori
+                    LOCKHash(msg.hdr.sender);
+                    ris = register_op(*fd, msg); //TODO controllare errori
+                    UNLOCKHash(msg.hdr.sender);
+                    printRisOP(msg, ris);
                     break;
                 case CONNECT_OP:
-                    connect_op(*fd, msg);
+                    LOCKHash(msg.hdr.sender);
+                    LOCKList();
+                    ris = connect_op(*fd, msg);
+                    UNLOCKList();
+                    UNLOCKHash(msg.hdr.sender);
+                    printRisOP(msg, ris);
                     break;
                 /*case POSTTXT_OP:
                     posttxt_op(msg, utentiRegistrati, hashLock, utentiConnessi);
@@ -205,7 +212,10 @@ static void * pool(void * arg){
                     getprevmsgs_op(msg, utentiRegistrati, hashLock, utentiConnessi);
                     break;*/
                 case USRLIST_OP:
-                    usrlist_op(*fd, msg);
+                    LOCKList();
+                    ris = usrlist_op(*fd, msg);
+                    UNLOCKList();
+                    printRisOP(msg, ris);
                     break;
                 /*case UNREGISTER_OP:
                     unregister_op(msg, utentiRegistrati, hashLock, utentiConnessi);
@@ -216,13 +226,30 @@ static void * pool(void * arg){
                 default: printf("Errore default\n");
                     //TODO gestione errore
             }
-
             if(writen(pipe, fd, sizeof(int)) == -1){
                 perror("Errore writen");
                 exit(-1);//TODO controlla errori
             }
         }
+        free(msg.data.buf);
         free(fd);
+    }
+}
+
+void printRisOP(message_t m, int ok){
+    switch(m.hdr.op){
+        case REGISTER_OP:
+            if(ok == 0) printf("REGISTRAZIONE COMPLETATA: %s\n", m.hdr.sender);
+            else printf("ERRORE. REGISTRAZIONE ANNULLATA\n");
+            break;
+        case CONNECT_OP:
+            if(ok == 0) printf("UTENTE CONNESSO: %s\n", m.hdr.sender);
+            else printf("ERRORE. CONNESSIONE ANNULLATA");
+            break;
+        case USRLIST_OP:
+            if(ok == 0) printf("LISTA UTENTI ONLINE SPEDITA\n");
+            else printf("ERRORE. SPEDIZIONE ANNULLATA\n");
+            break;
     }
 }
 
@@ -306,8 +333,9 @@ static void * segnali(void * arg){}
 *           0 altrimenti
 */
 int isPipe(int fd){
+    if(fd < 0) return -1;
     struct stat file;
-    ec_meno1_return(fstat(fd, &file), "Errore stat file");
+    if(fstat(fd, &file) == -1 ) return -1;
     return S_ISFIFO(file.st_mode);
 }
 
@@ -332,7 +360,7 @@ int createSocket(){
     struct sockaddr_un sa;
     strncpy(sa.sun_path, configurazione.UnixPath, UNIX_PATH_MAX);
     sa.sun_family = AF_UNIX;
-    ec_meno1_return(fd_skt = socket(AF_UNIX,SOCK_STREAM,0), "Errore socket");
+    if((fd_skt = socket(AF_UNIX,SOCK_STREAM,0)) == -1) return -1;
     ec_meno1_return(bind(fd_skt,(struct sockaddr *)&sa, sizeof(sa)), "Errore bind");
     ec_meno1_return(listen(fd_skt, SOMAXCONN), "Errore listen");
     return fd_skt;
