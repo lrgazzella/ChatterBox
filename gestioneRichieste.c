@@ -112,19 +112,23 @@ int unregister_op(long fd, message_t m){ // va chiamata con la lock sulla tabell
     void * daEliminare = (void *)(m.data.hdr.receiver);
     message_t r;
 
-    if(!registrato((char *)nickname)){ // Utente non registrato -> errore OP_NICK_UNKNOWN. Oss: devo controllare se è registrato perchè se il client scrive un comando tipo "./client -l nomesocket -C Lorenzo -c Lorenzo -k Lorenzo", il parser non lo blocca perchè ci sono tutti gli elmenti ma poichè li manda in modo sequenziale, arriva prima la richiesta di deregistrazione di un client non ancora registrato
-        setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
+    if(getUtenteNickname((char *)nickname) == NULL){ // Utente non connesso e quindi non registrato -> errore OP_FAIL. Oss: devo controllare se è registrato perchè se il client scrive un comando tipo "./client -l nomesocket -C Lorenzo -c Lorenzo -k Lorenzo", il parser non lo blocca perchè ci sono tutti gli elmenti ma poichè li manda in modo sequenziale, arriva prima la richiesta di deregistrazione di un client non ancora registrato
+        setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(fd, &(r.hdr));
         return -1;
-    }else{ // utente registrato -> lo cancello
-        list_node_t * usr;
-        if((usr = getUtenteNickname((char *)nickname)) == NULL){ // Devo controllarlo per il comando "./client -l nomesocket -C Lorenzo -k Lorenzo". Lorenzo è registrato, ma non ancora connesso. Se la connessione dovesse fallire accetterei un'operazione da un client non connesso
-            setHeader(&(r.hdr), OP_FAIL, "");
+    }else{ // utente connesso e quindi registrato -> posso cancellare "daEliminare"
+
+        if(!registrato((char *)daEliminare)){ // guardo se daEliminare è registrato. se non è registrato mando errore
+            setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
             sendHeader(fd, &(r.hdr));
             return -1;
         }
-        list_remove(utentiConnessi->list, usr);
-        if(icl_hash_delete(utentiRegistrati->hash, nickname, free, deleteHistory) == -1){ // errore
+        list_node_t * usr;
+        if((usr = getUtenteNickname((char *)daEliminare)) != NULL){ // Controllo se daEliminare è connesso. semmai lo elimino dalla lista degli utenti connessi
+            list_remove(utentiConnessi->list, usr);
+        }
+
+        if(icl_hash_delete(utentiRegistrati->hash, daEliminare, free, deleteHistory) == -1){ // errore
             setHeader(&(r.hdr), OP_FAIL, "");
             sendHeader(fd, &(r.hdr));
             return -1;
@@ -144,6 +148,8 @@ int disconnect_op(long fd){
     }
     return -1;
 }
+
+
 
 list_node_t * getUtenteFd(long fd){ // Da chiamara con la lock sulla lista degli utenti connessi
     setOrdinamentoLista(cmpFdElemList);
