@@ -189,10 +189,15 @@ static void * pool(void * arg){
                     UNLOCKHash(msg.hdr.sender);
                     printRisOP(msg, ris);
                     break;
-                /*case POSTTXT_OP:
-                    posttxt_op(msg, utentiRegistrati, hashLock, utentiConnessi);
+                case POSTTXT_OP:
+                    LOCKHash(msg.hdr.sender);
+                    LOCKList();
+                    ris = posttxt_op(*fd, msg);
+                    UNLOCKList();
+                    UNLOCKHash(msg.hdr.sender);
+                    printRisOP(msg, ris);
                     break;
-                case POSTTEXTALL_OP:
+                /*case POSTTEXTALL_OP:
                     posttextall_op(msg, utentiRegistrati, hashLock, utentiConnessi);
                     break;
                 case POSTFILE_OP:
@@ -247,7 +252,12 @@ void printRisOP(message_t m, int ok){
             break;
         case UNREGISTER_OP:
             if(ok == 0) printf("UTENTE ELIMINATO\n");
-            else printf("ERRORE. ELIMINAZIONE UTENTE ANNULLATA");
+            else printf("ERRORE. ELIMINAZIONE UTENTE ANNULLATA\n");
+            break;
+        case POSTTXT_OP:
+            if(ok == 0) printf("MESSAGGIO INVIATO CORRETTAMENTE\n");
+            else printf("ERRORE. INVIO MESSAGGIO ANNULLATO\n");
+            break;
     }
 }
 

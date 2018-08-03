@@ -13,7 +13,7 @@ history_s * initHistory(){
     return r;
 }
 
-int add(history_s * h, message_t * m) {
+void add(history_s * h, message_t * m) {
     if(h->list[h->pos] != NULL)
         freeMsg(h->list[h->pos]);
     h->list[h->pos] = m;

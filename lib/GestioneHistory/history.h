@@ -10,6 +10,6 @@ typedef struct history{
 
 
 history_s * initHistory();
-int add(history_s * h, message_t * m);
+void add(history_s * h, message_t * m);
 void deleteHistory(void * r);
 void freeMsg(message_t * elem);

@@ -11,6 +11,7 @@ int registrato(char * nickname);
 list_node_t * getUtenteFd(long fd);
 list_node_t * getUtenteNickname(char * nickname);
 void setOrdinamentoLista(int (*match)(void *a, void *b));
+message_t * copyMessage(message_t m);
 /* per tutte le funzioni: 0 successo, -1 errore */
 
 int register_op(long fd, message_t m){ // Prima di chiamarla bisogna fare la lock della hash
@@ -149,7 +150,51 @@ int disconnect_op(long fd){
     return -1;
 }
 
+int posttxt_op(long fd, message_t m){ // va chiamata con la lock sulla tabella hash e sulla lista degli utenti connessi
+    void * sender = (void *)(m.hdr.sender);
+    void * receiver = (void *)(m.data.hdr.receiver);
 
+    message_t r;
+
+    if(getUtenteNickname(sender) == NULL){ // Guardo se l'utente che sta inviando il messaggio è connesso e quindi registrato // TODO verificare se basta guarda se l'utente è connesso oppure serve anche guardare se è registrato. Questo solo per i messaggi di ritorno. Se non regiustrato OP_NICK_UNKNOWN. Se non connesso OP_FAIL
+        setHeader(&(r.hdr), OP_FAIL, "");
+        sendHeader(fd, &(r.hdr));
+        return -1;
+    }
+    history_s * h;
+    if((h = icl_hash_find(utentiRegistrati->hash, (void *)receiver)) == NULL){  // guardo se il ricevente è registrato. Se non è registrato errore
+        setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
+        sendHeader(fd, &(r.hdr));
+        return -1;
+    }
+
+    if(m.data.len > configurazione.MaxMsgSize){ // Controllo subito se la lunghezza del messaggio rispetta il file di configurazione. se non rispetta -> errore
+        setHeader(&(r.hdr), OP_MSG_TOOLONG, "");
+        sendHeader(fd, &(r.hdr));
+        return -1;
+    }
+    /* Invio messaggio */
+    list_node_t * usrReceiver;
+    m.hdr.op = TXT_MESSAGE; // Cambio l'op del messaggio
+    if((usrReceiver = getUtenteNickname(receiver)) != NULL){ // Se il receiver è connesso glielo invio subito
+        pthread_mutex_lock(&(((utente_connesso_s *)usrReceiver->val)->fd_m));
+        sendRequest(((utente_connesso_s *)usrReceiver->val)->fd, &m); // TODO controllare errori
+        pthread_mutex_unlock(&(((utente_connesso_s *)usrReceiver->val)->fd_m));
+    }
+    // In ogni caso aggiungo il messaggio alla history del receiver
+
+    add(h, copyMessage(m));
+    setHeader(&(r.hdr), OP_OK, "");
+    sendHeader(fd, &(r.hdr));
+    return 0;
+}
+
+message_t * copyMessage(message_t m){
+    message_t * toAdd = malloc(sizeof(message_t)); // TODO gestire errore
+    setHeader(&(toAdd->hdr), m.hdr.op, m.hdr.sender);
+    setData(&(toAdd->data), m.data.hdr.receiver, m.data.buf, m.data.hdr.len);
+    return toAdd;
+}
 
 list_node_t * getUtenteFd(long fd){ // Da chiamara con la lock sulla lista degli utenti connessi
     setOrdinamentoLista(cmpFdElemList);
