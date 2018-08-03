@@ -19,7 +19,7 @@ int getfile_op(long fd, message_t m);
 int getprevmsgs_op(long fd, message_t m);
 int usrlist_op(long fd, message_t m);
 int unregister_op(long fd, message_t m);
-int disconnect_op(long fd, message_t m);
+int disconnect_op(long fd);
 
 
 #endif

@@ -57,8 +57,6 @@ static void * listener(void * arg);
 static void * pool(void * arg);
 static void * segnali(void * arg);
 void initHashLock();
-int cmpElemList(void * a, void * b); // da settare quando si crea una nuova lista
-void freeElemList(void * a); // da settare quando si crea una nuova lista
 void printRisOP(message_t m, int ok);
 
 
@@ -107,8 +105,7 @@ int main(int argc, char *argv[]) {
     utentiConnessi = malloc(sizeof(list_s));
     ec_null_return(utentiConnessi->list = list_new(), "Errore creazione lista");
     pthread_mutex_init(&(utentiConnessi->list_m), NULL);
-    utentiConnessi->list->free = freeElemList;
-    utentiConnessi->list->match = cmpElemList;
+    utentiConnessi->list->free = freeUtente_Connesso_s;
     initHashLock();
 
     /* Creazione pipe */
@@ -144,16 +141,6 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-int cmpElemList(void * a, void * b){
-    // a è una stringa (nickname)
-    // b è un utente_connesso_s
-    return !strcmp((char *)a, ((utente_connesso_s *)b)->nickname);
-}
-void freeElemList(void * a){
-    utente_connesso_s * aa = (utente_connesso_s *)a;
-    pthread_mutex_destroy(&(aa->fd_m));
-    free(aa);
-}
 
 void initHashLock(){
     int i=0;
@@ -174,11 +161,17 @@ static void * pool(void * arg){
             free(fd);
             perror("Errore readMsg");
             exit(-1);
-        }else if(r == 0){// vuol dire che il client ha finito di comunicare, allora devo chiudere la connessione e decrementare nSocketUtenti
-            close(*fd); //TODO controllare errore
-            pthread_mutex_lock(&(nSock->contatore_m));
+        }else if(r == 0){
+            // vuol dire che il client ha finito di comunicare, allora devo chiudere la connessione e eliminare l'utente dagli utenti connessi
+            // è come se mi mandasse un messaggio con operazione DISCONNECT_OP
+            // oss: Devo controllare se esiste nella lista degli utenti un utente_connesso_s->fd = *fd
+            LOCKList();
+            disconnect_op(*fd); // rimuovo l'utente dalla lista degli utenti connessi (se esisite)
+            UNLOCKList();
+            close(*fd); // Chiudo il socket. TODO controllare errore
+            LOCKnSock();
             nSock->contatore --;
-            pthread_mutex_unlock(&(nSock->contatore_m));
+            UNLOCKnSock();
         }else{
             printf("Ricevuta op: %d da: %s\n", msg.hdr.op, msg.hdr.sender);
             switch(msg.hdr.op){
@@ -217,12 +210,14 @@ static void * pool(void * arg){
                     UNLOCKList();
                     printRisOP(msg, ris);
                     break;
-                /*case UNREGISTER_OP:
-                    unregister_op(msg, utentiRegistrati, hashLock, utentiConnessi);
+                case UNREGISTER_OP:
+                    LOCKHash(msg.hdr.sender);
+                    LOCKList();
+                    ris = unregister_op(*fd, msg);
+                    UNLOCKList();
+                    UNLOCKHash(msg.hdr.sender);
+                    printRisOP(msg, ris);
                     break;
-                case DISCONNECT_OP:
-                    disconnect_op(msg, utentiRegistrati, hashLock, utentiConnessi);
-                    break;*/
                 default: printf("Errore default\n");
                     //TODO gestione errore
             }
@@ -250,6 +245,9 @@ void printRisOP(message_t m, int ok){
             if(ok == 0) printf("LISTA UTENTI ONLINE SPEDITA\n");
             else printf("ERRORE. SPEDIZIONE ANNULLATA\n");
             break;
+        case UNREGISTER_OP:
+            if(ok == 0) printf("UTENTE ELIMINATO\n");
+            else printf("ERRORE. ELIMINAZIONE UTENTE ANNULLATA");
     }
 }
 

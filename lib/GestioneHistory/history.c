@@ -18,12 +18,14 @@ int add(history_s * h, message_t * m) {
         freeMsg(h->list[h->pos]);
     h->list[h->pos] = m;
     if(h->pos + 1 == configurazione.MaxHistMsgs) h->pos = 0;
-    else h->pos ++; 
+    else h->pos ++;
 }
 
 void freeMsg(message_t *elem){
-    free(elem->data.buf);
-    free(elem);
+    if(elem){
+        free(elem->data.buf);
+        free(elem);
+    }
     /* Posso fare la free dell'intero messaggio dato che, in caso di POSTTEXTALL_OP,
        io farei tante copie del messaggio e le aggiungerei ad ogni client.
        Altrimenti se facessi un'unica copia del messaggio, dovrei vedere, prima di fare la free, se

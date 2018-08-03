@@ -2,6 +2,7 @@
 #define STRUTTURE_CONDIVISE_
 
 #include <pthread.h>
+#include <string.h>
 #include "./lib/GestioneQueue/queue.h"
 #include "./lib/GestioneListe/list.h"
 #include "./lib/GestioneHashTable/icl_hash.h"
@@ -9,7 +10,11 @@
 #include "./config.h"
 #include "./parser.h"
 
+//int cmpNicknameElemList(void * a, void * b); // da settare prima di fare una ricerca per nickname
 
+//int cmpFdElemList(void * a, void * b); // da settare prima di fare una ricerca per fd
+
+//void freeUtente_Connesso_s(void * a);
 
 typedef struct utente_connesso{
     char nickname[MAX_NAME_LENGTH + 1];
@@ -63,6 +68,31 @@ static void UNLOCKList (){
     pthread_mutex_unlock(&(utentiConnessi->list_m));
 }
 
+static void LOCKnSock(){
+    pthread_mutex_lock(&(nSock->contatore_m));
+}
+
+static void UNLOCKnSock(){
+    pthread_mutex_unlock(&(nSock->contatore_m));
+}
+
+static int cmpNicknameElemList(void * a, void * b){
+    // a è una stringa (nickname)
+    // b è un utente_connesso_s
+    return !strcmp((char *)a, ((utente_connesso_s *)b)->nickname);
+}
+
+static int cmpFdElemList(void * a, void * b){
+    // a è un intero (fd)
+    // b è un utente_connesso_s
+    return (*((int *)a)) == ((utente_connesso_s *)b)->fd;
+}
+
+static void freeUtente_Connesso_s(void * a){ // da settare quando si crea una nuova lista di utente_connesso_s
+    utente_connesso_s * aa = (utente_connesso_s *)a;
+    pthread_mutex_destroy(&(aa->fd_m));
+    free(aa);
+}
 
 /*
   utenti connessi a cosa serve?
