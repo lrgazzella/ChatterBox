@@ -6,7 +6,7 @@
 #include "./lib/GestioneQueue/queue.h"
 #include "./lib/GestioneListe/list.h"
 #include "./lib/GestioneHashTable/icl_hash.h"
-#include "./lib/GestioneBoundedQueue/boundedqueue.h"
+#include "./message.h"
 #include "./config.h"
 #include "./parser.h"
 
@@ -94,6 +94,11 @@ static void freeUtente_Connesso_s(void * a){ // da settare quando si crea una nu
     free(aa);
 }
 
+static void freeMessage_t(void * a){
+    message_t * m = (message_t *)a;
+    free(m->data.buf);
+    free(m);
+}
 /*
   utenti connessi a cosa serve?
   ogni volta che un utente mi fa una CONNECT_OP lo devo aggiungere alla lista.

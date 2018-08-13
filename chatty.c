@@ -33,7 +33,6 @@
 #include "./lib/GestioneQueue/queue.h"
 #include "./lib/GestioneListe/list.h"
 #include "./lib/GestioneHashTable/icl_hash.h"
-#include "./lib/GestioneBoundedQueue/boundedqueue.h"
 
 #include "./utility.h"
 #include "./connections.h"
@@ -153,6 +152,7 @@ static void * pool(void * arg){
     int * fd;
     int pipe = *((int *)arg);
     int ris, r;
+    int lock;
     message_t msg;
     while(1){
         fd = (int *)pop(richieste);
@@ -205,10 +205,15 @@ static void * pool(void * arg){
                     break;
                 case GETFILE_OP:
                     getfile_op(msg, utentiRegistrati, hashLock, utentiConnessi);
-                    break;
-                case GETPREVMSGS_OP:
-                    getprevmsgs_op(msg, utentiRegistrati, hashLock, utentiConnessi);
                     break;*/
+                case GETPREVMSGS_OP:
+                    LOCKHash(msg.hdr.sender);
+                    LOCKList();
+                    ris = getprevmsgs_op(*fd, msg);
+                    UNLOCKList();
+                    UNLOCKHash(msg.hdr.sender);
+                    printRisOP(msg, ris);
+                    break;
                 case USRLIST_OP:
                     LOCKList();
                     ris = usrlist_op(*fd, msg);
@@ -216,11 +221,20 @@ static void * pool(void * arg){
                     printRisOP(msg, ris);
                     break;
                 case UNREGISTER_OP:
-                    LOCKHash(msg.hdr.sender);
+                    lock = 0;
+                    if(getIndexLockHash(msg.hdr.sender) != getIndexLockHash(msg.data.hdr.receiver)) {
+                        // Controllo se la funzione hash applicata ai due nickname restituisce lo stesso valore.
+                        // Se i valori sono diversi, dentro l'if faccio la lock sul sender e poi fuori dall'if faccio la lock sul receiver
+                        // Se i valori sono uguale, faccio solo la lock sul receiver che automaticamente fa la lock anche sulla parte de sender
+                        LOCKHash(msg.hdr.sender);
+                        lock = 1;
+                    }
+                    LOCKHash(msg.data.hdr.receiver);
                     LOCKList();
                     ris = unregister_op(*fd, msg);
                     UNLOCKList();
-                    UNLOCKHash(msg.hdr.sender);
+                    UNLOCKHash(msg.data.hdr.receiver);
+                    if(lock) UNLOCKHash(msg.hdr.sender);
                     printRisOP(msg, ris);
                     break;
                 default: printf("Errore default\n");
@@ -257,6 +271,10 @@ void printRisOP(message_t m, int ok){
         case POSTTXT_OP:
             if(ok == 0) printf("MESSAGGIO INVIATO CORRETTAMENTE\n");
             else printf("ERRORE. INVIO MESSAGGIO ANNULLATO\n");
+            break;
+        case GETPREVMSGS_OP:
+            if(ok == 0) printf("HISTORY INVIATA CORRETTAMENTE\n");
+            else printf("ERRORE. INVIO HISTORY ANNULLATA\n");
             break;
     }
 }
