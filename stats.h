@@ -3,7 +3,7 @@
  *
  * Dipartimento di Informatica Università di Pisa
  * Docenti: Prencipe, Torquati
- * 
+ *
  */
 #if !defined(MEMBOX_STATS_)
 #define MEMBOX_STATS_
@@ -30,14 +30,13 @@ struct statistics {
  *
  * @param fout descrittore del file aperto in append.
  *
- * @return 0 in caso di successo, -1 in caso di fallimento 
+ * @return 0 in caso di successo, -1 in caso di fallimento
  */
-static inline int printStats(FILE *fout) {
-    extern struct statistics chattyStats;
+static inline int printStats(FILE *fout, struct statistics chattyStats) {
 
     if (fprintf(fout, "%ld - %ld %ld %ld %ld %ld %ld %ld\n",
 		(unsigned long)time(NULL),
-		chattyStats.nusers, 
+		chattyStats.nusers,
 		chattyStats.nonline,
 		chattyStats.ndelivered,
 		chattyStats.nnotdelivered,

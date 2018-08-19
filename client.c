@@ -168,6 +168,7 @@ static int execute_requestreply(int connfd, operation_t *o) {
 		return -1;
 	    }
 	    close(fd);
+        printf("FILE: %s\n", o->msg);
 	    setData(&msg.data, rname, o->msg, strlen(o->msg)+1); // invio il nome del file
 	} else
 	    setData(&msg.data, rname, o->msg, o->size);	 // POSTTXTALL_OP o POSTTXT_OP. o->msg sarà il testo del messaggio

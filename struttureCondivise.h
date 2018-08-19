@@ -9,23 +9,20 @@
 #include "./message.h"
 #include "./config.h"
 #include "./parser.h"
+#include "./stats.h"
 
-//int cmpNicknameElemList(void * a, void * b); // da settare prima di fare una ricerca per nickname
-
-//int cmpFdElemList(void * a, void * b); // da settare prima di fare una ricerca per fd
-
-//void freeUtente_Connesso_s(void * a);
 
 typedef struct utente_connesso{
-    char nickname[MAX_NAME_LENGTH + 1];
+    char * nickname; // Deve essere una stringa di lunghezza massima: [MAX_NAME_LENGTH + 1];
     long fd;
     pthread_mutex_t fd_m;
 } utente_connesso_s;
 
-typedef struct list_struct{
-    list_t * list;
-    pthread_mutex_t list_m;
-} list_s;
+typedef struct array_struct{
+    utente_connesso_s * arr; // Contiene tutti gli utenti connessi
+    int nConnessi;
+    pthread_mutex_t arr_m;
+} array_s;
 
 typedef struct connessi{
     int contatore;
@@ -37,35 +34,49 @@ typedef struct hash{
     pthread_mutex_t hash_m[HASHSIZE / HASHGROUPSIZE];
 } hash_s;
 
+typedef struct stat_struct{
+    struct statistics stat;
+    pthread_mutex_t stat_m;
+} stat_s;
+
 
 /* Variabili globali */
 extern Queue_t * richieste;
 extern config configurazione;
 extern hash_s * utentiRegistrati;
-extern list_s * utentiConnessi;
+extern array_s * utentiConnessi;
 extern connessi_s * nSock;
+extern stat_s * statistiche;
 
 static int getIndexLockHash(char * key){
     int hash_val = (* utentiRegistrati->hash->hash_function)(key) % utentiRegistrati->hash->nbuckets;
     return hash_val % (HASHSIZE/HASHGROUPSIZE);
 }
+// Dato un indice di buca della hash, prende la lock relativa
+static void LOCKPosRegistrati(int pos){
+    pthread_mutex_lock(&(utentiRegistrati->hash_m[pos % (HASHSIZE/HASHGROUPSIZE)]));
+}
 
-static void LOCKHash (char * nick){
+static void UNLOCKPosRegistrati(int pos){
+    pthread_mutex_unlock(&(utentiRegistrati->hash_m[pos % (HASHSIZE/HASHGROUPSIZE)]));
+}
+
+static void LOCKRegistrati (char * nick){
     int indiceLock = getIndexLockHash(nick);
     pthread_mutex_lock(&(utentiRegistrati->hash_m[indiceLock]));
 }
 
-static void UNLOCKHash (char * nick){
+static void UNLOCKRegistrati (char * nick){
     int indiceLock = getIndexLockHash(nick);
     pthread_mutex_unlock(&(utentiRegistrati->hash_m[indiceLock]));
 }
 
-static void LOCKList (){
-    pthread_mutex_lock(&(utentiConnessi->list_m));
+static void LOCKConnessi (){
+    pthread_mutex_lock(&(utentiConnessi->arr_m));
 }
 
-static void UNLOCKList (){
-    pthread_mutex_unlock(&(utentiConnessi->list_m));
+static void UNLOCKConnessi (){
+    pthread_mutex_unlock(&(utentiConnessi->arr_m));
 }
 
 static void LOCKnSock(){
@@ -76,22 +87,40 @@ static void UNLOCKnSock(){
     pthread_mutex_unlock(&(nSock->contatore_m));
 }
 
-static int cmpNicknameElemList(void * a, void * b){
-    // a è una stringa (nickname)
-    // b è un utente_connesso_s
-    return !strcmp((char *)a, ((utente_connesso_s *)b)->nickname);
+static void LOCKfd(int i){ // Prende la lock sull'fd dell'utente in posizione i
+    pthread_mutex_lock(&(utentiConnessi->arr[i].fd_m));
 }
 
-static int cmpFdElemList(void * a, void * b){
-    // a è un intero (fd)
-    // b è un utente_connesso_s
-    return (*((int *)a)) == ((utente_connesso_s *)b)->fd;
+static void UNLOCKfd(int i){
+    pthread_mutex_unlock(&(utentiConnessi->arr[i].fd_m));
 }
 
-static void freeUtente_Connesso_s(void * a){ // da settare quando si crea una nuova lista di utente_connesso_s
-    utente_connesso_s * aa = (utente_connesso_s *)a;
-    pthread_mutex_destroy(&(aa->fd_m));
-    free(aa);
+static void LOCKStat(){
+    pthread_mutex_lock(&(statistiche->stat_m));
+}
+
+static void UNLOCKStat(){
+    pthread_mutex_unlock(&(statistiche->stat_m));
+}
+
+static void ADDStat(char * stat, int s){ // somma s alla statistica stat
+    LOCKStat();
+    if(strcmp(stat, "nusers") == 0){
+        statistiche->stat.nusers += s;
+    }else if(strcmp(stat, "nonline") == 0){
+        statistiche->stat.nonline += s;
+    }else if(strcmp(stat, "ndelivered") == 0){
+        statistiche->stat.ndelivered += s;
+    }else if(strcmp(stat, "nnotdelivered") == 0){
+        statistiche->stat.nnotdelivered += s;
+    }else if(strcmp(stat, "nfiledelivered") == 0){
+        statistiche->stat.nfiledelivered += s;
+    }else if(strcmp(stat, "nfilenotdelivered") == 0){
+        statistiche->stat.nfilenotdelivered += s;
+    }else if(strcmp(stat, "nerrors") == 0){
+        statistiche->stat.nerrors += s;
+    }
+    UNLOCKStat();
 }
 
 static void freeMessage_t(void * a){

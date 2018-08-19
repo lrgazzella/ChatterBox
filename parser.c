@@ -25,7 +25,7 @@ int check(config * configs){
     if(configs->MaxFileSize <= 0) return -1;
     if(configs->MaxHistMsgs <= 0) return -1;
     if(configs->DirName == NULL || strlen(configs->DirName) == 0) return -1;
-    if(configs->StatFileName == NULL || strlen(configs->StatFileName) == 0) return -1;
+    if(configs->StatFileName == NULL /*|| strlen(configs->StatFileName) == 0*/) return -1; // se strlen(StatFileName) = 0 -> devo ignorare il segnale 
     return 0;
 }
 

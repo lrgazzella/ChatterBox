@@ -64,6 +64,7 @@ coda_circolare_iteratore_s * initIteratore(coda_circolare_s * c){ // se la coda 
 
 void * next(coda_circolare_iteratore_s * i){
     if(i->daLeggere == 0) return NULL;
+
     void * r = i->codaCircolare->coda[i->next];
     i->next = (i->next + 1) % (i->codaCircolare->maxlung);
     i->daLeggere --;
