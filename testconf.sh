@@ -16,24 +16,27 @@ pid=$!
 
 for((i=0;i<50;++i)); do
     ./client -l $1 -k pippo -S "ciao":pluto;
+    #sleep 1
     ./client -l $1 -k pluto -S "ciao":pippo;
-    ./client -l $1 -k minni -s client:pluto -s client:pippo; 
+    #sleep 1
+    ./client -l $1 -k minni -s stats.h:pluto -s script.sh:pippo;
+    #sleep 1
 done
 
 # messaggio di errore che mi aspetto
 OP_MSG_TOOLONG=28
 
-./client -l $1 -k pippo -s libchatty.a:pluto
+./client -l $1 -k pippo -s prova.txt:pluto
 e=$?
 if [[ $((256-e)) != $OP_MSG_TOOLONG ]]; then
-    echo "Errore non corrispondente $e"
+    echo "Errore non corrispondente file$e"
     exit 1
 fi
 
 ./client -l $1 -k pluto -S "1234567891011":pippo
 e=$?
 if [[ $((256-e)) != $OP_MSG_TOOLONG ]]; then
-    echo "Errore non corrispondente $e"
+    echo "Errore non corrispondente messaggio $e"
     exit 1
 fi
 

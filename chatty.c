@@ -42,7 +42,7 @@
 
 /* Variabili globali */
 Queue_t * richieste;
-config configurazione;
+config * configurazione;
 hash_s * utentiRegistrati;
 array_s * utentiConnessi;
 connessi_s * nSock;
@@ -64,6 +64,7 @@ void initNSock();
 void initStat();
 void initConnessi();
 void printRisOP(message_t m, int ok);
+void stopAllThread();
 
 
 /* Funzione di hash */
@@ -100,18 +101,19 @@ int main(int argc, char *argv[]) {
     int i;
 
     /* Inizializzazione */
-    initParseCheck(pathFileConf, &configurazione); //TODO controllare errori
+    configurazione = malloc(sizeof(config));
+    initParseCheck(pathFileConf, configurazione); //TODO controllare errori
     initDirFile();
     richieste = initQueue();
     initStat();
     initNSock();
     initRegistrati(); //TODO controllare errori
     initConnessi();
-    allThread = malloc(sizeof(pthread_t) * (configurazione.ThreadsInPool + 2)); // pool + listener + segnali
+    allThread = malloc(sizeof(pthread_t) * (configurazione->ThreadsInPool + 2)); // pool + listener + segnali
 
     /* Creazione pipe */
-    int ** pfds = malloc(sizeof(int *) * configurazione.ThreadsInPool);
-    for(i=0; i<configurazione.ThreadsInPool; i++){
+    int ** pfds = malloc(sizeof(int *) * configurazione->ThreadsInPool);
+    for(i=0; i<configurazione->ThreadsInPool; i++){
         pfds[i] = malloc(sizeof(int) * 2);
         if(pipe(pfds[i]) == -1){ //TODO gestione errore
             perror("Errore pipe\n");
@@ -145,21 +147,58 @@ int main(int argc, char *argv[]) {
     allThread[1] = listener_id;
 
     /* Avvio pool */
-    pthread_t * pool_id = malloc(sizeof(pthread_t) * configurazione.ThreadsInPool); // TODO gestione Errore
-    for(i=0; i<configurazione.ThreadsInPool; i++){
+    pthread_t * pool_id = malloc(sizeof(pthread_t) * configurazione->ThreadsInPool); // TODO gestione Errore
+    for(i=0; i<configurazione->ThreadsInPool; i++){
         pthread_create(&(pool_id[i]), NULL, &pool, &(pfds[i][1]));
         allThread[i+2] = pool_id[i];
     }
 
     /* Join */
+    printf("JOIN\n");
     int * ret_listener, * ret_segnali;
-    pthread_join(segnali_id, (void **)&ret_segnali);
+    pthread_join(segnali_id, (void **)&ret_segnali); // TODO se tanto nel thread segnali elimino tutti i thread, a che mi serve fare le join sugli altri thread?
     pthread_join(listener_id, (void **)&ret_listener);
     int * ret_pool;
-    for(i=0; i<configurazione.ThreadsInPool; i++){
+    for(i=0; i<configurazione->ThreadsInPool; i++){
         pthread_join(pool_id[i], (void **)&ret_pool);
     }
-    free(pathFileConf);
+
+    /* FREE */
+    // Eliminare la hash e le relative history
+    icl_hash_destroy(utentiRegistrati->hash, free, freeCoda);
+    for(i=0; i<HASHSIZE / HASHGROUPSIZE; i++){
+        pthread_mutex_destroy(&(utentiRegistrati->hash_m[i]));
+    }
+
+    free(utentiRegistrati);
+    // Eliminare array connessi
+    for(i=0; i<configurazione->MaxConnections; i++){
+        if(utentiConnessi->arr[i].nickname)
+            free(utentiConnessi->arr[i].nickname);
+        pthread_mutex_destroy(&(utentiConnessi->arr[i].fd_m));
+    }
+    free(utentiConnessi->arr);
+    pthread_mutex_destroy(&(utentiConnessi->arr_m));
+    free(utentiConnessi);
+    // Eliminare la coda delle richieste
+    deleteQueue(richieste); // TODO non libera i nodi
+    // Eliminare le statistiche
+    pthread_mutex_destroy(&(statistiche->stat_m));
+    free(statistiche);
+    // Eliminare nSock
+    pthread_mutex_destroy(&(nSock->contatore_m));
+    free(nSock);
+    // Eliminare pipe
+    for(i=0; i<configurazione->ThreadsInPool; i++){
+        free(pfds[i]);
+    }
+    free(pfds);
+    // Eliminare Configurazioni
+    FreeConfig(configurazione);
+
+    //free(pathFileConf);
+    free(pool_id);
+    free(allThread);
     return 0;
 }
 
@@ -177,12 +216,12 @@ void initStat(){
 
 // Se esiste già la cartella con quel nome la svuota, altrimenti la crea
 void initDirFile(){
-    DIR * fileDir;
-    size_t lenPath = strlen(configurazione.DirName);
+    DIR * fileDir = NULL;
+    size_t lenPath = strlen(configurazione->DirName);
 
-    if((fileDir = opendir(configurazione.DirName)) == NULL){
+    if((fileDir = opendir(configurazione->DirName)) == NULL){
         if(errno == ENOENT){ // la directory che ho cercato di aprire non esiste
-            if(mkdir(configurazione.DirName, 0777) == -1){
+            if(mkdir(configurazione->DirName, 0777) == -1){
                 perror("Errore creazione cartella file");
                 exit -1;
             }
@@ -200,12 +239,13 @@ void initDirFile(){
                 continue;
             }
             tmpPath = malloc(sizeof(char) * (lenPath + 1 + strlen(elem->d_name) + 1)); // "path/elem->d_name'\0'"
-            strcat(tmpPath, configurazione.DirName);
+            strcat(tmpPath, configurazione->DirName);
             strcat(tmpPath, "/"); // TODO controllare errori
             strcat(tmpPath, elem->d_name); // TODO controllare errori
             remove(tmpPath); // TODO controllare errori
             free(tmpPath);
         }
+        closedir(fileDir); // TODO controllare errore
         if(errno != 0){
             perror("Errore lettura file nella cartella");
         }
@@ -214,11 +254,11 @@ void initDirFile(){
 
 void initConnessi(){
     utentiConnessi = malloc(sizeof(array_s));
-    utentiConnessi->arr = malloc(sizeof(utente_connesso_s) * configurazione.MaxConnections);
+    utentiConnessi->arr = malloc(sizeof(utente_connesso_s) * configurazione->MaxConnections);
     pthread_mutex_init(&(utentiConnessi->arr_m), NULL);
     utentiConnessi->nConnessi = 0;
     int i;
-    for(i=0; i<configurazione.MaxConnections; i++){
+    for(i=0; i<configurazione->MaxConnections; i++){
         utentiConnessi->arr[i].nickname = NULL;
         utentiConnessi->arr[i].fd = -1;
         pthread_mutex_init(&(utentiConnessi->arr[i].fd_m), NULL);
@@ -244,6 +284,17 @@ void initHashLock(){
     }
 }
 
+void stopPool(){
+    int i;
+    for(i=0; i<configurazione->ThreadsInPool; i++){
+        int * toPush = malloc(sizeof(int));
+        *toPush = -1;
+        push(richieste, toPush); // TODO controllare errori
+    }
+}
+
+
+
 static void * pool(void * arg){
     int * fd;
     int pipe = *((int *)arg);
@@ -252,6 +303,10 @@ static void * pool(void * arg){
     message_t msg;
     while(1){
         fd = (int *)pop(richieste);
+        if(*fd == -1){
+            free(fd);
+            pthread_exit((void *)0);
+        }
         r = readMsg(*fd, &msg);
         if(r < 0){ //TODO controllare errori.
             free(fd);
@@ -267,8 +322,12 @@ static void * pool(void * arg){
             LOCKnSock();
             nSock->contatore --;
             UNLOCKnSock();
+            // Quindi non ho letto nulla e non devo liberare niente
         }else{
-            printf("Ricevuta op: %d da: %s\n", msg.hdr.op, msg.hdr.sender);
+            //printf("Ricevuta op: %d da: %s\n", msg.hdr.op, msg.hdr.sender);
+            //printf("--- MESSAGGIO ---\n");
+            //printf("BUF: %s\nLEN: %d\nSENDER:%s\nRECEIVER:%s\n", msg.data.buf, msg.data.hdr.len, msg.hdr.sender, msg.data.hdr.receiver);
+
             switch(msg.hdr.op){
                 case REGISTER_OP:
                     ris = register_op(*fd, msg); //TODO controllare errori
@@ -283,13 +342,16 @@ static void * pool(void * arg){
                     printRisOP(msg, ris);
                     break;
                 case POSTTXTALL_OP:
-                    posttxtall_op(*fd, msg);
+                    ris = posttxtall_op(*fd, msg);
+                    printRisOP(msg, ris);
                     break;
                 case POSTFILE_OP:
-                    postfile_op(*fd, msg);
+                    ris = postfile_op(*fd, msg);
+                    printRisOP(msg, ris);
                     break;
                 case GETFILE_OP:
-                    getfile_op(*fd, msg);
+                    ris = getfile_op(*fd, msg);
+                    printRisOP(msg, ris);
                     break;
                 case GETPREVMSGS_OP:
                     ris = getprevmsgs_op(*fd, msg);
@@ -310,8 +372,14 @@ static void * pool(void * arg){
                 perror("Errore writen");
                 exit(-1);//TODO controlla errori
             }
+            //printf("LENNNN: %d\n", msg.data.hdr.len);
+            if(msg.data.hdr.len > 0){
+                //printf("Eseguo free\n");
+                free(msg.data.buf);
+            }
         }
-        free(msg.data.buf);
+
+
         free(fd);
     }
 }
@@ -368,7 +436,7 @@ static void * listener(void * arg){
     }
     int **pfds = (int **)arg;
     FD_ZERO(&set);
-    for(i=0; i<configurazione.ThreadsInPool; i++){
+    for(i=0; i<configurazione->ThreadsInPool; i++){
         FD_SET(pfds[i][0], &set);
         if(pfds[i][0] > fd_num) fd_num = pfds[i][0];
     }
@@ -376,17 +444,19 @@ static void * listener(void * arg){
     if(fd_skt > fd_num) fd_num = fd_skt;
     while (1) {
         rdset = set;
+        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
         if (select(fd_num+1,&rdset,NULL,NULL,NULL) == -1) {
             perror("Errore select");
             exit(-1); // TODO gestione errore
         } else {
+            pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
             int fd;
             for (fd = 0; fd<=fd_num;fd++) {
                 if (FD_ISSET(fd, &rdset)) {
                     if (fd == fd_skt) { /* sock connect pronto */
                         int fd_c = accept(fd_skt, NULL, 0);
                         pthread_mutex_lock(&(nSock->contatore_m));
-                        if(nSock->contatore >= configurazione.MaxConnections){
+                        if(nSock->contatore >= configurazione->MaxConnections){
                             pthread_mutex_unlock(&(nSock->contatore_m));
                             message_t m;
                             setHeader(&(m.hdr), OP_FAIL, "");
@@ -437,9 +507,9 @@ static void * segnali(void * arg){
     while(sigwait(&toHandle, &sigRicevuto) == 0){ // non ci sono errori
         printf("Ricevuto segnale: %d\n", sigRicevuto);
         if(sigRicevuto == SIGUSR1){
-            if(strlen(configurazione.StatFileName) > 0){
+            if(strlen(configurazione->StatFileName) > 0){
                 FILE * fileStat;
-                if((fileStat = fopen(configurazione.StatFileName, "a")) == NULL){ // "a" nella fopen corrisponde a O_WRONLY | O_CREAT | O_APPEND nella open
+                if((fileStat = fopen(configurazione->StatFileName, "a")) == NULL){ // "a" nella fopen corrisponde a O_WRONLY | O_CREAT | O_APPEND nella open
                     perror("Errore apertura file stat");
                     exit -1;
                 }
@@ -448,9 +518,9 @@ static void * segnali(void * arg){
                 UNLOCKStat();
             }
         }else{ // Ho ricevuto o SIGQUIT o SIGTERM o SIGINT
-            //liberaTutto();
             printf("LIBERO TUTTO\n");
-            exit(1);
+            stopAllThread();
+            pthread_exit((void *)0);
         }
     }
 
@@ -467,18 +537,11 @@ int isPipe(int fd){
     return S_ISFIFO(file.st_mode);
 }
 
-void liberaTutto(){
+void stopAllThread(){
     // Eliminare tutti i thread
     int i;
-    for(i=1; i<configurazione.ThreadsInPool+2; i++){ // TODO allThread[0] è il th dei segnali. Devo eliminarlo ora?
-        pthread_cancel(allThread[]);
-    }
-
-    // Eliminare la hash e le relative history
-    // Eliminare array connessi
-    // Eliminare la coda delle richieste
-    // Eliminare le statistiche
-    // Eliminare nSock
+    pthread_cancel(allThread[1]); // Fermo subito il listener almeno non possono più arrivare le richieste
+    stopPool(); // Fermo tutti i thread del pool
 }
 
 int aggiorna(fd_set * set, int max){
@@ -493,14 +556,14 @@ int aggiorna(fd_set * set, int max){
 
 // legge file configurazione, eliminare l'eventuale socket vecchia e crea la socket del server
 int createSocket(){
-    if(remove(configurazione.UnixPath) == -1){
+    if(remove(configurazione->UnixPath) == -1){
         if(errno != ENOENT) {// Se errno == ENOENT vuol dire che non esiste un file con quel path
             return -1;
         }
     }
     int fd_skt;
     struct sockaddr_un sa;
-    strncpy(sa.sun_path, configurazione.UnixPath, UNIX_PATH_MAX);
+    strncpy(sa.sun_path, configurazione->UnixPath, UNIX_PATH_MAX);
     sa.sun_family = AF_UNIX;
     if((fd_skt = socket(AF_UNIX,SOCK_STREAM,0)) == -1) return -1;
     ec_meno1_return(bind(fd_skt,(struct sockaddr *)&sa, sizeof(sa)), "Errore bind");

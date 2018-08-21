@@ -5,19 +5,9 @@
 #include <stdio.h>
 #include "queue.h"
 
-static pthread_mutex_t qlock = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t  qcond = PTHREAD_COND_INITIALIZER;
 
-static Node_t *allocNode()         { return malloc(sizeof(Node_t));  }
-static Queue_t *allocQueue()       { return malloc(sizeof(Queue_t)); }
-static void freeNode(Node_t *node) { free((void*)node); }
-static void LockQueue()            { pthread_mutex_lock(&qlock);   }
-static void UnlockQueue()          { pthread_mutex_unlock(&qlock); }
-static void UnlockQueueAndWait()   { pthread_cond_wait(&qcond, &qlock); }
-static void UnlockQueueAndSignal() {
-    pthread_cond_signal(&qcond);
-    pthread_mutex_unlock(&qlock);
-}
+
+
 
 /* ------------------- interfaccia della coda ------------------ */
 Queue_t *initQueue() {
@@ -58,7 +48,7 @@ int push(Queue_t *q, void *data) {
 void *pop(Queue_t *q) {
     LockQueue();
     while(q->head == q->tail) {
-	UnlockQueueAndWait();
+	       UnlockQueueAndWait();
     }
     // locked
     assert(q->head->next);

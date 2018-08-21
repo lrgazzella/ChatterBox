@@ -6,6 +6,7 @@
 #include "./lib/GestioneQueue/queue.h"
 #include "./lib/GestioneListe/list.h"
 #include "./lib/GestioneHashTable/icl_hash.h"
+#include "./lib/GestioneHistory/codaCircolare.h"
 #include "./message.h"
 #include "./config.h"
 #include "./parser.h"
@@ -42,7 +43,7 @@ typedef struct stat_struct{
 
 /* Variabili globali */
 extern Queue_t * richieste;
-extern config configurazione;
+extern config * configurazione;
 extern hash_s * utentiRegistrati;
 extern array_s * utentiConnessi;
 extern connessi_s * nSock;
@@ -121,6 +122,10 @@ static void ADDStat(char * stat, int s){ // somma s alla statistica stat
         statistiche->stat.nerrors += s;
     }
     UNLOCKStat();
+}
+
+static void freeCoda(void * c){
+    eliminaCoda((coda_circolare_s *)c);
 }
 
 static void freeMessage_t(void * a){

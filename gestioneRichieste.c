@@ -9,7 +9,6 @@ void concat(char * str1, char * str2, int first);
 char * makeListUsr();
 int registrato(char * nickname);
 message_t * copyMessage(message_t m);
-void freeCoda(void * c);
 char * intToString(int n);
 int getUsrNickname(char * nickname);
 int getUsrFd(long fd);
@@ -19,11 +18,11 @@ int getPosizioneLibera();
 int register_op(long fd, message_t m){
     void * nickname = malloc(sizeof(char) * (MAX_NAME_LENGTH + 1));
     strcpy((char *) nickname, m.hdr.sender);
-    
+
     message_t r;
     LOCKRegistrati(m.hdr.sender);
     if(!registrato(m.hdr.sender)){ // Non esiste un utente con quel nickname, allora lo creo
-        coda_circolare_s * hist = initCodaCircolare(configurazione.MaxMsgSize, freeMessage_t);
+        coda_circolare_s * hist = initCodaCircolare(configurazione->MaxMsgSize, freeMessage_t);
 
         if(icl_hash_insert(utentiRegistrati->hash, nickname, (void *)hist) == NULL){
             // Inserimento non andato a buon fine, allora rimuovo la coda che avevo creato per il nuovo utente
@@ -38,7 +37,7 @@ int register_op(long fd, message_t m){
             if(connect_op(fd, m, 1) == -1){ // La connect non è andata a buon fine, allora devo annullare la registrazione
                 icl_hash_delete(utentiRegistrati->hash, nickname, free, freeCoda); // Mi libera direttamente anche la history
                 UNLOCKRegistrati(m.hdr.sender);
-                free(nickname);
+                // free(nickname); non serve, la free del nickname la fa icl_hash_delete
                 return -1;
             }else {
                 UNLOCKRegistrati(m.hdr.sender);
@@ -59,11 +58,10 @@ int register_op(long fd, message_t m){
 // atomica == 1 -> ho già la lock sui registrati
 int connect_op(long fd, message_t m, int atomica){
     // Se deve fare la lock della hash deve avere atomica = 0
-    void * nickname = (void *)(m.hdr.sender);
     message_t r;
     if(!atomica){
         LOCKRegistrati(m.hdr.sender);
-        if(!registrato((char *)nickname)){ // Non esiste un utente registrato con questo nickname, restituisco un messaggio di errore OP_NICK_UNKNOWN
+        if(!registrato(m.hdr.sender)){ // Non esiste un utente registrato con questo nickname, restituisco un messaggio di errore OP_NICK_UNKNOWN
             UNLOCKRegistrati(m.hdr.sender);
             setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
             sendHeader(fd, &(r.hdr)); // rispondo direttamente sull'fd con cui mi ha fatto la richiesta
@@ -76,9 +74,9 @@ int connect_op(long fd, message_t m, int atomica){
     /* Non posso rilasciare la lock della hash prima di aver aggiunto nuovoUtente alla lista degli utenti connessi. Altrimenti se client1 facesse una richiesta UNREGISTER_OP per clientCorrente, il client1 non vedrebbe che clientCorrente è dentro la lista degli utenti connessi, quindi non lo eliminerebbe e resterebbe per sempre nella lista */
     LOCKConnessi();
     int pos;
-    if((pos = getUsrNickname(nickname)) != -1){ // Controllo se è già connesso
+    if((pos = getUsrNickname(m.hdr.sender)) != -1){ // Controllo se è già connesso
         // Esisite un utente già connesso con lo stesso nickname
-        if(!atomica) UNLOCKRegistrati(m.hdr.sender); // TODO va bene rilasciare le lock prima di inviare il messaggio?
+        if(!atomica) UNLOCKRegistrati(m.hdr.sender);
         UNLOCKConnessi();
         setHeader(&(r.hdr), OP_FAIL, ""); // Se non facessi questo controllo potrei dire, a un utente che ha sbagliato l'inserimento del nickname, che la connessione è andata a buon fine, mentre il nickname inserito è già connesso
         sendHeader(fd, &(r.hdr)); // rispondo sull'fd. Questo fd è quello con cui mi hanno fatto la richiesta, non quello dell'utente connesso
@@ -114,11 +112,10 @@ int connect_op(long fd, message_t m, int atomica){
 
 // atomica == 1 -> ho già la lock sui registrati, sui connessi e sull'fd su cui dovrò rispondere
 int usrlist_op(long fd, message_t m, int atomica){
-    void * nickname = (void *)(m.hdr.sender);
     message_t r;
     if(!atomica) {
         LOCKRegistrati(m.hdr.sender);
-        if(!registrato((char *)nickname)){ // Controllo se l'utente è registrato. Se non è registrato gli mando un errore OP_NICK_UNKNOWN
+        if(!registrato(m.hdr.sender)){ // Controllo se l'utente è registrato. Se non è registrato gli mando un errore OP_NICK_UNKNOWN
             UNLOCKRegistrati(m.hdr.sender);
             setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
             sendHeader(fd, &(r.hdr));
@@ -127,7 +124,7 @@ int usrlist_op(long fd, message_t m, int atomica){
         }
         int pos;
         LOCKConnessi();
-        if((pos = getUsrNickname(nickname)) != -1){ // Controllo se l'utente è connesso. Se è connesso bene, altrimenti ritorno errore
+        if((pos = getUsrNickname(m.hdr.sender)) != -1){ // Controllo se l'utente è connesso. Se è connesso bene, altrimenti ritorno errore
             // Esisite un utente già connesso con lo stesso nickname
             UNLOCKConnessi();
             UNLOCKRegistrati(m.hdr.sender);
@@ -149,6 +146,8 @@ int usrlist_op(long fd, message_t m, int atomica){
             setData(&(r.data), "", listStr, (MAX_NAME_LENGTH + 1) * nUsr);
             sendRequest(fd, &r);
             UNLOCKfd(pos);
+            free(r.data.buf); //r.data.buf non potrà mai essere vuoto -> almeno l'utente che sta chiamando la usrlist_op è connesso
+            free(listStr);
             return 0;
         }else{ // utente non connesso -> non devo prendere la lock su alcun fd
             UNLOCKRegistrati(m.hdr.sender);
@@ -164,12 +163,14 @@ int usrlist_op(long fd, message_t m, int atomica){
         setHeader(&(r.hdr), OP_OK, "");
         setData(&(r.data), "", listStr, (MAX_NAME_LENGTH + 1) * nUsr);
         sendRequest(fd, &r);
+        // free(r.data.buf); -> r.data.buf e listStr puntano alla stessa area di memoria
+        free(listStr);
         return 0;
     }
 }
 
 int unregister_op(long fd, message_t m){ // va chiamata con la lock sulla tabella hash (blocco del receiver e del sender) e sulla lista degli utenti connessi
-    void * nickname = (void *)(m.hdr.sender);
+
     message_t r;
     int pos;
 
@@ -220,7 +221,7 @@ int unregister_op(long fd, message_t m){ // va chiamata con la lock sulla tabell
         ADDStat("nerrors", 1);
         return -1;
     }
-    icl_hash_delete(utentiRegistrati->hash, nickname, free, freeCoda); // Mi libera direttamente anche la history. Non controllo errore dato che icl_hash_delete torna -1 solo nel caso in cui l'utente da eliminare non esista. Ma questo non può accadere altirmenti avrei mandato errore sopra
+    icl_hash_delete(utentiRegistrati->hash, (void *)&(m.hdr.sender), free, freeCoda); // Mi libera direttamente anche la history. Non controllo errore dato che icl_hash_delete torna -1 solo nel caso in cui l'utente da eliminare non esista. Ma questo non può accadere altirmenti avrei mandato errore sopra
 
     UNLOCKRegistrati(m.hdr.sender);
     setHeader(&(r.hdr), OP_OK, "");
@@ -248,10 +249,7 @@ int disconnect_op(long fd){
 }
 
 int posttxt_op(long fd, message_t m){
-    ADDStat("nnotdelivered", 1);
 
-    void * sender = (void *)(m.hdr.sender);
-    void * receiver = (void *)(m.data.hdr.receiver);
     // TODO controllare che sender e receiver non siano uguali. Altrimenti avrei che un client si può mandare un messaggio da solo
     message_t r;
     int posSender, posReceiver;
@@ -262,7 +260,6 @@ int posttxt_op(long fd, message_t m){
         setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
         sendHeader(fd, &(r.hdr));
         ADDStat("nerrors", 1);
-        ADDStat("nnotdelivered", -1);
         return -1;
     }
 
@@ -273,7 +270,6 @@ int posttxt_op(long fd, message_t m){
         setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(fd, &(r.hdr));
         ADDStat("nerrors", 1);
-        ADDStat("nnotdelivered", -1);
         return -1;
     }
 
@@ -287,64 +283,59 @@ int posttxt_op(long fd, message_t m){
         setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(fd, &(r.hdr));
         ADDStat("nerrors", 1);
-        ADDStat("nnotdelivered", -1);
         return -1;
     }
 
-    if(m.data.hdr.len > configurazione.MaxMsgSize){ // Controllo subito se la lunghezza del messaggio rispetta il file di configurazione. se non rispetta -> errore
+    if(m.data.hdr.len > configurazione->MaxMsgSize){ // Controllo subito se la lunghezza del messaggio rispetta il file di configurazione-> se non rispetta -> errore
         setHeader(&(r.hdr), OP_MSG_TOOLONG, "");
         sendHeader(fd, &(r.hdr));
         UNLOCKfd(posSender);
         ADDStat("nerrors", 1);
-        ADDStat("nnotdelivered", -1);
         return -1;
     }
 
     coda_circolare_s * h;
     LOCKRegistrati(m.data.hdr.receiver);
-    if((h = icl_hash_find(utentiRegistrati->hash, (void *)receiver)) == NULL){
+    if((h = icl_hash_find(utentiRegistrati->hash, (void *)&(m.data.hdr.receiver))) == NULL){
         UNLOCKRegistrati(m.data.hdr.receiver);
         setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
         sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
         UNLOCKfd(posSender);
         ADDStat("nerrors", 1);
-        ADDStat("nnotdelivered", -1);
         return -1;
     }
 
+    message_t * toSend = copyMessage(m);
+    toSend->hdr.op = TXT_MESSAGE;
     LOCKConnessi();
     if((posReceiver = getUsrNickname(m.data.hdr.receiver)) != -1){ // receiver connesso -> gli invio il messaggio
-         int fdReceiver = utentiConnessi->arr[posReceiver].fd;
-         UNLOCKConnessi();
-         LOCKfd(posReceiver);
-         if(strcmp(m.data.hdr.receiver, utentiConnessi->arr[posReceiver].nickname) == 0 || utentiConnessi->arr[posReceiver].fd == fdReceiver){
-             m.hdr.op = TXT_MESSAGE;
-             sendRequest(utentiConnessi->arr[posReceiver].fd, &m);
-         }
+         LOCKfd(posReceiver); // Non rilascio la lock dei connnessi
+         sendRequest(utentiConnessi->arr[posReceiver].fd, toSend);
          UNLOCKfd(posReceiver);
+         ADDStat("ndelivered", 1);
+    }else{
+        ADDStat("nnotdelivered", 1); // Lo devo fare solo se l'utente non è online
     }
     UNLOCKConnessi();
 
     /* Aggiungo il messaggio alla history del receiver */
-    inserisci(h, copyMessage(m));
+    inserisci(h, toSend); // toSend lo libererà la unregister_op
     UNLOCKRegistrati(m.data.hdr.receiver);
     setHeader(&(r.hdr), OP_OK, "");
     sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
     UNLOCKfd(posSender);
-    ADDStat("nnotdelivered", -1);
-    ADDStat("ndelivered", 1);
+
     return 0;
 }
 
 int getprevmsgs_op(long fd, message_t m){
-    void * sender = (void *)(m.hdr.sender);
 
     message_t r;
     coda_circolare_s * h;
     int pos;
 
     LOCKRegistrati(m.hdr.sender);
-    if((h = (coda_circolare_s *)icl_hash_find(utentiRegistrati->hash, sender)) == NULL){
+    if((h = (coda_circolare_s *)icl_hash_find(utentiRegistrati->hash, (void *)&(m.hdr.sender))) == NULL){
         UNLOCKRegistrati(m.hdr.sender);
         setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
         sendHeader(fd, &(r.hdr));
@@ -399,14 +390,12 @@ int posttxtall_op(long fd, message_t m){
     }
 
     LOCKConnessi();
-    ADDStat("nnotdelivered", utentiConnessi->nConnessi);
     if((posSender = getUsrNickname(m.hdr.sender)) == -1){
         UNLOCKConnessi();
         UNLOCKRegistrati(m.hdr.sender);
         setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(fd, &(r.hdr));
         ADDStat("nerrors", 1);
-        ADDStat("nnotdelivered", -utentiConnessi->nConnessi);
         return -1;
     }
 
@@ -422,18 +411,16 @@ int posttxtall_op(long fd, message_t m){
         setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(fd, &(r.hdr));
         ADDStat("nerrors", 1);
-        ADDStat("nnotdelivered", -utentiConnessi->nConnessi);
         return -1;
     }
 
-    if(m.data.hdr.len > configurazione.MaxMsgSize){ // Controllo subito se la lunghezza del messaggio rispetta il file di configurazione. se non rispetta -> errore
+    if(m.data.hdr.len > configurazione->MaxMsgSize){ // Controllo subito se la lunghezza del messaggio rispetta il file di configurazione-> se non rispetta -> errore
         UNLOCKConnessi();
         UNLOCKRegistrati(m.hdr.sender);
         setHeader(&(r.hdr), OP_MSG_TOOLONG, "");
         sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
         UNLOCKfd(posSender);
         ADDStat("nerrors", 1);
-        ADDStat("nnotdelivered", -utentiConnessi->nConnessi);
         return -1;
     }
 
@@ -454,6 +441,9 @@ int posttxtall_op(long fd, message_t m){
                     LOCKfd(posReceiver);
                     sendRequest(utentiConnessi->arr[posReceiver].fd, &m);
                     UNLOCKfd(posReceiver);
+                    ADDStat("ndelivered", 1);
+                }else{
+                    ADDStat("nnotdelivered", 1);
                 }
                 // In ogni caso aggiungo il messaggio alla sua history
                 inserisci((coda_circolare_s *)currUsr->data, copyMessage(m));
@@ -478,6 +468,7 @@ int postfile_op(long fd, message_t m){
         UNLOCKRegistrati(m.hdr.sender);
         setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
         sendHeader(fd, &(r.hdr));
+        ADDStat("nerrors", 1);
         return -1;
     }
 
@@ -487,6 +478,7 @@ int postfile_op(long fd, message_t m){
         UNLOCKRegistrati(m.hdr.sender);
         setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(fd, &(r.hdr));
+        ADDStat("nerrors", 1);
         return -1;
     }
 
@@ -499,40 +491,49 @@ int postfile_op(long fd, message_t m){
         UNLOCKRegistrati(m.hdr.sender);
         setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(fd, &(r.hdr));
+        ADDStat("nerrors", 1);
         return -1;
     }
 
     /* Leggo il file */
     message_t file;
 
-    char * path = malloc(sizeof(char) * (strlen(configurazione.DirName) + 1 + m.data.hdr.len + 1));
-    strcat(path, configurazione.DirName);
+    char * path = calloc(sizeof(char), (strlen(configurazione->DirName) + 1 + m.data.hdr.len)); // m.data.hdr.len tiene già conto dello '\0'
+    path[0] = '\0';
+    strcat(path, configurazione->DirName);
     strcat(path, "/"); // TODO controllare errori
     strcat(path, m.data.buf); // TODO controllare errori
-    printf("PATH: %s\n", path);
-    //checkDirectory(configurazione.DirName);
+    // TODO checkDirectory(configurazione->DirName);
 
-    if(access(path, F_OK) != -1) { // se esiste già un file con quel nome -> torno errore OP_FAIL
+    /*if(access(path, F_OK) != -1) { // se esiste già un file con quel nome -> torno errore OP_FAIL
         setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
         UNLOCKfd(posSender);
         return -1;
-    }
+    }*/
+
     readData(fd, &(file.data)); // Leggo il file vero e proprio
+
     // file.data.hdr.len corrisponde alla dimensione del file in byte
-    if((file.data.hdr.len / 1024) > configurazione.MaxFileSize){
+    if((file.data.hdr.len / 1024) > configurazione->MaxFileSize){
         setHeader(&(r.hdr), OP_MSG_TOOLONG, "");
         sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
         UNLOCKfd(posSender);
+        free(path);
+        free(file.data.buf);
+        ADDStat("nerrors", 1);
         return -1;
     }
     int fdNewFile;
-    if((fdNewFile = open(path, O_CREAT | O_WRONLY, 0777)) == -1){ // TODO controllare errori
-        perror("Errore creazione file\n");
-        exit -1;
+    if((fdNewFile = open(path, O_CREAT | O_WRONLY | O_TRUNC, 0777)) == -1){ // TODO controllare errori e STAT
+        free(file.data.buf);
+        free(path);
+        perror("Errore creazione file");
+        exit(-1);
     }
     write(fdNewFile, file.data.buf, file.data.hdr.len);
     close(fdNewFile);
+    free(file.data.buf);
     // File creato
 
     /* Controllo se è registrato. Se non è registrato elimino il file e torno errore */
@@ -544,30 +545,36 @@ int postfile_op(long fd, message_t m){
         sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
         UNLOCKfd(posSender);
         remove(path); // TODO controllare errori
+        free(path);
+        ADDStat("nerrors", 1);
         return -1;
     }
 
     /* Lo comunico all'utente*/
     message_t toSend;
     setHeader(&(toSend.hdr), FILE_MESSAGE, m.hdr.sender);
-    setData(&(toSend.data), "", m.data.buf, m.data.hdr.len);
+    setData(&(toSend.data), "", strdup(m.data.buf), m.data.hdr.len); // m.data.buf contiene il nome del file
 
     //LOCKConnessi(); // TODO attenzione al deadlock, forse non posso rilasciarla sopra
     if((posReceiver = getUsrNickname(m.data.hdr.receiver)) != -1){ // se è connesso gli mando subito un messaggio
         LOCKfd(posReceiver);
         sendRequest(utentiConnessi->arr[posReceiver].fd, &toSend);
         UNLOCKfd(posReceiver);
+        ADDStat("nfiledelivered", 1);
+    }else{
+        ADDStat("nfilenotdelivered", 1);
     }
     UNLOCKConnessi();
 
     // In ogni caso lo aggiungo sulla sua history
 
-    inserisci(h, copyMessage(m));
-    printf("Inserito nella history\n");
+    inserisci(h, copyMessage(toSend));
+    free(toSend.data.buf);
     UNLOCKRegistrati(m.data.hdr.receiver);
     setHeader(&(r.hdr), OP_OK, "");
     sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
     UNLOCKfd(posSender);
+    free(path);
     return 0;
 }
 
@@ -577,11 +584,11 @@ int getfile_op(long fd, message_t m){
     int pos;
 
     LOCKRegistrati(m.hdr.sender);
-    printf("Presa\n");
     if(!registrato(m.hdr.sender)){
         UNLOCKRegistrati(m.hdr.sender);
         setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
         sendHeader(fd, &(r.hdr));
+        ADDStat("nerrors", 1);
         return -1;
     }
 
@@ -591,6 +598,7 @@ int getfile_op(long fd, message_t m){
         UNLOCKConnessi();
         setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(fd, &(r.hdr));
+        ADDStat("nerrors", 1);
         return -1;
     }
 
@@ -601,11 +609,12 @@ int getfile_op(long fd, message_t m){
         UNLOCKfd(pos);
         setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(fd, &(r.hdr));
+        ADDStat("nerrors", 1);
         return -1;
     }
 
-    char * path = malloc(sizeof(char) * (strlen(configurazione.DirName) + 1 + m.data.hdr.len + 1));
-    strcat(path, configurazione.DirName);
+    char * path = malloc(sizeof(char) * (strlen(configurazione->DirName) + 1 + m.data.hdr.len + 1));
+    strcat(path, configurazione->DirName);
     strcat(path, "/");
     strcat(path, m.data.buf);
 
@@ -613,17 +622,18 @@ int getfile_op(long fd, message_t m){
         setHeader(&(r.hdr), OP_NO_SUCH_FILE, "");
         sendHeader(utentiConnessi->arr[pos].fd, &(r.hdr));
         UNLOCKfd(pos);
+        ADDStat("nerrors", 1);
         return -1;
     }
 
     int fdToSend;
     if((fdToSend = open(path, O_RDONLY)) == -1){
-        perror("Errore apertura file"); // TODO gestione errore
+        perror("Errore apertura file"); // TODO gestione errore e STAT
         exit -1;
     }
     struct stat statBuf;
     if(fstat(fdToSend, &statBuf) == -1){
-        perror("Errore stat file"); // TODO gestione errore
+        perror("Errore stat file"); // TODO gestione errore e STAT
         exit -1;
     }
 
@@ -631,13 +641,14 @@ int getfile_op(long fd, message_t m){
         setHeader(&(r.hdr), OP_NO_SUCH_FILE, "");
         sendHeader(utentiConnessi->arr[pos].fd, &(r.hdr));
         UNLOCKfd(pos);
+        ADDStat("nerrors", 1);
         return -1;
     }
 
     char * mappedfile = mmap(NULL, statBuf.st_size, PROT_READ,MAP_PRIVATE, fdToSend, 0);
     if(mappedfile == MAP_FAILED){
         perror("Errere mmap");
-        exit -1; // TODO gestione errore
+        exit -1; // TODO gestione errore e STAT
     }
     close(fdToSend);
     setHeader(&(r.hdr), OP_OK, "");
@@ -648,9 +659,7 @@ int getfile_op(long fd, message_t m){
     return 0;
 }
 
-void freeCoda(void * c){
-    eliminaCoda((coda_circolare_s *)c);
-}
+
 
 /*
  * @ return -1 se non esiste un utente connesso con quel nickname
@@ -658,7 +667,7 @@ void freeCoda(void * c){
  */
 int getUsrNickname(char * nickname){
     int i;
-    for(i=0; i<configurazione.MaxConnections; i++){
+    for(i=0; i<configurazione->MaxConnections; i++){
         if(utentiConnessi->arr[i].nickname) // controllo se il nickname è null
             if(strcmp(utentiConnessi->arr[i].nickname, nickname) == 0)
                 return i;
@@ -672,7 +681,7 @@ int getUsrNickname(char * nickname){
  */
 int getUsrFd(long fd){
     int i = 0;
-    for(i=0; i<configurazione.MaxConnections; i++){
+    for(i=0; i<configurazione->MaxConnections; i++){
         if(utentiConnessi->arr[i].fd == fd)
             return i;
     }
@@ -685,7 +694,7 @@ int getUsrFd(long fd){
  */
 int getPosizioneLibera(){
     int i;
-    for(i=0; i<configurazione.MaxConnections; i++){
+    for(i=0; i<configurazione->MaxConnections; i++){
         if(utentiConnessi->arr[i].nickname == NULL && utentiConnessi->arr[i].fd == -1){ // basterebbe anche solo una delle due condizioni
             return i;
         }
@@ -707,11 +716,15 @@ int registrato(char * nickname){
 char * makeListUsr(){
     int i = 0;
     char * r = calloc((MAX_NAME_LENGTH + 1) * utentiConnessi->nConnessi, sizeof(char)); // TODO controllare errore
+    if(!r) {
+        printf("Errore calloc\n");
+        exit(-1);
+    }
     for(i=0; i<(MAX_NAME_LENGTH + 1) * utentiConnessi->nConnessi; i++){
         r[i] = '\0';
     }
-    for(i=0; i<configurazione.MaxConnections; i++){
-        if(utentiConnessi->arr[i].nickname != NULL && utentiConnessi->arr[i].fd != -1){
+    for(i=0; i<configurazione->MaxConnections; i++){
+        if(utentiConnessi->arr[i].nickname != NULL && utentiConnessi->arr[i].fd != -1){ // Sono le posizioni dell'array in cui non ci sono utenti
             concat(r, utentiConnessi->arr[i].nickname, ((MAX_NAME_LENGTH + 1) * i)); // basterebbe anche solo una delle due condizioni
         }
     }

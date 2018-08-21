@@ -58,7 +58,7 @@ int readData(long fd, message_data_t *data){
         return r;
     }else{
         data->buf = calloc(data->hdr.len, sizeof(char));
-        if(!data->buf) return -1; // TODO da gestire
+        if(!data->buf) exit(-1); // TODO da gestire
         return readn(fd, data->buf, sizeof(char) * data->hdr.len);
     }
 }

@@ -35,7 +35,7 @@ if [[ $? != 0 ]]; then
     exit 1
 fi
 # quarto
-./client -l $1 -k qui -S "ciao a tutti": 
+./client -l $1 -k qui -S "ciao a tutti":
 if [[ $? != 0 ]]; then
     exit 1
 fi
@@ -63,7 +63,7 @@ OP_NICK_ALREADY=26
 ./client -l $1 -c pippo
 e=$?
 if [[ $((256-e)) != $OP_NICK_ALREADY ]]; then
-    echo "Errore non corrispondente $e" 
+    echo "Errore non corrispondente $e"
     exit 1
 fi
 
@@ -94,7 +94,7 @@ fi
 if [[ $? != 0 ]]; then
     exit 1
 fi
-./client -l $1 -k pluto -S "Ti mando un file":pippo -s ./chatty:pippo -s ./libchatty.a:pippo
+./client -l $1 -k pluto -S "Ti mando un file":pippo -s ./chatty:pippo -s stats.h:pippo
 if [[ $? != 0 ]]; then
     exit 1
 fi
@@ -102,10 +102,10 @@ fi
 # controllo che i file siano arrivati al server e che siano corretti
 md51=$(md5sum ./client | cut -d " " -f 1)
 md52=$(md5sum ./chatty | cut -d " " -f 1)
-md53=$(md5sum ./libchatty.a | cut -d " " -f 1)
+md53=$(md5sum ./stats.h | cut -d " " -f 1)
 md5client=$(md5sum $2/client | cut -d " " -f 1)
 md5chatty=$(md5sum $2/chatty | cut -d " " -f 1)
-md5lib=$(md5sum $2/libchatty.a | cut -d " " -f 1)
+md5lib=$(md5sum $2/stats.h | cut -d " " -f 1)
 
 if [[ $md5client != $md51 ]]; then
     echo "./client e $2/client differiscono!"
@@ -116,11 +116,9 @@ if [[ $md5chatty != $md52 ]]; then
     exit 1
 fi
 if [[ $md5lib != $md53 ]]; then
-    echo "./libchatty.a e $2/libchatty.a differiscono!"
+    echo "stats.h e $2stats.h differiscono!"
     exit 1
 fi
 
 echo "Test OK!"
 exit 0
-
-

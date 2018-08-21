@@ -2,6 +2,7 @@
 #define QUEUE_H_
 
 
+
 /** Elemento della coda.
  *
  */
@@ -20,7 +21,21 @@ typedef struct Queue {
 } Queue_t;
 
 
-/** Alloca ed inizializza una coda. Deve essere chiamata da un solo 
+static pthread_mutex_t qlock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  qcond = PTHREAD_COND_INITIALIZER;
+
+static Node_t *allocNode()         { return malloc(sizeof(Node_t));  }
+static Queue_t *allocQueue()       { return malloc(sizeof(Queue_t)); }
+static void freeNode(Node_t *node) { free((void*)node); }
+static void LockQueue()            { pthread_mutex_lock(&qlock);   }
+static void UnlockQueue()          { pthread_mutex_unlock(&qlock); }
+static void UnlockQueueAndWait()   { pthread_cond_wait(&qcond, &qlock); }
+static void UnlockQueueAndSignal() {
+    pthread_cond_signal(&qcond);
+    pthread_mutex_unlock(&qlock);
+}
+
+/** Alloca ed inizializza una coda. Deve essere chiamata da un solo
  *  thread (tipicamente il thread main).
  *   \param nrow numero righe
  *   \param numero colonne
@@ -32,14 +47,14 @@ Queue_t *initQueue();
 
 /** Cancella una coda allocata con initQueue. Deve essere chiamata da
  *  da un solo thread (tipicamente il thread main).
- *  
+ *
  *   \param q puntatore alla coda da cancellare
  */
 void deleteQueue(Queue_t *q);
 
 /** Inserisce un dato nella coda.
  *   \param data puntatore al dato da inserire
- *  
+ *
  *   \retval 0 se successo
  *   \retval -1 se errore (errno settato opportunamente)
  */
@@ -59,8 +74,8 @@ unsigned long length(Queue_t *q);
 
 /** Stampa sullo standard output la lunghezza della coda e gli elementi in essa contenuti
  *
- *   \param q puntatore alla coda 
- *   \param f funzione che trasforma data in una stringa. La stringa e' contenuta in buf che 
+ *   \param q puntatore alla coda
+ *   \param f funzione che trasforma data in una stringa. La stringa e' contenuta in buf che
  *   ha una size di s bytes.
  */
 void queueStatus(Queue_t *q, void (*f)(char *buf, size_t s, void *data));
