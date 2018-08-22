@@ -1,3 +1,7 @@
+#define _POSIX_C_SOURCE 200809L
+#define _GNU_SOURCE
+#include <strings.h>
+
 #include "./gestioneRichieste.h"
 #include "./parser.h"
 #include "./message.h"
@@ -5,17 +9,18 @@
 #include "./struttureCondivise.h"
 #include "./lib/GestioneHistory/codaCircolare.h"
 
-void concat(char * str1, char * str2, int first);
+
 char * makeListUsr();
 int registrato(char * nickname);
 message_t * copyMessage(message_t m);
 char * intToString(int n);
 int getUsrNickname(char * nickname);
 int getUsrFd(long fd);
+char * getOnlyFileName(char * path);
 int getPosizioneLibera();
 /* per tutte le funzioni: 0 successo, -1 errore */
 
-int register_op(long fd, message_t m){
+int register_op(long fd, message_t m){//printf("REG\n");
     void * nickname = malloc(sizeof(char) * (MAX_NAME_LENGTH + 1));
     strcpy((char *) nickname, m.hdr.sender);
 
@@ -23,7 +28,7 @@ int register_op(long fd, message_t m){
     LOCKRegistrati(m.hdr.sender);
     if(!registrato(m.hdr.sender)){ // Non esiste un utente con quel nickname, allora lo creo
         coda_circolare_s * hist = initCodaCircolare(configurazione->MaxMsgSize, freeMessage_t);
-
+        // TODO controllare che il nickname non sia > MAX_NAME_LENGTH
         if(icl_hash_insert(utentiRegistrati->hash, nickname, (void *)hist) == NULL){
             // Inserimento non andato a buon fine, allora rimuovo la coda che avevo creato per il nuovo utente
             UNLOCKRegistrati(m.hdr.sender);
@@ -56,7 +61,7 @@ int register_op(long fd, message_t m){
 }
 
 // atomica == 1 -> ho già la lock sui registrati
-int connect_op(long fd, message_t m, int atomica){
+int connect_op(long fd, message_t m, int atomica){//printf("CONN\n");
     // Se deve fare la lock della hash deve avere atomica = 0
     message_t r;
     if(!atomica){
@@ -111,10 +116,12 @@ int connect_op(long fd, message_t m, int atomica){
 }
 
 // atomica == 1 -> ho già la lock sui registrati, sui connessi e sull'fd su cui dovrò rispondere
-int usrlist_op(long fd, message_t m, int atomica){
+int usrlist_op(long fd, message_t m, int atomica){//printf("USRLIST\n");
     message_t r;
+    //bzero(&r, sizeof(message_t));
     if(!atomica) {
         LOCKRegistrati(m.hdr.sender);
+        //printf("USR -> lock registrati\n");
         if(!registrato(m.hdr.sender)){ // Controllo se l'utente è registrato. Se non è registrato gli mando un errore OP_NICK_UNKNOWN
             UNLOCKRegistrati(m.hdr.sender);
             setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
@@ -124,30 +131,23 @@ int usrlist_op(long fd, message_t m, int atomica){
         }
         int pos;
         LOCKConnessi();
+        //printf("USR -> lock connessi\n");
         if((pos = getUsrNickname(m.hdr.sender)) != -1){ // Controllo se l'utente è connesso. Se è connesso bene, altrimenti ritorno errore
             // Esisite un utente già connesso con lo stesso nickname
-            UNLOCKConnessi();
-            UNLOCKRegistrati(m.hdr.sender);
+
             LOCKfd(pos);
-            if(strcmp(m.hdr.sender, utentiConnessi->arr[pos].nickname) != 0 || utentiConnessi->arr[pos].fd != fd){
-                // Vuol dire che nel frattempo che prendevo la lock, il client è stato disconnesso
-                UNLOCKfd(pos);
-                setHeader(&(r.hdr), OP_FAIL, "");
-                sendHeader(fd, &(r.hdr));
-                ADDStat("nerrors", 1);
-                return -1;
-            }
-            LOCKConnessi();
+            //printf("USR -> lock FD\n");
             char * listStr = makeListUsr();
             int nUsr = utentiConnessi->nConnessi;
-            UNLOCKConnessi(); // TODO controllare possibili deadlock
+            UNLOCKConnessi();
+            UNLOCKRegistrati(m.hdr.sender);
             // Devo farla sotto la makeListUsr. L'alternativa sarebbe stata quella di mettere la unlock prima dell'if che controlla se il nickname ottenuto dopo la lock sull'fd è uguale a quello che sto analizzando e di fare la lock dei connessi nella funzione makeListUsr. Avrei però rischiato di andare in deadlock. Io a questo punto ho la lock sull'fd. Se nel frattempo si inseriva una richiesta di unregister, prendeva la lock sui connessi e si metteva in attesa per la lock sull'fd. Ora quando la makeListUsr andava a fare la lock sui connessi restava in attesa dato che al momento è della funzione unregister. Ma la unregister non può andare avanti finchè non termina la usrlist, ovvero fino a quando non termina la makeListUsr.
             setHeader(&(r.hdr), OP_OK, "");
             setData(&(r.data), "", listStr, (MAX_NAME_LENGTH + 1) * nUsr);
             sendRequest(fd, &r);
             UNLOCKfd(pos);
             free(r.data.buf); //r.data.buf non potrà mai essere vuoto -> almeno l'utente che sta chiamando la usrlist_op è connesso
-            free(listStr);
+            // free(listStr); liberando r.data.buf libero anche listStr
             return 0;
         }else{ // utente non connesso -> non devo prendere la lock su alcun fd
             UNLOCKRegistrati(m.hdr.sender);
@@ -170,7 +170,7 @@ int usrlist_op(long fd, message_t m, int atomica){
 }
 
 int unregister_op(long fd, message_t m){ // va chiamata con la lock sulla tabella hash (blocco del receiver e del sender) e sulla lista degli utenti connessi
-
+    //printf("UNREG\n");
     message_t r;
     int pos;
 
@@ -249,6 +249,7 @@ int disconnect_op(long fd){
 }
 
 int posttxt_op(long fd, message_t m){
+    //printf("POSTTXT\n");
 
     // TODO controllare che sender e receiver non siano uguali. Altrimenti avrei che un client si può mandare un messaggio da solo
     message_t r;
@@ -263,6 +264,7 @@ int posttxt_op(long fd, message_t m){
         return -1;
     }
 
+
     LOCKConnessi();
     if((posSender = getUsrNickname(m.hdr.sender)) == -1){
         UNLOCKConnessi();
@@ -273,31 +275,29 @@ int posttxt_op(long fd, message_t m){
         return -1;
     }
 
-    UNLOCKConnessi();
-    UNLOCKRegistrati(m.hdr.sender);
 
-    LOCKfd(posSender);
-    // TODO visto che prima era connesso potrei pure evitare questo controllo e inviare comunque il messaggio al receiver
-    if(strcmp(m.hdr.sender, utentiConnessi->arr[posSender].nickname) != 0 || utentiConnessi->arr[posSender].fd != fd){ // il sender è stato deregistrato nel frattempo che era in attesa sulla lock
-        UNLOCKfd(posSender);
-        setHeader(&(r.hdr), OP_FAIL, "");
-        sendHeader(fd, &(r.hdr));
-        ADDStat("nerrors", 1);
-        return -1;
-    }
+    LOCKfd(posSender); // Non ho rilasciato la lock sui connessi
+    UNLOCKRegistrati(m.hdr.sender);
+    UNLOCKConnessi();
 
     if(m.data.hdr.len > configurazione->MaxMsgSize){ // Controllo subito se la lunghezza del messaggio rispetta il file di configurazione-> se non rispetta -> errore
         setHeader(&(r.hdr), OP_MSG_TOOLONG, "");
-        sendHeader(fd, &(r.hdr));
+        sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
         UNLOCKfd(posSender);
         ADDStat("nerrors", 1);
         return -1;
     }
+    UNLOCKfd(posSender);
 
     coda_circolare_s * h;
     LOCKRegistrati(m.data.hdr.receiver);
     if((h = icl_hash_find(utentiRegistrati->hash, (void *)&(m.data.hdr.receiver))) == NULL){
         UNLOCKRegistrati(m.data.hdr.receiver);
+        LOCKfd(posSender);
+        if(strcmp(m.hdr.sender, utentiConnessi->arr[posSender].nickname) != 0 || utentiConnessi->arr[posSender].fd != fd){ // è stato disconnesso
+            UNLOCKfd(posSender);
+            return -1;
+        }
         setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
         sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
         UNLOCKfd(posSender);
@@ -310,25 +310,30 @@ int posttxt_op(long fd, message_t m){
     LOCKConnessi();
     if((posReceiver = getUsrNickname(m.data.hdr.receiver)) != -1){ // receiver connesso -> gli invio il messaggio
          LOCKfd(posReceiver); // Non rilascio la lock dei connnessi
+         //printf("POSTTXT -> lock FD receiver\n");
          sendRequest(utentiConnessi->arr[posReceiver].fd, toSend);
          UNLOCKfd(posReceiver);
          ADDStat("ndelivered", 1);
     }else{
-        ADDStat("nnotdelivered", 1); // Lo devo fare solo se l'utente non è online
+         ADDStat("nnotdelivered", 1); // Lo devo fare solo se l'utente non è online
     }
     UNLOCKConnessi();
 
     /* Aggiungo il messaggio alla history del receiver */
     inserisci(h, toSend); // toSend lo libererà la unregister_op
     UNLOCKRegistrati(m.data.hdr.receiver);
+    LOCKfd(posSender);
+    if(strcmp(m.hdr.sender, utentiConnessi->arr[posSender].nickname) != 0 || utentiConnessi->arr[posSender].fd != fd){
+        UNLOCKfd(posSender);
+        return 0;
+    }
     setHeader(&(r.hdr), OP_OK, "");
     sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
     UNLOCKfd(posSender);
-
     return 0;
 }
 
-int getprevmsgs_op(long fd, message_t m){
+int getprevmsgs_op(long fd, message_t m){//printf("PREVMSG\n");
 
     message_t r;
     coda_circolare_s * h;
@@ -369,18 +374,20 @@ int getprevmsgs_op(long fd, message_t m){
             sendRequest(utentiConnessi->arr[pos].fd, toSend); // TODO controllare errori
         }
     }
+    UNLOCKfd(pos);
     UNLOCKConnessi();
     UNLOCKRegistrati(m.hdr.sender);
-    UNLOCKfd(pos);
+
     eliminaIteratore(it);
     return 0;
 }
 
-int posttxtall_op(long fd, message_t m){
+int posttxtall_op(long fd, message_t m){//printf("POSTALL\n");
     message_t r;
     int posSender;
 
     LOCKRegistrati(m.hdr.sender);
+
     if(!registrato(m.hdr.sender)){
         UNLOCKRegistrati(m.hdr.sender);
         setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
@@ -390,6 +397,7 @@ int posttxtall_op(long fd, message_t m){
     }
 
     LOCKConnessi();
+
     if((posSender = getUsrNickname(m.hdr.sender)) == -1){
         UNLOCKConnessi();
         UNLOCKRegistrati(m.hdr.sender);
@@ -399,31 +407,19 @@ int posttxtall_op(long fd, message_t m){
         return -1;
     }
 
-    // UNLOCKConnessi(); Utenti connessi non posso rilasciarlo qui -> serve nei for per vedere se gli utenti sono connessi
-    UNLOCKRegistrati(m.hdr.sender);
-
     LOCKfd(posSender);
-    // TODO Se sono stato disconnesso mentre prendevo la lock, devo comunque inviare i messaggi visto che all'inizio ero connesso
-    if(strcmp(m.hdr.sender, utentiConnessi->arr[posSender].nickname) != 0 || utentiConnessi->arr[posSender].fd != fd){ // Sono stato disconnesso mentre prendevo la lock
-        UNLOCKfd(posSender);
-        UNLOCKConnessi();
-        UNLOCKRegistrati(m.hdr.sender);
-        setHeader(&(r.hdr), OP_FAIL, "");
-        sendHeader(fd, &(r.hdr));
-        ADDStat("nerrors", 1);
-        return -1;
-    }
+    UNLOCKRegistrati(m.hdr.sender);
 
     if(m.data.hdr.len > configurazione->MaxMsgSize){ // Controllo subito se la lunghezza del messaggio rispetta il file di configurazione-> se non rispetta -> errore
         UNLOCKConnessi();
-        UNLOCKRegistrati(m.hdr.sender);
         setHeader(&(r.hdr), OP_MSG_TOOLONG, "");
         sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
         UNLOCKfd(posSender);
-        ADDStat("nerrors", 1);
+        ADDStat("nerrors", 1);////printf("ERRORE 4\n");
         return -1;
     }
-
+    UNLOCKfd(posSender);
+    UNLOCKConnessi();
     icl_entry_t * bucket;
     icl_entry_t * currUsr;
     int posReceiver;
@@ -434,6 +430,7 @@ int posttxtall_op(long fd, message_t m){
 
     for (i=0; i<utentiRegistrati->hash->nbuckets; i++) {
         LOCKPosRegistrati(i);
+        LOCKConnessi();
         bucket = utentiRegistrati->hash->buckets[i];
         for (currUsr=bucket; currUsr!=NULL; currUsr=currUsr->next) {
             if(strcmp(currUsr->key, m.hdr.sender) != 0){ // altimenti si invierebbe il messaggio da solo
@@ -449,73 +446,92 @@ int posttxtall_op(long fd, message_t m){
                 inserisci((coda_circolare_s *)currUsr->data, copyMessage(m));
             }
         }
+        UNLOCKConnessi();
         UNLOCKPosRegistrati(i);
     }
-    UNLOCKConnessi();
+    LOCKfd(posSender);
+    if(strcmp(m.hdr.sender, utentiConnessi->arr[posSender].nickname) != 0 || utentiConnessi->arr[posSender].fd != fd){
+        UNLOCKfd(posSender); // è stato disconnesso mentre inviavo i messaggi
+        return 0;
+    }
     setHeader(&(r.hdr), OP_OK, "");
     sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
     UNLOCKfd(posSender);
     return 0;
 }
 
-int postfile_op(long fd, message_t m){
-
+int postfile_op(long fd, message_t m){// m.data.hdr.len tiene già conto dello '\0'
+    //printf("POSTFILE\n");
     message_t r;
-    int posSender, posReceiver;
+    int posSender, posReceiver, equal = 1;
 
+    //printf("LOCK registrati sender\n");
     LOCKRegistrati(m.hdr.sender);
+    //printf("PRESA LOCK registrati sender\n");
+    if(getIndexLockHash(m.hdr.sender) != getIndexLockHash(m.data.hdr.receiver)){
+        //printf("LOCK registrati receiver\n");
+        LOCKRegistrati(m.data.hdr.receiver);
+        //printf("PRESA LOCK registrati receiver\n");
+        equal = 0;
+    }
     if(!registrato(m.hdr.sender)){
         UNLOCKRegistrati(m.hdr.sender);
+        if(!equal) UNLOCKRegistrati(m.data.hdr.receiver);
         setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
         sendHeader(fd, &(r.hdr));
         ADDStat("nerrors", 1);
         return -1;
     }
 
+    //printf("LOCK CONNESSI\n");
     LOCKConnessi();
+    //printf("PRESA LOCK CONNESSI\n");
     if((posSender = getUsrNickname(m.hdr.sender)) == -1){
         UNLOCKConnessi();
         UNLOCKRegistrati(m.hdr.sender);
+        if(!equal) UNLOCKRegistrati(m.data.hdr.receiver);
         setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(fd, &(r.hdr));
         ADDStat("nerrors", 1);
         return -1;
     }
-
-    UNLOCKRegistrati(m.hdr.sender);
-    // TODO potrei pure non vedere se "è andata a buon fine, tanto il messaggio lo devo inviare comunque"
+    //printf("LOCK SENDER\n");
     LOCKfd(posSender);
-    if(strcmp(m.hdr.sender, utentiConnessi->arr[posSender].nickname) != 0 || utentiConnessi->arr[posSender].fd != fd){
-        UNLOCKfd(posSender);
-        UNLOCKConnessi();
+    //printf("PRESA LOCK SENDER\n");
+
+    /* Controllo se il receiver è registrato */
+    coda_circolare_s * h;
+    if((h = (coda_circolare_s *)icl_hash_find(utentiRegistrati->hash, m.data.hdr.receiver)) == NULL){
         UNLOCKRegistrati(m.hdr.sender);
-        setHeader(&(r.hdr), OP_FAIL, "");
-        sendHeader(fd, &(r.hdr));
+        if(!equal) UNLOCKRegistrati(m.data.hdr.receiver);
+        UNLOCKConnessi();
+        setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
+        sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
+        UNLOCKfd(posSender);
         ADDStat("nerrors", 1);
         return -1;
     }
 
     /* Leggo il file */
     message_t file;
+    char * fileName = getOnlyFileName(m.data.buf);
 
-    char * path = calloc(sizeof(char), (strlen(configurazione->DirName) + 1 + m.data.hdr.len)); // m.data.hdr.len tiene già conto dello '\0'
+    char * path = calloc(sizeof(char), (strlen(configurazione->DirName) + 1 + strlen(fileName) + 1));
     path[0] = '\0';
     strcat(path, configurazione->DirName);
     strcat(path, "/"); // TODO controllare errori
-    strcat(path, m.data.buf); // TODO controllare errori
-    // TODO checkDirectory(configurazione->DirName);
+    strcat(path, fileName); // TODO controllare errori
+    //free(fileName);
+    // TODO checkDirectory(path);
 
-    /*if(access(path, F_OK) != -1) { // se esiste già un file con quel nome -> torno errore OP_FAIL
-        setHeader(&(r.hdr), OP_FAIL, "");
-        sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
-        UNLOCKfd(posSender);
-        return -1;
-    }*/
 
     readData(fd, &(file.data)); // Leggo il file vero e proprio
 
     // file.data.hdr.len corrisponde alla dimensione del file in byte
     if((file.data.hdr.len / 1024) > configurazione->MaxFileSize){
+        UNLOCKRegistrati(m.hdr.sender);
+        UNLOCKRegistrati(m.data.hdr.receiver);
+        UNLOCKConnessi();
         setHeader(&(r.hdr), OP_MSG_TOOLONG, "");
         sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
         UNLOCKfd(posSender);
@@ -525,6 +541,7 @@ int postfile_op(long fd, message_t m){
         return -1;
     }
     int fdNewFile;
+    //printf("PATH: |%s|\n", path);
     if((fdNewFile = open(path, O_CREAT | O_WRONLY | O_TRUNC, 0777)) == -1){ // TODO controllare errori e STAT
         free(file.data.buf);
         free(path);
@@ -536,24 +553,11 @@ int postfile_op(long fd, message_t m){
     free(file.data.buf);
     // File creato
 
-    /* Controllo se è registrato. Se non è registrato elimino il file e torno errore */
-    coda_circolare_s * h;
-    LOCKRegistrati(m.data.hdr.receiver);
-    if((h = (coda_circolare_s *)icl_hash_find(utentiRegistrati->hash, m.data.hdr.receiver)) == NULL){
-        UNLOCKRegistrati(m.data.hdr.receiver);
-        setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
-        sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
-        UNLOCKfd(posSender);
-        remove(path); // TODO controllare errori
-        free(path);
-        ADDStat("nerrors", 1);
-        return -1;
-    }
 
     /* Lo comunico all'utente*/
     message_t toSend;
     setHeader(&(toSend.hdr), FILE_MESSAGE, m.hdr.sender);
-    setData(&(toSend.data), "", strdup(m.data.buf), m.data.hdr.len); // m.data.buf contiene il nome del file
+    setData(&(toSend.data), "", strdup(fileName), strlen(fileName)); // m.data.buf contiene il nome del file
 
     //LOCKConnessi(); // TODO attenzione al deadlock, forse non posso rilasciarla sopra
     if((posReceiver = getUsrNickname(m.data.hdr.receiver)) != -1){ // se è connesso gli mando subito un messaggio
@@ -565,6 +569,7 @@ int postfile_op(long fd, message_t m){
         ADDStat("nfilenotdelivered", 1);
     }
     UNLOCKConnessi();
+    if(!equal) UNLOCKRegistrati(m.hdr.sender);
 
     // In ogni caso lo aggiungo sulla sua history
 
@@ -578,7 +583,7 @@ int postfile_op(long fd, message_t m){
     return 0;
 }
 
-int getfile_op(long fd, message_t m){
+int getfile_op(long fd, message_t m){//printf("GETFILE\n");
 
     message_t r;
     int pos;
@@ -589,6 +594,7 @@ int getfile_op(long fd, message_t m){
         setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
         sendHeader(fd, &(r.hdr));
         ADDStat("nerrors", 1);
+        //printf("ERRORE 1\n");
         return -1;
     }
 
@@ -599,21 +605,25 @@ int getfile_op(long fd, message_t m){
         setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(fd, &(r.hdr));
         ADDStat("nerrors", 1);
+        //printf("ERRORE 2\n");
         return -1;
     }
 
-    UNLOCKRegistrati(m.hdr.sender);
-    UNLOCKConnessi();
+
     LOCKfd(pos);
-    if(strcmp(m.hdr.sender, utentiConnessi->arr[pos].nickname) != 0 || utentiConnessi->arr[pos].fd != fd){
+    /*if(strcmp(m.hdr.sender, utentiConnessi->arr[pos].nickname) != 0 || utentiConnessi->arr[pos].fd != fd){
         UNLOCKfd(pos);
         setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(fd, &(r.hdr));
         ADDStat("nerrors", 1);
+        //printf("ERRORE 3\n");
         return -1;
-    }
+    }*/
+    UNLOCKRegistrati(m.hdr.sender);
+    UNLOCKConnessi();
 
     char * path = malloc(sizeof(char) * (strlen(configurazione->DirName) + 1 + m.data.hdr.len + 1));
+    path[0] = '\0';
     strcat(path, configurazione->DirName);
     strcat(path, "/");
     strcat(path, m.data.buf);
@@ -622,33 +632,39 @@ int getfile_op(long fd, message_t m){
         setHeader(&(r.hdr), OP_NO_SUCH_FILE, "");
         sendHeader(utentiConnessi->arr[pos].fd, &(r.hdr));
         UNLOCKfd(pos);
+        free(path);
         ADDStat("nerrors", 1);
+        //printf("ERRORE 4\n");
         return -1;
     }
 
     int fdToSend;
     if((fdToSend = open(path, O_RDONLY)) == -1){
         perror("Errore apertura file"); // TODO gestione errore e STAT
-        exit -1;
+        free(path);
+        exit(-1);
     }
     struct stat statBuf;
     if(fstat(fdToSend, &statBuf) == -1){
         perror("Errore stat file"); // TODO gestione errore e STAT
-        exit -1;
+        free(path);
+        exit(-1);
     }
 
-    if(!S_ISREG(statBuf.st_mode)){
+    /*if(!S_ISREG(statBuf.st_mode)){
         setHeader(&(r.hdr), OP_NO_SUCH_FILE, "");
         sendHeader(utentiConnessi->arr[pos].fd, &(r.hdr));
         UNLOCKfd(pos);
         ADDStat("nerrors", 1);
+        free(path);
+        //printf("ERRORE 5\n");
         return -1;
-    }
+    }*/
 
     char * mappedfile = mmap(NULL, statBuf.st_size, PROT_READ,MAP_PRIVATE, fdToSend, 0);
     if(mappedfile == MAP_FAILED){
         perror("Errere mmap");
-        exit -1; // TODO gestione errore e STAT
+        exit(-1); // TODO gestione errore e STAT
     }
     close(fdToSend);
     setHeader(&(r.hdr), OP_OK, "");
@@ -656,6 +672,7 @@ int getfile_op(long fd, message_t m){
     sendRequest(utentiConnessi->arr[pos].fd, &r);
     UNLOCKfd(pos);
     munmap(mappedfile, statBuf.st_size);
+    free(path);
     return 0;
 }
 
@@ -713,28 +730,27 @@ int registrato(char * nickname){
     return icl_hash_find(utentiRegistrati->hash, (void *)nickname) != NULL;
 }
 
+char * getOnlyFileName(char * path){ // Prende in input un path e restituisce il nome del file associato al path
+    char * token, * last;
+    last = token = strtok(path, "/");
+    while((token = strtok(NULL, "/")) != NULL) last = token;
+    return last;
+}
+
 char * makeListUsr(){
     int i = 0;
-    char * r = calloc((MAX_NAME_LENGTH + 1) * utentiConnessi->nConnessi, sizeof(char)); // TODO controllare errore
+    char * r = malloc(sizeof(char) * ((MAX_NAME_LENGTH + 1) * utentiConnessi->nConnessi)); // TODO controllare errore
     if(!r) {
         printf("Errore calloc\n");
         exit(-1);
     }
-    for(i=0; i<(MAX_NAME_LENGTH + 1) * utentiConnessi->nConnessi; i++){
-        r[i] = '\0';
-    }
+    memset(r, 0, sizeof(char) * ((MAX_NAME_LENGTH + 1) * utentiConnessi->nConnessi));
+    char * tmp = r;
     for(i=0; i<configurazione->MaxConnections; i++){
         if(utentiConnessi->arr[i].nickname != NULL && utentiConnessi->arr[i].fd != -1){ // Sono le posizioni dell'array in cui non ci sono utenti
-            concat(r, utentiConnessi->arr[i].nickname, ((MAX_NAME_LENGTH + 1) * i)); // basterebbe anche solo una delle due condizioni
+            strncpy(tmp, utentiConnessi->arr[i].nickname, MAX_NAME_LENGTH + 1); // basterebbe anche solo una delle due condizioni
+            tmp += MAX_NAME_LENGTH + 1;
         }
     }
     return r;
-}
-
-void concat(char * str1, char * str2, int first){ // Alla fine str1 = str1
-    // str1 deve essere allocata in modo che possa contenere str2
-    // first = primo spazio libero di str1 per copiare la stringa str2
-    for(int i=0; i<strlen(str2); i++){
-        str1[first + i] = str2[i];
-    }
 }

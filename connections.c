@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 199309L
 #include "connections.h"
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -72,12 +73,14 @@ int readMsg(long fd, message_t *msg){
 
 int sendHeader(long fd, message_hdr_t *hdr){
     if(fd < 0 || hdr == NULL) return -1;
+    //bzero(hdr, sizeof(message_hdr_t));
     return writen(fd, hdr, sizeof(message_hdr_t));
 }
 
 int sendData(long fd, message_data_t *data){
     if(fd < 0 || data == NULL) return -1;
-    int r = writen(fd, &(data->hdr), sizeof(message_data_hdr_t));
+    //bzero(data, sizeof(data));
+    int r = writen(fd, &(data->hdr), sizeof(message_data_hdr_t)); // TODO credo che devo allocare il buffer
     if(r <= 0){
         return r;
     }

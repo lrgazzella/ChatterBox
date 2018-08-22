@@ -1,7 +1,7 @@
 #ifndef QUEUE_H_
 #define QUEUE_H_
 
-
+#include <stddef.h> // L'ho dovuto inserire visto che si compila con il compilatore c99 e non conosce il tipo size_t
 
 /** Elemento della coda.
  *
@@ -20,20 +20,6 @@ typedef struct Queue {
     unsigned long  qlen;
 } Queue_t;
 
-
-static pthread_mutex_t qlock = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t  qcond = PTHREAD_COND_INITIALIZER;
-
-static Node_t *allocNode()         { return malloc(sizeof(Node_t));  }
-static Queue_t *allocQueue()       { return malloc(sizeof(Queue_t)); }
-static void freeNode(Node_t *node) { free((void*)node); }
-static void LockQueue()            { pthread_mutex_lock(&qlock);   }
-static void UnlockQueue()          { pthread_mutex_unlock(&qlock); }
-static void UnlockQueueAndWait()   { pthread_cond_wait(&qcond, &qlock); }
-static void UnlockQueueAndSignal() {
-    pthread_cond_signal(&qcond);
-    pthread_mutex_unlock(&qlock);
-}
 
 /** Alloca ed inizializza una coda. Deve essere chiamata da un solo
  *  thread (tipicamente il thread main).

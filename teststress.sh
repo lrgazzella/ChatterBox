@@ -29,10 +29,9 @@ clientpid+=$!
 
 wait $clientpid
 
-for ((i=0;i<16;++i)); do 
+for ((i=0;i<16;++i)); do
 
     # si fa lo spawn di un certo numero di processi ognuno che esegue una sequenza di operazioni con differente velocita'
-
     ./client -l $1 -t 200 -k topolino -S "aaaaaaaaaaaaaaaaaaaaaaaaaaa":minni -S "bbbbbbbbbbbbbbbbb":pluto -S "ccccccccccccccccc": -S "ddddddddddddddddddddd":paperino -s client:minni -s chatty:qua -p -R 1 &
     ./client -l $1 -t 600 -k paperino -R 1  -S "aaaaaaaaaaaaaaaaaaaaaaaaaaa":minni -S "bbbbbbbbbbbbbbbbb":pluto -S "ccccccccccccccccc": -S "ddddddddddddddddddddd":topolino -s ./libchatty.a:pluto -p &
     ./client -l $1 -t 300 -k pluto -R 1  -S "aaaaaaaaaaaaaaaaaaaaaaaaaaa":minni -S "bbbbbbbbbbbbbbbbb":pluto -S "ccccccccccccccccc": -S "ddddddddddddddddddddd":topolino -s ./libchatty.a:minni -p &
@@ -44,17 +43,17 @@ for ((i=0;i<16;++i)); do
     ./client -l $1 -t 300 -k "zio paperone" -S "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa":clarabella -S "bbbbbbbbbbbbbbbbbb": -S "ccccccccccccccccc": -S "ddddddddddddddddddddd":topolino -p &
     ./client -l $1 -t 100 -k clarabella -S "bbbbbbbbbbbbbbbbbbbbbbbbbbbbb": -R 1 -s chatty:minni -S "ccccccccccccccccc": -S "ddddddddddddddddddddd": -S "eeeeeeeeeeeeeeeeeeeee": -S "fffffffffffffffff": -S "gggggggggggggggd": -S "hhhhhhhhhhhhh": -S "iiiiiiiiiiiiiiiiiiiiii": -S "llllllllllllllllll": -p &
 
-    for((k=0;k<5;++k)); do 
+    for((k=0;k<5;++k)); do
         # questi comandi falliscono tutti
 	./client -l $1 -k "utente$k" -S "ciao":
-	# statistiche 
+	# statistiche
 	killall -USR1 chatty
-    done    
+    done
 
     ./client -l $1 -c utente1
     ./client -l $1 -c utente2
     ./client -l $1 -k utente1 -R 5 -S connections.o:utente2 -p
-    ./client -l $1 -k utente2 -R 5 -p -S chatty.o:utente1 
+    ./client -l $1 -k utente2 -R 5 -p -S chatty.o:utente1
 
     ./client -l $i -C utente1
     ./client -l $i -C utente2
@@ -62,7 +61,8 @@ for ((i=0;i<16;++i)); do
     wait
 done
 
-#statistiche 
+#statistiche
 killall -USR1 chatty
 
 
+#

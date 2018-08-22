@@ -15,6 +15,7 @@ FILE_DA_CONSEGNARE=Makefile \
 			ops.h \
 			stats.h \
 			config.h \
+			client.c \
 		   	DATA/chatty.conf1 \
 			DATA/chatty.conf2 \
 			connections.h \
@@ -32,8 +33,6 @@ FILE_DA_CONSEGNARE=Makefile \
 			lib/GestioneListe/list_iterator.c \
 			lib/GestioneListe/list_node.c \
 			lib/GestioneListe/list.c \
-			lib/GestioneListe/list_iterator.h \
-			lib/GestioneListe/list_node.h \
 			lib/GestioneListe/list.h \
 			lib/GestioneQueue/queue.c \
 			lib/GestioneQueue/queue.h
@@ -82,7 +81,18 @@ TARGETS		= chatty        \
 
 
 # aggiungere qui i file oggetto da compilare
-OBJECTS		=
+OBJECTS		=  	chatty.o \
+				client.o \
+				connections.o \
+				gestioneRichieste.o \
+				parser.o \
+				lib/GestioneHashTable/icl_hash.o \
+				lib/GestioneHistory/codaCircolare.o \
+				lib/GestioneListe/list_iterator.o \
+				lib/GestioneListe/list_node.o \
+				lib/GestioneListe/list.o \
+				lib/GestioneQueue/queue.o
+
 
 # aggiungere qui gli altri include
 INCLUDE_FILES   = connections.h \
@@ -96,8 +106,6 @@ INCLUDE_FILES   = connections.h \
 		  utility.h \
 		  lib/GestioneHashTable/icl_hash.h \
 		  lib/GestioneHistory/codaCircolare.h \
-		  lib/GestioneListe/list_iterator.h \
-		  lib/GestioneListe/list_node.h \
 		  lib/GestioneListe/list.h \
 		  lib/GestioneQueue/queue.h
 

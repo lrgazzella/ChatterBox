@@ -126,7 +126,7 @@ static int downloadFile(int connfd, char *filename, char *sender) {
 	    if (readMessage(connfd, &msg.hdr)<=0) return -1;
 	} break;
 	default: {
-	    fprintf(stderr, "ERRORE: ricevuto messaggio non valido\n");
+	    fprintf(stderr, "ERRORE: ricevuto messaggio non valido: %d\n", msg.hdr.op);
 	    return -1;
 	}
 	}
@@ -143,7 +143,6 @@ static int execute_requestreply(int connfd, operation_t *o) {
     message_t msg;
     char  *mappedfile = NULL;
 
-    //setData(&msg.data, "", NULL, 0);
     setData(&msg.data, rname, NULL, 0); // NULL e 0 perchè sto facendo una richiesta, non invio nulla. I casi in cui invio file o testo, li gestisco nell'if
     setHeader(&msg.hdr, op, sname);
     if (op == POSTTXT_OP || op == POSTTXTALL_OP || op == POSTFILE_OP) {
@@ -250,7 +249,7 @@ static int execute_requestreply(int connfd, operation_t *o) {
             }
             // numero di messaggi che devo ricevere
             size_t nmsgs = *(size_t*)(msg.data.buf);
-            printf("Devo ricevere %zu messaggi\n", nmsgs);
+            // printf("Devo ricevere %zu messaggi\n", nmsgs);
             char *FILENAMES[nmsgs]; // NOTA: si suppone che nmsgs non sia molto grande
             size_t nfiles=0;
             for(size_t i=0;i<nmsgs;++i) {
@@ -347,7 +346,7 @@ static int execute_receive(int connfd, operation_t *o) {
                 printf("[Il file '%s' e' stato scaricato correttamente]\n",filename);
             } break;
             default: {
-                fprintf(stderr, "ERRORE: ricevuto messaggio non valido\n");
+                fprintf(stderr, "ERRORE: ricevuto messaggio non valido: %d\n", msg.hdr.op);
                 return -1;
             }
 	}

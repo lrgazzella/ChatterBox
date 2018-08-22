@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
     for(i=0; i<configurazione->ThreadsInPool; i++){
         pthread_join(pool_id[i], (void **)&ret_pool);
     }
-
+    printf("THREAD STOPPATI\n");
     /* FREE */
     // Eliminare la hash e le relative history
     icl_hash_destroy(utentiRegistrati->hash, free, freeCoda);
@@ -171,6 +171,7 @@ int main(int argc, char *argv[]) {
     }
 
     free(utentiRegistrati);
+    printf("FREE REGISTRATI\n");
     // Eliminare array connessi
     for(i=0; i<configurazione->MaxConnections; i++){
         if(utentiConnessi->arr[i].nickname)
@@ -180,25 +181,31 @@ int main(int argc, char *argv[]) {
     free(utentiConnessi->arr);
     pthread_mutex_destroy(&(utentiConnessi->arr_m));
     free(utentiConnessi);
+    printf("FREE CONNESSI\n");
     // Eliminare la coda delle richieste
     deleteQueue(richieste); // TODO non libera i nodi
+    printf("FREE QUEUE\n");
     // Eliminare le statistiche
     pthread_mutex_destroy(&(statistiche->stat_m));
     free(statistiche);
+    printf("FREE STAT\n");
     // Eliminare nSock
     pthread_mutex_destroy(&(nSock->contatore_m));
     free(nSock);
+    printf("FREE NSOCK\n");
     // Eliminare pipe
     for(i=0; i<configurazione->ThreadsInPool; i++){
         free(pfds[i]);
     }
     free(pfds);
+    printf("FREE PIPE\n");
     // Eliminare Configurazioni
     FreeConfig(configurazione);
-
+    printf("FREE CONFIG\n");
     //free(pathFileConf);
     free(pool_id);
     free(allThread);
+    printf("FREE TUTTO\n");
     return 0;
 }
 
@@ -223,11 +230,11 @@ void initDirFile(){
         if(errno == ENOENT){ // la directory che ho cercato di aprire non esiste
             if(mkdir(configurazione->DirName, 0777) == -1){
                 perror("Errore creazione cartella file");
-                exit -1;
+                exit(-1);
             }
         }else{
             perror("Errore apertura cartella file");
-            exit -1;
+            exit(-1);
         }
     }else{
         struct dirent * elem = NULL;
@@ -239,6 +246,7 @@ void initDirFile(){
                 continue;
             }
             tmpPath = malloc(sizeof(char) * (lenPath + 1 + strlen(elem->d_name) + 1)); // "path/elem->d_name'\0'"
+            tmpPath[0] = '\0';
             strcat(tmpPath, configurazione->DirName);
             strcat(tmpPath, "/"); // TODO controllare errori
             strcat(tmpPath, elem->d_name); // TODO controllare errori
@@ -309,9 +317,8 @@ static void * pool(void * arg){
         }
         r = readMsg(*fd, &msg);
         if(r < 0){ //TODO controllare errori.
-            free(fd);
             perror("Errore readMsg");
-            exit(-1);
+            //exit(-1);
         }else if(r == 0){
             // vuol dire che il client ha finito di comunicare, allora devo chiudere la connessione e eliminare l'utente dagli utenti connessi
             // è come se mi mandasse un messaggio con operazione DISCONNECT_OP
@@ -387,40 +394,40 @@ static void * pool(void * arg){
 void printRisOP(message_t m, int ok){
     switch(m.hdr.op){
         case REGISTER_OP:
-            if(ok == 0) printf("REGISTRAZIONE COMPLETATA: %s\n", m.hdr.sender);
-            else printf("ERRORE. REGISTRAZIONE ANNULLATA\n");
+            if(ok == 0) printf("REGISTER_OP OK: %s\n", m.hdr.sender);
+            else printf("REGISTER_OP ERRORE: %s\n", m.hdr.sender);
             break;
         case CONNECT_OP:
-            if(ok == 0) printf("UTENTE CONNESSO: %s\n", m.hdr.sender);
-            else printf("ERRORE. CONNESSIONE ANNULLATA\n");
+            if(ok == 0) printf("CONNECT_OP OK: %s\n", m.hdr.sender);
+            else printf("CONNECT_OP ERRORE: %s\n", m.hdr.sender);
             break;
         case USRLIST_OP:
-            if(ok == 0) printf("LISTA UTENTI ONLINE SPEDITA\n");
-            else printf("ERRORE. SPEDIZIONE ANNULLATA\n");
+            if(ok == 0) printf("USRLIST_OP OK: %s\n", m.hdr.sender);
+            else printf("USRLIST_OP ERRORE: %s\n", m.hdr.sender);
             break;
         case UNREGISTER_OP:
-            if(ok == 0) printf("UTENTE ELIMINATO\n");
-            else printf("ERRORE. ELIMINAZIONE UTENTE ANNULLATA\n");
+            if(ok == 0) printf("UNREGISTER_OP OK: %s\n", m.hdr.sender);
+            else printf("UNREGISTER_OP ERRORE: %s\n", m.hdr.sender);
             break;
         case POSTTXT_OP:
-            if(ok == 0) printf("MESSAGGIO INVIATO CORRETTAMENTE\n");
-            else printf("ERRORE. INVIO MESSAGGIO ANNULLATO\n");
+            if(ok == 0) printf("POSTTXT_OP OK: %s\n", m.hdr.sender);
+            else printf("POSTTXT_OP ERRORE: %s\n", m.hdr.sender);
             break;
         case GETPREVMSGS_OP:
-            if(ok == 0) printf("HISTORY INVIATA CORRETTAMENTE\n");
-            else printf("ERRORE. INVIO HISTORY ANNULLATA\n");
+            if(ok == 0) printf("GETPREVMSGS_OP OK: %s\n", m.hdr.sender);
+            else printf("GETPREVMSGS_OP ERRORE: %s\n", m.hdr.sender);
             break;
         case POSTTXTALL_OP:
-            if(ok == 0) printf("MESSAGGIO INVIATO A TUTTTI CORRETTAMENTE\n");
-            else printf("ERRORE. INVIO MESSAGGIO A TUTTI ANNULLATO\n");
+            if(ok == 0) printf("POSTTXTALL_OP OK: %s\n", m.hdr.sender);
+            else printf("POSTTXTALL_OP ERRORE: %s\n", m.hdr.sender);
             break;
         case GETFILE_OP:
-            if(ok == 0) printf("FILE INVIATO A TUTTTI CORRETTAMENTE\n");
-            else printf("ERRORE. FILE MESSAGGIO A TUTTI ANNULLATO\n");
+            if(ok == 0) printf("GETFILE_OP OK: %s\n", m.hdr.sender);
+            else printf("GETFILE_OP ERRORE: %s\n", m.hdr.sender);
             break;
         case POSTFILE_OP:
-            if(ok == 0) printf("INVIATO FILE CORRETTAMENTE\n");
-            else printf("ERRORE. INVIO FILE ANNULLATO\n");
+            if(ok == 0) printf("POSTFILE_OP OK: %s\n", m.hdr.sender);
+            else printf("POSTFILE_OP ERRORE: %s\n", m.hdr.sender);
             break;
     }
 }
@@ -511,11 +518,12 @@ static void * segnali(void * arg){
                 FILE * fileStat;
                 if((fileStat = fopen(configurazione->StatFileName, "a")) == NULL){ // "a" nella fopen corrisponde a O_WRONLY | O_CREAT | O_APPEND nella open
                     perror("Errore apertura file stat");
-                    exit -1;
+                    exit(-1);
                 }
                 LOCKStat();
                 printStats(fileStat, statistiche->stat);
                 UNLOCKStat();
+                fclose(fileStat);
             }
         }else{ // Ho ricevuto o SIGQUIT o SIGTERM o SIGINT
             printf("LIBERO TUTTO\n");
@@ -523,8 +531,8 @@ static void * segnali(void * arg){
             pthread_exit((void *)0);
         }
     }
-
 }
+
 /**
 * @return: -1 se ci sono stati errori
 *           1 se fd è una pipe
@@ -539,7 +547,6 @@ int isPipe(int fd){
 
 void stopAllThread(){
     // Eliminare tutti i thread
-    int i;
     pthread_cancel(allThread[1]); // Fermo subito il listener almeno non possono più arrivare le richieste
     stopPool(); // Fermo tutti i thread del pool
 }
