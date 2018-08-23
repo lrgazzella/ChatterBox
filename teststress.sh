@@ -31,6 +31,7 @@ wait $clientpid
 
 for ((i=0;i<16;++i)); do
 
+    echo "@@@@@@@@@@@@@@@@@@@@@@@@@@  ITERAZIONE $i INIZIATA  @@@@@@@@@@@@@@@@@@@@@@@@@@"
     # si fa lo spawn di un certo numero di processi ognuno che esegue una sequenza di operazioni con differente velocita'
     ./client -l $1 -t 200 -k topolino -S "aaaaaaaaaaaaaaaaaaaaaaaaaaa":minni -S "bbbbbbbbbbbbbbbbb":pluto -S "ccccccccccccccccc": -S "ddddddddddddddddddddd":paperino -s client:minni -s chatty:qua -p -R 1 &
     ./client -l $1 -t 600 -k paperino -R 1  -S "aaaaaaaaaaaaaaaaaaaaaaaaaaa":minni -S "bbbbbbbbbbbbbbbbb":pluto -S "ccccccccccccccccc": -S "ddddddddddddddddddddd":topolino -s ./libchatty.a:pluto -p &
@@ -45,9 +46,9 @@ for ((i=0;i<16;++i)); do
 
     for((k=0;k<5;++k)); do
         # questi comandi falliscono tutti
-	./client -l $1 -k "utente$k" -S "ciao":
-	# statistiche
-	killall -USR1 chatty
+    	./client -l $1 -k "utente$k" -S "ciao":
+    	# statistiche
+    	killall -USR1 chatty
     done
 
     ./client -l $1 -c utente1
@@ -59,8 +60,10 @@ for ((i=0;i<16;++i)); do
     ./client -l $i -C utente2
 
     wait
+    echo "@@@@@@@@@@@@@@@@@@@@@@@@@@  ITERAZIONE $i TERMINATA  @@@@@@@@@@@@@@@@@@@@@@@@@@"
 done
 
+echo " +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+- FINE +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+- "
 #statistiche
 killall -USR1 chatty
 

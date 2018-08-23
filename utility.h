@@ -24,6 +24,15 @@
     return -1;\
 }
 
+#define ec_meno1_c(s,m,c) if ((s) == -1) {\
+    perror(m);\
+    c;\
+}
+
+#define ec_null_c(s,m,c) if ((s) == -1) {\
+    perror(m);\
+    c;\
+}
 
 #include <errno.h>
 #include <unistd.h>

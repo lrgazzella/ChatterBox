@@ -238,7 +238,6 @@ void initDirFile(){
         }
     }else{
         struct dirent * elem = NULL;
-        struct stat statElem;
         errno = 0;
         char * tmpPath = NULL;
         while((elem = readdir(fileDir)) != NULL){
@@ -301,13 +300,10 @@ void stopPool(){
     }
 }
 
-
-
 static void * pool(void * arg){
     int * fd;
     int pipe = *((int *)arg);
     int ris, r;
-    int lock;
     message_t msg;
     while(1){
         fd = (int *)pop(richieste);
@@ -331,46 +327,46 @@ static void * pool(void * arg){
             UNLOCKnSock();
             // Quindi non ho letto nulla e non devo liberare niente
         }else{
-            //printf("Ricevuta op: %d da: %s\n", msg.hdr.op, msg.hdr.sender);
+            printf("Ricevuta op: %d da: %s con fd: %d\n", msg.hdr.op, msg.hdr.sender, *fd);
             //printf("--- MESSAGGIO ---\n");
             //printf("BUF: %s\nLEN: %d\nSENDER:%s\nRECEIVER:%s\n", msg.data.buf, msg.data.hdr.len, msg.hdr.sender, msg.data.hdr.receiver);
 
             switch(msg.hdr.op){
                 case REGISTER_OP:
                     ris = register_op(*fd, msg); //TODO controllare errori
-                    printRisOP(msg, ris);
+                    //printRisOP(msg, ris);
                     break;
                 case CONNECT_OP:
                     ris = connect_op(*fd, msg, 0);
-                    printRisOP(msg, ris);
+                    //printRisOP(msg, ris);
                     break;
                 case POSTTXT_OP:
                     ris = posttxt_op(*fd, msg);
-                    printRisOP(msg, ris);
+                    //printRisOP(msg, ris);
                     break;
                 case POSTTXTALL_OP:
                     ris = posttxtall_op(*fd, msg);
-                    printRisOP(msg, ris);
+                    //printRisOP(msg, ris);
                     break;
                 case POSTFILE_OP:
                     ris = postfile_op(*fd, msg);
-                    printRisOP(msg, ris);
+                    //printRisOP(msg, ris);
                     break;
                 case GETFILE_OP:
                     ris = getfile_op(*fd, msg);
-                    printRisOP(msg, ris);
+                    //printRisOP(msg, ris);
                     break;
                 case GETPREVMSGS_OP:
                     ris = getprevmsgs_op(*fd, msg);
-                    printRisOP(msg, ris);
+                    //printRisOP(msg, ris);
                     break;
                 case USRLIST_OP:
                     ris = usrlist_op(*fd, msg, 0);
-                    printRisOP(msg, ris);
+                    //printRisOP(msg, ris);
                     break;
                 case UNREGISTER_OP:
                     ris = unregister_op(*fd, msg);
-                    printRisOP(msg, ris);
+                    //printRisOP(msg, ris);
                     break;
                 default: printf("Errore default\n");
                     //TODO gestione errore
@@ -462,7 +458,7 @@ static void * listener(void * arg){
                 if (FD_ISSET(fd, &rdset)) {
                     if (fd == fd_skt) { /* sock connect pronto */
                         int fd_c = accept(fd_skt, NULL, 0);
-                        pthread_mutex_lock(&(nSock->contatore_m));
+                        pthread_mutex_lock(&(nSock->contatore_m)); // TODO usare la funzione in struttureCondivise
                         if(nSock->contatore >= configurazione->MaxConnections){
                             pthread_mutex_unlock(&(nSock->contatore_m));
                             message_t m;
@@ -493,6 +489,7 @@ static void * listener(void * arg){
                                 perror("Errore push");
                                 exit(-1);
                             }
+                            printf("Inserito fd: %d\n", fd);
                             FD_CLR(fd, &set);
                             fd_num = aggiorna(&set, fd_num);
                         }else{
