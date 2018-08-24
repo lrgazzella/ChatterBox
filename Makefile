@@ -11,6 +11,7 @@
 #
 FILE_DA_CONSEGNARE=Makefile \
 			chatty.c \
+			chatty.h \
 			message.h \
 			ops.h \
 			stats.h \
@@ -96,18 +97,19 @@ OBJECTS		=  	chatty.o \
 
 # aggiungere qui gli altri include
 INCLUDE_FILES   = connections.h \
-		  message.h \
-		  ops.h \
-		  stats.h \
-		  config.h \
-		  gestioneRichieste.h \
-		  parser.h \
-		  struttureCondivise.h \
-		  utility.h \
-		  lib/GestioneHashTable/icl_hash.h \
-		  lib/GestioneHistory/codaCircolare.h \
-		  lib/GestioneListe/list.h \
-		  lib/GestioneQueue/queue.h
+			chatty.h \
+			message.h \
+			ops.h \
+			stats.h \
+			config.h \
+			gestioneRichieste.h \
+			parser.h \
+			struttureCondivise.h \
+			utility.h \
+			lib/GestioneHashTable/icl_hash.h \
+			lib/GestioneHistory/codaCircolare.h \
+			lib/GestioneListe/list.h \
+			lib/GestioneQueue/queue.h
 
 
 .PHONY: all clean cleanall test1 test2 test3 test4 test5 consegna
@@ -211,7 +213,7 @@ consegna:
 	sleep 3
 	make test5
 	sleep 3
-	#tar -cvf $(TARNAME)_$(CORSO)_chatty.tar $(FILE_DA_CONSEGNARE)
+	tar -cvf $(TARNAME)_$(CORSO)_chatty.tar $(FILE_DA_CONSEGNARE)
 	@echo "*** TAR PRONTO $(TARNAME)_$(CORSO)_chatty.tar "
 	@echo "Per la consegna seguire le istruzioni specificate nella pagina del progetto:"
 	@echo " http://didawiki.di.unipi.it/doku.php/informatica/sol/laboratorio17/progetto"
