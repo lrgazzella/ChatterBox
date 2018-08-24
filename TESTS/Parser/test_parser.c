@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 
     printf("UnixPath: %s \n", conf.UnixPath);
     printf("MaxConnections: %d\n", conf.MaxConnections);
-    FreeConfig(&conf); //TODO scrivere nella documentazione che bisogna fare la free
+    FreeConfig(&conf); 
 
 
     return (EXIT_SUCCESS);

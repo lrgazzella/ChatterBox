@@ -59,7 +59,7 @@ int readData(long fd, message_data_t *data){
         return r;
     }else{
         data->buf = calloc(data->hdr.len, sizeof(char));
-        if(!data->buf) exit(-1); // TODO da gestire
+        if(!data->buf) return -1;
         return readn(fd, data->buf, sizeof(char) * data->hdr.len);
     }
 }
@@ -79,8 +79,7 @@ int sendHeader(long fd, message_hdr_t *hdr){
 
 int sendData(long fd, message_data_t *data){
     if(fd < 0 || data == NULL) return -1;
-    //bzero(data, sizeof(data));
-    int r = writen(fd, &(data->hdr), sizeof(message_data_hdr_t)); // TODO credo che devo allocare il buffer
+    int r = writen(fd, &(data->hdr), sizeof(message_data_hdr_t));
     if(r <= 0){
         return r;
     }

@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+/* Tutte le funzioni tornano -1 in caso di errore e 0 in caso di successo */
 
 int initParseCheck(char * nomeFile, config * configs){
     int p;
@@ -50,26 +51,24 @@ int parse(char * nomeFile, config * configs){
     char * save = NULL;
     int ok = 0;
 
+    if((fd = fopen(nomeFile, "r")) == NULL) return -1;
 
-    ec_null_return(fd = fopen(nomeFile, "r"), "Errore apertura file di configurazione");
     errno = 0;
     while (((read = getline(&line, &len, fd)) != -1) && (ok == 0)) { //in line ci sarà la una riga del file conf
         RemoveSpaces(line);
         if(line[0] != '#' && strlen(line) != 0){ //è un commento o una riga vuota, li ignoro
             char * parametro = strtok_r(line, "=", &save);
             char * value = strdup(save);
-            //printf("Parametro: |%s|\n", parametro);
-            //printf("Value: |%s|\n", value);
             ok = makeConfig(parametro, value, configs);
-            //free(parametro); //TODO perchè non funziona se metto le free?
             free(value);
         }
         errno = 0;
     }
     free(line);
     fclose(fd);
-    if(ok != 0) return ok; // se c'è stato un errore nella makeConfig ritorno
-    return -1; //se non ci sono stati errori, torna 0, altrimenti il codice di errore
+    if(ok != 0) return -1; // Se c'è stato un errore nella makeConfig ritorno -1
+    if(errno != 0) return -1; // Se c'è stato un errore nella getline torna -1
+    return 0; // Se non ci sono stati errori, torna 0
 }
 
 void FreeConfig(config * configs){
