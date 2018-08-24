@@ -1,0 +1,171 @@
+\hypertarget{icl__hash_8c}{}\section{lib/\+Gestione\+Hash\+Table/icl\+\_\+hash.c File Reference}
+\label{icl__hash_8c}\index{lib/\+Gestione\+Hash\+Table/icl\+\_\+hash.\+c@{lib/\+Gestione\+Hash\+Table/icl\+\_\+hash.\+c}}
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}icl\+\_\+hash.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$limits.\+h$>$}\newline
+Include dependency graph for icl\+\_\+hash.\+c\+:
+% FIG 0
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{icl__hash_8c_a2d10e257c22cc1e2f5b4ba85836ea6e5}\label{icl__hash_8c_a2d10e257c22cc1e2f5b4ba85836ea6e5}} 
+\#define {\bfseries B\+I\+T\+S\+\_\+\+I\+N\+\_\+int}~( sizeof(int) $\ast$ C\+H\+A\+R\+\_\+\+B\+IT )
+\item 
+\mbox{\Hypertarget{icl__hash_8c_a733032d4ad1dbc4241e6484ee43c5503}\label{icl__hash_8c_a733032d4ad1dbc4241e6484ee43c5503}} 
+\#define {\bfseries T\+H\+R\+E\+E\+\_\+\+Q\+U\+A\+R\+T\+E\+RS}~((int) ((B\+I\+T\+S\+\_\+\+I\+N\+\_\+int $\ast$ 3) / 4))
+\item 
+\mbox{\Hypertarget{icl__hash_8c_a884e9ecda77996d026dce1f76dbd1cd8}\label{icl__hash_8c_a884e9ecda77996d026dce1f76dbd1cd8}} 
+\#define {\bfseries O\+N\+E\+\_\+\+E\+I\+G\+H\+TH}~((int) (B\+I\+T\+S\+\_\+\+I\+N\+\_\+int / 8))
+\item 
+\mbox{\Hypertarget{icl__hash_8c_a55bd7253449b589fcbbe9cdb09838150}\label{icl__hash_8c_a55bd7253449b589fcbbe9cdb09838150}} 
+\#define {\bfseries H\+I\+G\+H\+\_\+\+B\+I\+TS}~( $\sim$((unsigned int)($\sim$0) $>$$>$ O\+N\+E\+\_\+\+E\+I\+G\+H\+TH ))
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structicl__hash__s}{icl\+\_\+hash\+\_\+t} $\ast$ \hyperlink{icl__hash_8c_a7dd8c07b7cf001deceaf83273c08cb10}{icl\+\_\+hash\+\_\+create} (int nbuckets, unsigned int($\ast$hash\+\_\+function)(void $\ast$), int($\ast$hash\+\_\+key\+\_\+compare)(void $\ast$, void $\ast$))
+\item 
+void $\ast$ \hyperlink{icl__hash_8c_a13a0f184a9dc3dfa3a68445101370e32}{icl\+\_\+hash\+\_\+find} (\hyperlink{structicl__hash__s}{icl\+\_\+hash\+\_\+t} $\ast$ht, void $\ast$key)
+\item 
+\hyperlink{structicl__entry__s}{icl\+\_\+entry\+\_\+t} $\ast$ \hyperlink{icl__hash_8c_a650b9755a4efce9df3093602ddb40414}{icl\+\_\+hash\+\_\+insert} (\hyperlink{structicl__hash__s}{icl\+\_\+hash\+\_\+t} $\ast$ht, void $\ast$key, void $\ast$\hyperlink{structdata}{data})
+\item 
+int \hyperlink{icl__hash_8c_a9a61a09d5f70d66cc668565645aa3e88}{icl\+\_\+hash\+\_\+delete} (\hyperlink{structicl__hash__s}{icl\+\_\+hash\+\_\+t} $\ast$ht, void $\ast$key, void($\ast$free\+\_\+key)(void $\ast$), void($\ast$free\+\_\+data)(void $\ast$))
+\item 
+int \hyperlink{icl__hash_8c_a4644f0e1c6aecfefd5ab9c378695d24a}{icl\+\_\+hash\+\_\+destroy} (\hyperlink{structicl__hash__s}{icl\+\_\+hash\+\_\+t} $\ast$ht, void($\ast$free\+\_\+key)(void $\ast$), void($\ast$free\+\_\+data)(void $\ast$))
+\item 
+int \hyperlink{icl__hash_8c_a0f2c0d444320e2847ecaa8efbd9ff730}{icl\+\_\+hash\+\_\+dump} (F\+I\+LE $\ast$stream, \hyperlink{structicl__hash__s}{icl\+\_\+hash\+\_\+t} $\ast$ht)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Dependency free hash table implementation.
+
+This simple hash table implementation should be easy to drop into any other peice of code, it does not depend on anything else \+:-\/)
+
+\begin{DoxyAuthor}{Author}
+Jakub Kurzak 
+\end{DoxyAuthor}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{icl__hash_8c_a7dd8c07b7cf001deceaf83273c08cb10}\label{icl__hash_8c_a7dd8c07b7cf001deceaf83273c08cb10}} 
+\index{icl\+\_\+hash.\+c@{icl\+\_\+hash.\+c}!icl\+\_\+hash\+\_\+create@{icl\+\_\+hash\+\_\+create}}
+\index{icl\+\_\+hash\+\_\+create@{icl\+\_\+hash\+\_\+create}!icl\+\_\+hash.\+c@{icl\+\_\+hash.\+c}}
+\subsubsection{\texorpdfstring{icl\+\_\+hash\+\_\+create()}{icl\_hash\_create()}}
+{\footnotesize\ttfamily \hyperlink{structicl__hash__s}{icl\+\_\+hash\+\_\+t}$\ast$ icl\+\_\+hash\+\_\+create (\begin{DoxyParamCaption}\item[{int}]{nbuckets,  }\item[{unsigned int($\ast$)(void $\ast$)}]{hash\+\_\+function,  }\item[{int($\ast$)(void $\ast$, void $\ast$)}]{hash\+\_\+key\+\_\+compare }\end{DoxyParamCaption})}
+
+Create a new hash table.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em nbuckets} & -- number of buckets to create \\
+\hline
+\mbox{\tt in}  & {\em hash\+\_\+function} & -- pointer to the hashing function to be used \\
+\hline
+\mbox{\tt in}  & {\em hash\+\_\+key\+\_\+compare} & -- pointer to the hash key comparison function to be used\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+pointer to new hash table. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{icl__hash_8c_a9a61a09d5f70d66cc668565645aa3e88}\label{icl__hash_8c_a9a61a09d5f70d66cc668565645aa3e88}} 
+\index{icl\+\_\+hash.\+c@{icl\+\_\+hash.\+c}!icl\+\_\+hash\+\_\+delete@{icl\+\_\+hash\+\_\+delete}}
+\index{icl\+\_\+hash\+\_\+delete@{icl\+\_\+hash\+\_\+delete}!icl\+\_\+hash.\+c@{icl\+\_\+hash.\+c}}
+\subsubsection{\texorpdfstring{icl\+\_\+hash\+\_\+delete()}{icl\_hash\_delete()}}
+{\footnotesize\ttfamily int icl\+\_\+hash\+\_\+delete (\begin{DoxyParamCaption}\item[{\hyperlink{structicl__hash__s}{icl\+\_\+hash\+\_\+t} $\ast$}]{ht,  }\item[{void $\ast$}]{key,  }\item[{void($\ast$)(void $\ast$)}]{free\+\_\+key,  }\item[{void($\ast$)(void $\ast$)}]{free\+\_\+data }\end{DoxyParamCaption})}
+
+Free one hash table entry located by key (key and data are freed using functions).
+
+
+\begin{DoxyParams}{Parameters}
+{\em ht} & -- the hash table to be freed \\
+\hline
+{\em key} & -- the key of the new item \\
+\hline
+{\em free\+\_\+key} & -- pointer to function that frees the key \\
+\hline
+{\em free\+\_\+data} & -- pointer to function that frees the data\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success, -\/1 on failure. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{icl__hash_8c_a4644f0e1c6aecfefd5ab9c378695d24a}\label{icl__hash_8c_a4644f0e1c6aecfefd5ab9c378695d24a}} 
+\index{icl\+\_\+hash.\+c@{icl\+\_\+hash.\+c}!icl\+\_\+hash\+\_\+destroy@{icl\+\_\+hash\+\_\+destroy}}
+\index{icl\+\_\+hash\+\_\+destroy@{icl\+\_\+hash\+\_\+destroy}!icl\+\_\+hash.\+c@{icl\+\_\+hash.\+c}}
+\subsubsection{\texorpdfstring{icl\+\_\+hash\+\_\+destroy()}{icl\_hash\_destroy()}}
+{\footnotesize\ttfamily int icl\+\_\+hash\+\_\+destroy (\begin{DoxyParamCaption}\item[{\hyperlink{structicl__hash__s}{icl\+\_\+hash\+\_\+t} $\ast$}]{ht,  }\item[{void($\ast$)(void $\ast$)}]{free\+\_\+key,  }\item[{void($\ast$)(void $\ast$)}]{free\+\_\+data }\end{DoxyParamCaption})}
+
+Free hash table structures (key and data are freed using functions).
+
+
+\begin{DoxyParams}{Parameters}
+{\em ht} & -- the hash table to be freed \\
+\hline
+{\em free\+\_\+key} & -- pointer to function that frees the key \\
+\hline
+{\em free\+\_\+data} & -- pointer to function that frees the data\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success, -\/1 on failure. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{icl__hash_8c_a0f2c0d444320e2847ecaa8efbd9ff730}\label{icl__hash_8c_a0f2c0d444320e2847ecaa8efbd9ff730}} 
+\index{icl\+\_\+hash.\+c@{icl\+\_\+hash.\+c}!icl\+\_\+hash\+\_\+dump@{icl\+\_\+hash\+\_\+dump}}
+\index{icl\+\_\+hash\+\_\+dump@{icl\+\_\+hash\+\_\+dump}!icl\+\_\+hash.\+c@{icl\+\_\+hash.\+c}}
+\subsubsection{\texorpdfstring{icl\+\_\+hash\+\_\+dump()}{icl\_hash\_dump()}}
+{\footnotesize\ttfamily int icl\+\_\+hash\+\_\+dump (\begin{DoxyParamCaption}\item[{F\+I\+LE $\ast$}]{stream,  }\item[{\hyperlink{structicl__hash__s}{icl\+\_\+hash\+\_\+t} $\ast$}]{ht }\end{DoxyParamCaption})}
+
+Dump the hash table\textquotesingle{}s contents to the given file pointer.
+
+
+\begin{DoxyParams}{Parameters}
+{\em stream} & -- the file to which the hash table should be dumped \\
+\hline
+{\em ht} & -- the hash table to be dumped\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success, -\/1 on failure. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{icl__hash_8c_a13a0f184a9dc3dfa3a68445101370e32}\label{icl__hash_8c_a13a0f184a9dc3dfa3a68445101370e32}} 
+\index{icl\+\_\+hash.\+c@{icl\+\_\+hash.\+c}!icl\+\_\+hash\+\_\+find@{icl\+\_\+hash\+\_\+find}}
+\index{icl\+\_\+hash\+\_\+find@{icl\+\_\+hash\+\_\+find}!icl\+\_\+hash.\+c@{icl\+\_\+hash.\+c}}
+\subsubsection{\texorpdfstring{icl\+\_\+hash\+\_\+find()}{icl\_hash\_find()}}
+{\footnotesize\ttfamily void$\ast$ icl\+\_\+hash\+\_\+find (\begin{DoxyParamCaption}\item[{\hyperlink{structicl__hash__s}{icl\+\_\+hash\+\_\+t} $\ast$}]{ht,  }\item[{void $\ast$}]{key }\end{DoxyParamCaption})}
+
+Search for an entry in a hash table.
+
+
+\begin{DoxyParams}{Parameters}
+{\em ht} & -- the hash table to be searched \\
+\hline
+{\em key} & -- the key of the item to search for\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+pointer to the data corresponding to the key. If the key was not found, returns N\+U\+LL. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{icl__hash_8c_a650b9755a4efce9df3093602ddb40414}\label{icl__hash_8c_a650b9755a4efce9df3093602ddb40414}} 
+\index{icl\+\_\+hash.\+c@{icl\+\_\+hash.\+c}!icl\+\_\+hash\+\_\+insert@{icl\+\_\+hash\+\_\+insert}}
+\index{icl\+\_\+hash\+\_\+insert@{icl\+\_\+hash\+\_\+insert}!icl\+\_\+hash.\+c@{icl\+\_\+hash.\+c}}
+\subsubsection{\texorpdfstring{icl\+\_\+hash\+\_\+insert()}{icl\_hash\_insert()}}
+{\footnotesize\ttfamily \hyperlink{structicl__entry__s}{icl\+\_\+entry\+\_\+t}$\ast$ icl\+\_\+hash\+\_\+insert (\begin{DoxyParamCaption}\item[{\hyperlink{structicl__hash__s}{icl\+\_\+hash\+\_\+t} $\ast$}]{ht,  }\item[{void $\ast$}]{key,  }\item[{void $\ast$}]{data }\end{DoxyParamCaption})}
+
+Insert an item into the hash table.
+
+
+\begin{DoxyParams}{Parameters}
+{\em ht} & -- the hash table \\
+\hline
+{\em key} & -- the key of the new item \\
+\hline
+{\em data} & -- pointer to the new item\textquotesingle{}s data\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+pointer to the new item. Returns N\+U\+LL on error. 
+\end{DoxyReturn}

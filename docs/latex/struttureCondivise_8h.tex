@@ -1,0 +1,81 @@
+\hypertarget{struttureCondivise_8h}{}\section{strutture\+Condivise.\+h File Reference}
+\label{struttureCondivise_8h}\index{strutture\+Condivise.\+h@{strutture\+Condivise.\+h}}
+
+
+File che contiene tutte le trutture dati utilizzate dal server Si dichiara che il contenuto di questo file e\textquotesingle{} in ogni sua parte opera originale dell\textquotesingle{}autore.  
+
+
+{\ttfamily \#include $<$pthread.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}./lib/\+Gestione\+Queue/queue.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./lib/\+Gestione\+Liste/list.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./lib/\+Gestione\+Hash\+Table/icl\+\_\+hash.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./lib/\+Gestione\+History/coda\+Circolare.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./message.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./config.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./parser.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./stats.\+h\char`\"{}}\newline
+Include dependency graph for strutture\+Condivise.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structutente__connesso}{utente\+\_\+connesso}
+\begin{DoxyCompactList}\small\item\em Struttura utilizzata per memorizzare tutte le informazioni di un utente connesso. \end{DoxyCompactList}\item 
+struct \hyperlink{structarray__struct}{array\+\_\+struct}
+\begin{DoxyCompactList}\small\item\em Struttura utilizzata per memorizzare l\textquotesingle{}insieme degli utenti connessi. \end{DoxyCompactList}\item 
+struct \hyperlink{structconnessi}{connessi}
+\begin{DoxyCompactList}\small\item\em Struttura utilizzata per memorizzare un contatore in mutua esclusione. Verrà utilizzato per tenere traccia del numero di socket attive. \end{DoxyCompactList}\item 
+struct \hyperlink{structhash}{hash}
+\begin{DoxyCompactList}\small\item\em Struttura utilizzata per memorizzare tutti gli utenti registrati. \end{DoxyCompactList}\item 
+struct \hyperlink{structstat__struct}{stat\+\_\+struct}
+\begin{DoxyCompactList}\small\item\em Struttura utilizzata per avere la struct delle statistiche in mutua esclusione. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{struttureCondivise_8h_ac110bf9919a57712e640184d7263540e}\label{struttureCondivise_8h_ac110bf9919a57712e640184d7263540e}} 
+typedef struct \hyperlink{structutente__connesso}{utente\+\_\+connesso} {\bfseries utente\+\_\+connesso\+\_\+s}
+\item 
+\mbox{\Hypertarget{struttureCondivise_8h_a4f7b859231875605a993d083044ecdaf}\label{struttureCondivise_8h_a4f7b859231875605a993d083044ecdaf}} 
+typedef struct \hyperlink{structarray__struct}{array\+\_\+struct} {\bfseries array\+\_\+s}
+\item 
+\mbox{\Hypertarget{struttureCondivise_8h_aa588e223155a1e3838ec0fe7a7b1bf16}\label{struttureCondivise_8h_aa588e223155a1e3838ec0fe7a7b1bf16}} 
+typedef struct \hyperlink{structconnessi}{connessi} {\bfseries connessi\+\_\+s}
+\item 
+\mbox{\Hypertarget{struttureCondivise_8h_a6fa0fd37bcca8bd7107bf449db3780fd}\label{struttureCondivise_8h_a6fa0fd37bcca8bd7107bf449db3780fd}} 
+typedef struct \hyperlink{structhash}{hash} {\bfseries hash\+\_\+s}
+\item 
+\mbox{\Hypertarget{struttureCondivise_8h_a900ee2bfc54024ca2b697176569cb750}\label{struttureCondivise_8h_a900ee2bfc54024ca2b697176569cb750}} 
+typedef struct \hyperlink{structstat__struct}{stat\+\_\+struct} {\bfseries stat\+\_\+s}
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{struttureCondivise_8h_a1afc6192c4b6af2de66f3409243c270c}\label{struttureCondivise_8h_a1afc6192c4b6af2de66f3409243c270c}} 
+\hyperlink{structQueue}{Queue\+\_\+t} $\ast$ {\bfseries richieste}
+\item 
+\mbox{\Hypertarget{struttureCondivise_8h_ab958ac6b569893c2c75b7f5a1fedabff}\label{struttureCondivise_8h_ab958ac6b569893c2c75b7f5a1fedabff}} 
+\hyperlink{structconfig__s}{config} $\ast$ {\bfseries configurazione}
+\item 
+\mbox{\Hypertarget{struttureCondivise_8h_a79e8468ad1f199b7fe277f33a70a579a}\label{struttureCondivise_8h_a79e8468ad1f199b7fe277f33a70a579a}} 
+\hyperlink{structhash}{hash\+\_\+s} $\ast$ {\bfseries utenti\+Registrati}
+\item 
+\mbox{\Hypertarget{struttureCondivise_8h_a474353771144b03d76f9c3d1bbf5b1e9}\label{struttureCondivise_8h_a474353771144b03d76f9c3d1bbf5b1e9}} 
+\hyperlink{structarray__struct}{array\+\_\+s} $\ast$ {\bfseries utenti\+Connessi}
+\item 
+\mbox{\Hypertarget{struttureCondivise_8h_a40b8bdc04bd9c38e73673e9379e3850b}\label{struttureCondivise_8h_a40b8bdc04bd9c38e73673e9379e3850b}} 
+\hyperlink{structconnessi}{connessi\+\_\+s} $\ast$ {\bfseries n\+Sock}
+\item 
+\mbox{\Hypertarget{struttureCondivise_8h_a78b94091667df6a7b8b2aef8f836d4fb}\label{struttureCondivise_8h_a78b94091667df6a7b8b2aef8f836d4fb}} 
+\hyperlink{structstat__struct}{stat\+\_\+s} $\ast$ {\bfseries statistiche}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File che contiene tutte le trutture dati utilizzate dal server Si dichiara che il contenuto di questo file e\textquotesingle{} in ogni sua parte opera originale dell\textquotesingle{}autore. 
+
+\begin{DoxyAuthor}{Author}
+Lorenzo Gazzella 546890 
+\end{DoxyAuthor}

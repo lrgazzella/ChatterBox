@@ -5,10 +5,13 @@
  * Docenti: Prencipe, Torquati
  *
  */
-/**
- * @file chatty.c
- * @brief File principale del server chatterbox
- */
+
+ /** @file chatty.c
+   * @author Lorenzo Gazzella 546890
+   * @brief File principale del server chatterbox
+   * Si dichiara che il contenuto di questo file e' in ogni sua parte opera
+   * originale dell'autore
+   */
 #include "./chatty.h"
 
 // OSS: Nelle funzioni di init non controllo che la pthread_mutex_destroy vada a buon fine perchè può fallire solo per due motivi:
@@ -222,7 +225,6 @@ int initStat(){
     return 0;
 }
 
-// Se esiste già la cartella con quel nome la svuota, altrimenti la crea
 int initDirFile(){
     DIR * fileDir = NULL;
     size_t lenPath = strlen(configurazione->DirName);
@@ -341,9 +343,9 @@ void stopPool(int nThreadAttivi){
     }
 }
 
-static void * pool(void * arg){
+static void * pool(void * p){
     int * fd;
-    int pipe = *((int *)arg);
+    int pipe = *((int *)p);
     int ris, r;
     message_t msg;
     while(1){
@@ -460,7 +462,7 @@ void printRisOP(message_t m, int ok){
     }
 }
 
-static void * listener(void * arg){
+static void * listener(void * arrayPipe){
     int fd_skt, fd_num = 0;
     int i;
     fd_set rdset, set;
@@ -469,7 +471,7 @@ static void * listener(void * arg){
         stopAllThread(1, 0, configurazione->ThreadsInPool);
         pthread_exit((void *)-1);
     }
-    int **pfds = (int **)arg;
+    int **pfds = (int **)arrayPipe;
     FD_ZERO(&set);
     for(i=0; i<configurazione->ThreadsInPool; i++){
         FD_SET(pfds[i][0], &set);
@@ -540,8 +542,8 @@ static void * listener(void * arg){
     }
 }
 
-static void * segnali(void * arg){
-    sigset_t toHandle = *((sigset_t *)arg);
+static void * segnali(void * sgn_set){
+    sigset_t toHandle = *((sigset_t *)sgn_set);
     int sigRicevuto;
 
     while(sigwait(&toHandle, &sigRicevuto) == 0){ // non ci sono errori
@@ -568,11 +570,7 @@ static void * segnali(void * arg){
     }
 }
 
-/**
-* @return: -1 se ci sono stati errori
-*           1 se fd è una pipe
-*           0 altrimenti
-*/
+
 int isPipe(int fd){
     if(fd < 0) return -1;
     struct stat file;

@@ -31,10 +31,6 @@ FILE_DA_CONSEGNARE=Makefile \
 			lib/GestioneHashTable/icl_hash.h \
 			lib/GestioneHistory/codaCircolare.c \
 			lib/GestioneHistory/codaCircolare.h \
-			lib/GestioneListe/list_iterator.c \
-			lib/GestioneListe/list_node.c \
-			lib/GestioneListe/list.c \
-			lib/GestioneListe/list.h \
 			lib/GestioneQueue/queue.c \
 			lib/GestioneQueue/queue.h
 
@@ -89,9 +85,6 @@ OBJECTS		=  	chatty.o \
 				parser.o \
 				lib/GestioneHashTable/icl_hash.o \
 				lib/GestioneHistory/codaCircolare.o \
-				lib/GestioneListe/list_iterator.o \
-				lib/GestioneListe/list_node.o \
-				lib/GestioneListe/list.o \
 				lib/GestioneQueue/queue.o
 
 
@@ -108,7 +101,6 @@ INCLUDE_FILES   = connections.h \
 			utility.h \
 			lib/GestioneHashTable/icl_hash.h \
 			lib/GestioneHistory/codaCircolare.h \
-			lib/GestioneListe/list.h \
 			lib/GestioneQueue/queue.h
 
 

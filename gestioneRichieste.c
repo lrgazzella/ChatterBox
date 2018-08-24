@@ -1,3 +1,10 @@
+/** @file gestioneRichieste.c
+  * @author Lorenzo Gazzella 546890
+  * @brief Contiene l'implementazione di tutti i metodi per la gestione delle singole operazioni che il server gestisce.
+  *        Constiene inoltre alcune funzioni di utilità utilizzate nel corpo delle funzione per gestire le richieste.
+  * Si dichiara che il contenuto di questo file e' in ogni sua parte opera
+  * originale dell'autore
+  */
 #include "gestioneRichieste.h"
 
 
@@ -11,7 +18,6 @@ int getUsrFd(long fd);
 char * getOnlyFileName(char * path);
 int getPosizioneLibera();
 
-/* per tutte le funzioni: 0 successo, -1 errore */
 
 int register_op(long fd, message_t m){
     void * nickname = malloc(sizeof(char) * (MAX_NAME_LENGTH + 1));

@@ -1,0 +1,351 @@
+\hypertarget{chatty_8h}{}\section{chatty.\+h File Reference}
+\label{chatty_8h}\index{chatty.\+h@{chatty.\+h}}
+
+
+File che contiene la dichiarazione di tutte le funzioni utilizzate nel file \hyperlink{chatty_8c}{chatty.\+c} Si dichiara che il contenuto di questo file e\textquotesingle{} in ogni sua parte opera originale dell\textquotesingle{}autore.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$signal.\+h$>$}\newline
+{\ttfamily \#include $<$pthread.\+h$>$}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+{\ttfamily \#include $<$sys/stat.\+h$>$}\newline
+{\ttfamily \#include $<$dirent.\+h$>$}\newline
+{\ttfamily \#include $<$sys/un.\+h$>$}\newline
+{\ttfamily \#include $<$sys/socket.\+h$>$}\newline
+{\ttfamily \#include $<$sys/select.\+h$>$}\newline
+{\ttfamily \#include $<$getopt.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}./strutture\+Condivise.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./parser.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./lib/\+Gestione\+Queue/queue.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./lib/\+Gestione\+Liste/list.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./lib/\+Gestione\+Hash\+Table/icl\+\_\+hash.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./stats.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./utility.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./connections.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./config.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./gestione\+Richieste.\+h\char`\"{}}\newline
+Include dependency graph for chatty.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{chatty_8h_a3024ccd4a9af5109d24e6c57565d74a1}\label{chatty_8h_a3024ccd4a9af5109d24e6c57565d74a1}} 
+\#define {\bfseries \+\_\+\+P\+O\+S\+I\+X\+\_\+\+C\+\_\+\+S\+O\+U\+R\+CE}~200809L
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{chatty_8h_a5ece610682861d1713357ebe3d61997f}{create\+Socket} ()
+\begin{DoxyCompactList}\small\item\em Funzione che si occupa della creazione della socket. \end{DoxyCompactList}\item 
+int \hyperlink{chatty_8h_aad2eba9dcce98b4a5d1ab4b1cae9a527}{aggiorna} (fd\+\_\+set $\ast$set, int max)
+\begin{DoxyCompactList}\small\item\em Funzione che trova file descriptor più grande all\textquotesingle{}intero di un insieme di fd. Verrà chiamata a seguito di una cancellazione di un fd dall\textquotesingle{}insieme degli fd. \end{DoxyCompactList}\item 
+int \hyperlink{chatty_8h_a8509726415161d5a6944a64e31b511ac}{is\+Pipe} (int fd)
+\begin{DoxyCompactList}\small\item\em Funzione che verifica se un fd è una pipe. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{chatty_8h_a0e499099f562e203205fc3a172ce7351}\label{chatty_8h_a0e499099f562e203205fc3a172ce7351}} 
+void {\bfseries print\+Ris\+OP} (\hyperlink{structmessage__t}{message\+\_\+t} m, int ok)
+\item 
+void \hyperlink{chatty_8h_a03070d47a810d44ac351b8f5fd5000f6}{stop\+All\+Thread} (int segnali, int listener, int n\+Thread\+Attivi)
+\begin{DoxyCompactList}\small\item\em Funzione che stoppa i thread indicati dai parametri. \end{DoxyCompactList}\item 
+void \hyperlink{chatty_8h_a76db2dbced18d80ff2d884bc1be46e8b}{join\+All\+Thread} ()
+\begin{DoxyCompactList}\small\item\em Funzione effettua le join di tutti i thread del server. \end{DoxyCompactList}\item 
+void \hyperlink{chatty_8h_abba8289f04610be41e390483374e8cbe}{stop\+Pool} (int n\+Thread\+Attivi)
+\begin{DoxyCompactList}\small\item\em Funzione che stoppa un certo numero di thread del pool. \end{DoxyCompactList}\item 
+int \hyperlink{chatty_8h_a94bb61a938848c72a193879a5a6f89a5}{init\+Hash\+Lock} ()
+\begin{DoxyCompactList}\small\item\em Funzione che inizializza l\textquotesingle{}array (utenti\+Registrati.\+hash\+\_\+m) delle lock della tabella hash. \end{DoxyCompactList}\item 
+int \hyperlink{chatty_8h_ad072f5fd786f46f0d897d769cf17db16}{init\+Registrati} ()
+\begin{DoxyCompactList}\small\item\em Funzione che inizializza l\textquotesingle{}intera hash table degli utenti registrati e le relative lock. \end{DoxyCompactList}\item 
+int \hyperlink{chatty_8h_a8dd116ba5e18407ff278f3c5d361dc4b}{init\+Dir\+File} ()
+\begin{DoxyCompactList}\small\item\em Funzione che inizializza la directory in cui si andranno a salvare tutti i file scambiati tra gli utenti. \end{DoxyCompactList}\item 
+int \hyperlink{chatty_8h_acd8fc2aefafcfb9fefa2a0799a6a453a}{init\+N\+Sock} ()
+\begin{DoxyCompactList}\small\item\em Funzione che inizializza il contatore di socket attive e la relativa lock. Se la cartella esiste già la svuota, altrimenti la crea. \end{DoxyCompactList}\item 
+int \hyperlink{chatty_8h_a01aea843fbcf0464a585e15e926edd2f}{init\+Stat} ()
+\begin{DoxyCompactList}\small\item\em Funzione che inizializza la struct delle statistiche. \end{DoxyCompactList}\item 
+int \hyperlink{chatty_8h_a738938a93d951fd1ffd7f09e1e102a4c}{init\+Connessi} ()
+\begin{DoxyCompactList}\small\item\em Funzione che inizializza l\textquotesingle{}array degli utenti connessi e le relative lock. \end{DoxyCompactList}\item 
+void \hyperlink{chatty_8h_a31218041afb760a2d455019b7e5a978e}{cleanup\+Configurazione} ()
+\begin{DoxyCompactList}\small\item\em Funzione che libera la memoria occupata dalla struct delle configurazioni. \end{DoxyCompactList}\item 
+void \hyperlink{chatty_8h_a2e1ae9ecb3dcef089d578627891ef20a}{cleanup\+Richieste} ()
+\begin{DoxyCompactList}\small\item\em Funzione che libera la memoria occupata dalla coda delle richieste. \end{DoxyCompactList}\item 
+void \hyperlink{chatty_8h_a6896c6367d89aad456d07321e933a6c0}{cleanup\+Stat} ()
+\begin{DoxyCompactList}\small\item\em Funzione che libera la memoria occupata dalla struct delle statistiche. \end{DoxyCompactList}\item 
+void \hyperlink{chatty_8h_ab480aa59ec403d489123a3e6002477ee}{cleanup\+N\+Sock} ()
+\begin{DoxyCompactList}\small\item\em Funzione che libera la memoria occupata dalla struct relativa al contatore di socket attive. \end{DoxyCompactList}\item 
+void \hyperlink{chatty_8h_ae4243c2520358b625c0aff9c0a4243b4}{cleanup\+Registrati} ()
+\begin{DoxyCompactList}\small\item\em Funzione che libera la memoria occupata hash degli utenti registrati. \end{DoxyCompactList}\item 
+void \hyperlink{chatty_8h_a212ca8f9d5789c4482757ca3959667ef}{cleanup\+Connessi} ()
+\begin{DoxyCompactList}\small\item\em Funzione che libera la memoria occupata dall\textquotesingle{}array degli utenti connessi. \end{DoxyCompactList}\item 
+void \hyperlink{chatty_8h_a3fe5b3e9c7a25aa943e2d51c049776d4}{cleanup\+Pipe} ()
+\begin{DoxyCompactList}\small\item\em Funzione che libera la memoria occupata dall\textquotesingle{}array di pipe usate per la comunicazione tra listener e pool. \end{DoxyCompactList}\item 
+void \hyperlink{chatty_8h_a5190ec49d24282426465e3731a34c20f}{cleanup\+Thread\+Id} ()
+\begin{DoxyCompactList}\small\item\em Funzione che libera la memoria occupata dall\textquotesingle{}array degli id dei thread. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File che contiene la dichiarazione di tutte le funzioni utilizzate nel file \hyperlink{chatty_8c}{chatty.\+c} Si dichiara che il contenuto di questo file e\textquotesingle{} in ogni sua parte opera originale dell\textquotesingle{}autore. 
+
+\begin{DoxyAuthor}{Author}
+Lorenzo Gazzella 546890 
+\end{DoxyAuthor}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{chatty_8h_aad2eba9dcce98b4a5d1ab4b1cae9a527}\label{chatty_8h_aad2eba9dcce98b4a5d1ab4b1cae9a527}} 
+\index{chatty.\+h@{chatty.\+h}!aggiorna@{aggiorna}}
+\index{aggiorna@{aggiorna}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{aggiorna()}{aggiorna()}}
+{\footnotesize\ttfamily int aggiorna (\begin{DoxyParamCaption}\item[{fd\+\_\+set $\ast$}]{set,  }\item[{int}]{max }\end{DoxyParamCaption})}
+
+
+
+Funzione che trova file descriptor più grande all\textquotesingle{}intero di un insieme di fd. Verrà chiamata a seguito di una cancellazione di un fd dall\textquotesingle{}insieme degli fd. 
+
+aggiorna 
+\begin{DoxyParams}{Parameters}
+{\em set} & Insieme di file descriptor \\
+\hline
+{\em max} & Massimo attuale.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Nuovo massimo 
+\end{DoxyReturn}
+\mbox{\Hypertarget{chatty_8h_a31218041afb760a2d455019b7e5a978e}\label{chatty_8h_a31218041afb760a2d455019b7e5a978e}} 
+\index{chatty.\+h@{chatty.\+h}!cleanup\+Configurazione@{cleanup\+Configurazione}}
+\index{cleanup\+Configurazione@{cleanup\+Configurazione}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{cleanup\+Configurazione()}{cleanupConfigurazione()}}
+{\footnotesize\ttfamily void cleanup\+Configurazione (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che libera la memoria occupata dalla struct delle configurazioni. 
+
+cleanup\+Configurazione \mbox{\Hypertarget{chatty_8h_a212ca8f9d5789c4482757ca3959667ef}\label{chatty_8h_a212ca8f9d5789c4482757ca3959667ef}} 
+\index{chatty.\+h@{chatty.\+h}!cleanup\+Connessi@{cleanup\+Connessi}}
+\index{cleanup\+Connessi@{cleanup\+Connessi}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{cleanup\+Connessi()}{cleanupConnessi()}}
+{\footnotesize\ttfamily void cleanup\+Connessi (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che libera la memoria occupata dall\textquotesingle{}array degli utenti connessi. 
+
+cleanup\+Connessi \mbox{\Hypertarget{chatty_8h_ab480aa59ec403d489123a3e6002477ee}\label{chatty_8h_ab480aa59ec403d489123a3e6002477ee}} 
+\index{chatty.\+h@{chatty.\+h}!cleanup\+N\+Sock@{cleanup\+N\+Sock}}
+\index{cleanup\+N\+Sock@{cleanup\+N\+Sock}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{cleanup\+N\+Sock()}{cleanupNSock()}}
+{\footnotesize\ttfamily void cleanup\+N\+Sock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che libera la memoria occupata dalla struct relativa al contatore di socket attive. 
+
+cleanup\+N\+Sock \mbox{\Hypertarget{chatty_8h_a3fe5b3e9c7a25aa943e2d51c049776d4}\label{chatty_8h_a3fe5b3e9c7a25aa943e2d51c049776d4}} 
+\index{chatty.\+h@{chatty.\+h}!cleanup\+Pipe@{cleanup\+Pipe}}
+\index{cleanup\+Pipe@{cleanup\+Pipe}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{cleanup\+Pipe()}{cleanupPipe()}}
+{\footnotesize\ttfamily void cleanup\+Pipe (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che libera la memoria occupata dall\textquotesingle{}array di pipe usate per la comunicazione tra listener e pool. 
+
+cleanup\+Pipe \mbox{\Hypertarget{chatty_8h_ae4243c2520358b625c0aff9c0a4243b4}\label{chatty_8h_ae4243c2520358b625c0aff9c0a4243b4}} 
+\index{chatty.\+h@{chatty.\+h}!cleanup\+Registrati@{cleanup\+Registrati}}
+\index{cleanup\+Registrati@{cleanup\+Registrati}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{cleanup\+Registrati()}{cleanupRegistrati()}}
+{\footnotesize\ttfamily void cleanup\+Registrati (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che libera la memoria occupata hash degli utenti registrati. 
+
+cleanup\+Registrati \mbox{\Hypertarget{chatty_8h_a2e1ae9ecb3dcef089d578627891ef20a}\label{chatty_8h_a2e1ae9ecb3dcef089d578627891ef20a}} 
+\index{chatty.\+h@{chatty.\+h}!cleanup\+Richieste@{cleanup\+Richieste}}
+\index{cleanup\+Richieste@{cleanup\+Richieste}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{cleanup\+Richieste()}{cleanupRichieste()}}
+{\footnotesize\ttfamily void cleanup\+Richieste (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che libera la memoria occupata dalla coda delle richieste. 
+
+cleanup\+Richieste \mbox{\Hypertarget{chatty_8h_a6896c6367d89aad456d07321e933a6c0}\label{chatty_8h_a6896c6367d89aad456d07321e933a6c0}} 
+\index{chatty.\+h@{chatty.\+h}!cleanup\+Stat@{cleanup\+Stat}}
+\index{cleanup\+Stat@{cleanup\+Stat}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{cleanup\+Stat()}{cleanupStat()}}
+{\footnotesize\ttfamily void cleanup\+Stat (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che libera la memoria occupata dalla struct delle statistiche. 
+
+cleanup\+Stat \mbox{\Hypertarget{chatty_8h_a5190ec49d24282426465e3731a34c20f}\label{chatty_8h_a5190ec49d24282426465e3731a34c20f}} 
+\index{chatty.\+h@{chatty.\+h}!cleanup\+Thread\+Id@{cleanup\+Thread\+Id}}
+\index{cleanup\+Thread\+Id@{cleanup\+Thread\+Id}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{cleanup\+Thread\+Id()}{cleanupThreadId()}}
+{\footnotesize\ttfamily void cleanup\+Thread\+Id (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che libera la memoria occupata dall\textquotesingle{}array degli id dei thread. 
+
+cleanup\+Thread\+Id \mbox{\Hypertarget{chatty_8h_a5ece610682861d1713357ebe3d61997f}\label{chatty_8h_a5ece610682861d1713357ebe3d61997f}} 
+\index{chatty.\+h@{chatty.\+h}!create\+Socket@{create\+Socket}}
+\index{create\+Socket@{create\+Socket}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{create\+Socket()}{createSocket()}}
+{\footnotesize\ttfamily int create\+Socket (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che si occupa della creazione della socket. 
+
+create\+Socket \begin{DoxyReturn}{Returns}
+In caso di successo torna il file descriptor della nuova socket. In caso di errore torna -\/1 
+\end{DoxyReturn}
+\mbox{\Hypertarget{chatty_8h_a738938a93d951fd1ffd7f09e1e102a4c}\label{chatty_8h_a738938a93d951fd1ffd7f09e1e102a4c}} 
+\index{chatty.\+h@{chatty.\+h}!init\+Connessi@{init\+Connessi}}
+\index{init\+Connessi@{init\+Connessi}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{init\+Connessi()}{initConnessi()}}
+{\footnotesize\ttfamily int init\+Connessi (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che inizializza l\textquotesingle{}array degli utenti connessi e le relative lock. 
+
+init\+Connessi \begin{DoxyReturn}{Returns}
+0 in caso di successo, -\/1 altirmenti 
+\end{DoxyReturn}
+\mbox{\Hypertarget{chatty_8h_a8dd116ba5e18407ff278f3c5d361dc4b}\label{chatty_8h_a8dd116ba5e18407ff278f3c5d361dc4b}} 
+\index{chatty.\+h@{chatty.\+h}!init\+Dir\+File@{init\+Dir\+File}}
+\index{init\+Dir\+File@{init\+Dir\+File}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{init\+Dir\+File()}{initDirFile()}}
+{\footnotesize\ttfamily int init\+Dir\+File (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che inizializza la directory in cui si andranno a salvare tutti i file scambiati tra gli utenti. 
+
+init\+Dir\+File \begin{DoxyReturn}{Returns}
+0 in caso di successo, -\/1 altirmenti 
+\end{DoxyReturn}
+\mbox{\Hypertarget{chatty_8h_a94bb61a938848c72a193879a5a6f89a5}\label{chatty_8h_a94bb61a938848c72a193879a5a6f89a5}} 
+\index{chatty.\+h@{chatty.\+h}!init\+Hash\+Lock@{init\+Hash\+Lock}}
+\index{init\+Hash\+Lock@{init\+Hash\+Lock}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{init\+Hash\+Lock()}{initHashLock()}}
+{\footnotesize\ttfamily int init\+Hash\+Lock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che inizializza l\textquotesingle{}array (utenti\+Registrati.\+hash\+\_\+m) delle lock della tabella hash. 
+
+init\+Hash\+Lock \begin{DoxyReturn}{Returns}
+0 in caso di successo, -\/1 altirmenti 
+\end{DoxyReturn}
+\mbox{\Hypertarget{chatty_8h_acd8fc2aefafcfb9fefa2a0799a6a453a}\label{chatty_8h_acd8fc2aefafcfb9fefa2a0799a6a453a}} 
+\index{chatty.\+h@{chatty.\+h}!init\+N\+Sock@{init\+N\+Sock}}
+\index{init\+N\+Sock@{init\+N\+Sock}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{init\+N\+Sock()}{initNSock()}}
+{\footnotesize\ttfamily int init\+N\+Sock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che inizializza il contatore di socket attive e la relativa lock. Se la cartella esiste già la svuota, altrimenti la crea. 
+
+init\+N\+Sock \begin{DoxyReturn}{Returns}
+0 in caso di successo, -\/1 altirmenti 
+\end{DoxyReturn}
+\mbox{\Hypertarget{chatty_8h_ad072f5fd786f46f0d897d769cf17db16}\label{chatty_8h_ad072f5fd786f46f0d897d769cf17db16}} 
+\index{chatty.\+h@{chatty.\+h}!init\+Registrati@{init\+Registrati}}
+\index{init\+Registrati@{init\+Registrati}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{init\+Registrati()}{initRegistrati()}}
+{\footnotesize\ttfamily int init\+Registrati (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che inizializza l\textquotesingle{}intera hash table degli utenti registrati e le relative lock. 
+
+init\+Registrati \begin{DoxyReturn}{Returns}
+0 in caso di successo, -\/1 altirmenti 
+\end{DoxyReturn}
+\mbox{\Hypertarget{chatty_8h_a01aea843fbcf0464a585e15e926edd2f}\label{chatty_8h_a01aea843fbcf0464a585e15e926edd2f}} 
+\index{chatty.\+h@{chatty.\+h}!init\+Stat@{init\+Stat}}
+\index{init\+Stat@{init\+Stat}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{init\+Stat()}{initStat()}}
+{\footnotesize\ttfamily int init\+Stat (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che inizializza la struct delle statistiche. 
+
+init\+Stat \begin{DoxyReturn}{Returns}
+0 in caso di successo, -\/1 altirmenti 
+\end{DoxyReturn}
+\mbox{\Hypertarget{chatty_8h_a8509726415161d5a6944a64e31b511ac}\label{chatty_8h_a8509726415161d5a6944a64e31b511ac}} 
+\index{chatty.\+h@{chatty.\+h}!is\+Pipe@{is\+Pipe}}
+\index{is\+Pipe@{is\+Pipe}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{is\+Pipe()}{isPipe()}}
+{\footnotesize\ttfamily int is\+Pipe (\begin{DoxyParamCaption}\item[{int}]{fd }\end{DoxyParamCaption})}
+
+
+
+Funzione che verifica se un fd è una pipe. 
+
+is\+Pipe 
+\begin{DoxyParams}{Parameters}
+{\em fd} & fd da verificare\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\+: -\/1 se ci sono stati errori 1 se fd è una pipe 0 altrimenti 
+\end{DoxyReturn}
+\mbox{\Hypertarget{chatty_8h_a76db2dbced18d80ff2d884bc1be46e8b}\label{chatty_8h_a76db2dbced18d80ff2d884bc1be46e8b}} 
+\index{chatty.\+h@{chatty.\+h}!join\+All\+Thread@{join\+All\+Thread}}
+\index{join\+All\+Thread@{join\+All\+Thread}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{join\+All\+Thread()}{joinAllThread()}}
+{\footnotesize\ttfamily void join\+All\+Thread (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione effettua le join di tutti i thread del server. 
+
+join\+All\+Thread \mbox{\Hypertarget{chatty_8h_a03070d47a810d44ac351b8f5fd5000f6}\label{chatty_8h_a03070d47a810d44ac351b8f5fd5000f6}} 
+\index{chatty.\+h@{chatty.\+h}!stop\+All\+Thread@{stop\+All\+Thread}}
+\index{stop\+All\+Thread@{stop\+All\+Thread}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{stop\+All\+Thread()}{stopAllThread()}}
+{\footnotesize\ttfamily void stop\+All\+Thread (\begin{DoxyParamCaption}\item[{int}]{segnali,  }\item[{int}]{listener,  }\item[{int}]{n\+Thread\+Attivi }\end{DoxyParamCaption})}
+
+
+
+Funzione che stoppa i thread indicati dai parametri. 
+
+stop\+All\+Thread 
+\begin{DoxyParams}{Parameters}
+{\em segnali} & Varrà 1 se la funzione deve stoppare il thread dei segnali, 0 altirmenti \\
+\hline
+{\em listener} & Varrà 1 se la funzione deve stoppare il thread listener, 0 altirmenti \\
+\hline
+{\em n\+Thread\+Attivi} & Numero dei thread del pool che deve stoppare \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{chatty_8h_abba8289f04610be41e390483374e8cbe}\label{chatty_8h_abba8289f04610be41e390483374e8cbe}} 
+\index{chatty.\+h@{chatty.\+h}!stop\+Pool@{stop\+Pool}}
+\index{stop\+Pool@{stop\+Pool}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{stop\+Pool()}{stopPool()}}
+{\footnotesize\ttfamily void stop\+Pool (\begin{DoxyParamCaption}\item[{int}]{n\+Thread\+Attivi }\end{DoxyParamCaption})}
+
+
+
+Funzione che stoppa un certo numero di thread del pool. 
+
+stop\+Pool 
+\begin{DoxyParams}{Parameters}
+{\em n\+Thread\+Attivi} & Numero di thread che deve stoppare \\
+\hline
+\end{DoxyParams}

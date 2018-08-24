@@ -12,10 +12,10 @@
 
 /* Tutte le funzioni tornano -1 in caso di errore e 0 in caso di successo */
 
-int initParseCheck(char * nomeFile, config * configs){
+int initParseCheck(char * pathFile, config * configs){
     int p;
     init(configs);
-    if((p = parse(nomeFile, configs)) != 0)
+    if((p = parse(pathFile, configs)) != 0)
       return p;
     return check(configs);
 }
@@ -77,7 +77,7 @@ void FreeConfig(config * configs){
   free(configs->StatFileName);
   free(configs);
 }
-//Se ci sono due parametri uguali nello stesso file di configurazione, verrà preso il valore dell'ultimo
+
 int makeConfig(char * parametro, char * value, config * configs){
     if(strcmp(parametro, "UnixPath") == 0)
         configs->UnixPath = strdup(value);
@@ -99,7 +99,6 @@ int makeConfig(char * parametro, char * value, config * configs){
     return 0;
 }
 
-// Funzione che elimina gli tutti gli spazi, i tab e gli \n dalla stringa source
 void RemoveSpaces(char* source) {
     char* i = source;
     char* j = source;
