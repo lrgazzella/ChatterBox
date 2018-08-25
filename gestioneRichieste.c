@@ -12,7 +12,6 @@
 char * makeListUsr();
 int registrato(char * nickname);
 message_t * copyMessage(message_t m);
-char * intToString(int n);
 int getUsrNickname(char * nickname);
 int getUsrFd(long fd);
 char * getOnlyFileName(char * path);
@@ -27,6 +26,8 @@ int register_op(long fd, message_t m){
     if(strlen(m.hdr.sender) > MAX_NAME_LENGTH){ // Se la lunghezza del sender è maggiore di MAX_NAME_LENGTH -> sono sicuro che non è tra i registrati -> non è tra i connessi -> non prendo nessuna lock
         setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(fd, &(r.hdr));
+        ADDStat("nerrors", 1);
+        return -1;
     }
     LOCKRegistrati(m.hdr.sender);
     if(!registrato(m.hdr.sender)){ // Non esiste un utente con quel nickname, allora lo creo
@@ -42,6 +43,7 @@ int register_op(long fd, message_t m){
             ADDStat("nerrors", 1);
             return -1;
         }else{
+            // Non rilascio la lock sui registrati perchè altrimenti qualcuno potrebbe vederlo e mandargli un messaggio. Se però la connessione dovesse fallire, dovrei azzerare l'intera operazione
             if(connect_op(fd, m, 1) == -1){ // La connect non è andata a buon fine, allora devo annullare la registrazione
                 icl_hash_delete(utentiRegistrati->hash, nickname, free, freeCoda); // Mi libera direttamente anche la history
                 UNLOCKRegistrati(m.hdr.sender);
@@ -63,9 +65,7 @@ int register_op(long fd, message_t m){
     }
 }
 
-// atomica == 1 -> ho già la lock sui registrati
 int connect_op(long fd, message_t m, int atomica){
-    // Se deve fare la lock della hash deve avere atomica = 0
     message_t r;
     if(!atomica){
         LOCKRegistrati(m.hdr.sender);
@@ -79,7 +79,6 @@ int connect_op(long fd, message_t m, int atomica){
     } // se è atomica vuol dire che la connect_op è stata chiamata dalla register_op. Quindi sono sicuro che l'utente è registrato
 
     // Esiste un utente registrato con questo nickname, allora lo aggiungo alla lista degli utenti connessi
-    /* Non posso rilasciare la lock della hash prima di aver aggiunto nuovoUtente alla lista degli utenti connessi. Altrimenti se client1 facesse una richiesta UNREGISTER_OP per clientCorrente, il client1 non vedrebbe che clientCorrente è dentro la lista degli utenti connessi, quindi non lo eliminerebbe e resterebbe per sempre nella lista */
     LOCKConnessi();
     int pos;
     if((pos = getUsrNickname(m.hdr.sender)) != -1){ // Controllo se è già connesso
@@ -118,7 +117,6 @@ int connect_op(long fd, message_t m, int atomica){
 
 }
 
-// atomica == 1 -> ho già la lock sui registrati, sui connessi e sull'fd su cui dovrò rispondere
 int usrlist_op(long fd, message_t m, int atomica){
     message_t r;
     if(!atomica) {
@@ -134,12 +132,18 @@ int usrlist_op(long fd, message_t m, int atomica){
         LOCKConnessi();
         if((pos = getUsrNickname(m.hdr.sender)) != -1){ // Controllo se l'utente è connesso. Se è connesso bene, altrimenti ritorno errore
             // Esisite un utente già connesso con lo stesso nickname
-
-            LOCKfd(pos);
-            char * listStr = makeListUsr();
-            int nUsr = utentiConnessi->nConnessi;
-            UNLOCKConnessi();
             UNLOCKRegistrati(m.hdr.sender);
+            char * listStr = makeListUsr();
+            if(listStr == NULL){ // Errore -> fermo il server
+                UNLOCKConnessi();
+                perror("Errore creazione file");
+                stopAllThread(1, 1, configurazione->ThreadsInPool);
+                return -1;
+            }
+            int nUsr = utentiConnessi->nConnessi;
+            LOCKfd(pos);
+            UNLOCKConnessi();
+
             // Devo farla sotto la makeListUsr. L'alternativa sarebbe stata quella di mettere la unlock prima dell'if che controlla se il nickname ottenuto dopo la lock sull'fd è uguale a quello che sto analizzando e di fare la lock dei connessi nella funzione makeListUsr. Avrei però rischiato di andare in deadlock. Io a questo punto ho la lock sull'fd. Se nel frattempo si inseriva una richiesta di unregister, prendeva la lock sui connessi e si metteva in attesa per la lock sull'fd. Ora quando la makeListUsr andava a fare la lock sui connessi restava in attesa dato che al momento è della funzione unregister. Ma la unregister non può andare avanti finchè non termina la usrlist, ovvero fino a quando non termina la makeListUsr.
             setHeader(&(r.hdr), OP_OK, "");
             setData(&(r.data), "", listStr, (MAX_NAME_LENGTH + 1) * nUsr);
@@ -235,7 +239,7 @@ int disconnect_op(long fd){
         UNLOCKConnessi();
         return -1;
     }
-    LOCKfd(pos); // La disconnessione viene fatta dal client quando la read torna 0. Quindi non è possibile che mi disconnettano questo client quando rilascio la lock sui connessi
+    LOCKfd(pos);
     free(utentiConnessi->arr[pos].nickname);
     utentiConnessi->arr[pos].nickname = NULL;
     utentiConnessi->arr[pos].fd = -1;
@@ -334,7 +338,6 @@ int posttxt_op(long fd, message_t m){
 }
 
 int getprevmsgs_op(long fd, message_t m){
-
     message_t r;
     coda_circolare_s * h;
     int pos;
@@ -359,6 +362,8 @@ int getprevmsgs_op(long fd, message_t m){
     }
 
     LOCKfd(pos);
+    UNLOCKConnessi();
+
 
     /* Comunico al client quanti messaggi sono contenuti nella history */
     size_t dim = (size_t)lung(h);
@@ -374,9 +379,9 @@ int getprevmsgs_op(long fd, message_t m){
             sendRequest(utentiConnessi->arr[pos].fd, toSend); // TODO controllare errori
         }
     }
+    UNLOCKRegistrati(m.hdr.sender); // Visto che sto usando un elemento della hash, non posso rilasciarla prima la lock
     UNLOCKfd(pos);
-    UNLOCKConnessi();
-    UNLOCKRegistrati(m.hdr.sender);
+
 
     eliminaIteratore(it);
     return 0;
@@ -460,7 +465,7 @@ int posttxtall_op(long fd, message_t m){
 }
 
 int postfile_op(long fd, message_t m){// m.data.hdr.len tiene già conto dello '\0'
-    message_t r; // TODO Fare la stessa cosa della post txt
+    message_t r; 
     int posSender, posReceiver, equal = 1;
 
     LOCKRegistrati(m.hdr.sender);
@@ -657,10 +662,15 @@ int getfile_op(long fd, message_t m){
 
 
 
-/*
- * @ return -1 se non esiste un utente connesso con quel nickname
- *           altrimenti restituisce la posizione di quel nickname nell'array dei connessi
- */
+
+/**
+  * @function getUsrNickname
+  * @brief Funzione che restituisce la posizione di un nickname all'interno dell'array dei connessi
+  *
+  * @param nickname Nickname da cercare
+  *
+  * @return Se esiste un utente connesso con quel nickname, restituisce la sua posizone. -1 altrimenti
+  */
 int getUsrNickname(char * nickname){
     int i;
     for(i=0; i<configurazione->MaxConnections; i++){
@@ -671,10 +681,15 @@ int getUsrNickname(char * nickname){
     return -1;
 }
 
-/*
- * @ return -1 se non esiste un utente connesso con quell'fd
- *           altrimenti restituisce la posizione di quell'fd nell'array dei connessi
- */
+
+/**
+  * @function getUsrFd
+  * @brief Funzione che restituisce la posizione di un fd all'interno dell'array dei connessi
+  *
+  * @param fd fd da cercare
+  *
+  * @return Se esiste un utente connesso con quel fd, restituisce la sua posizone. -1 altrimenti
+  */
 int getUsrFd(long fd){
     int i = 0;
     for(i=0; i<configurazione->MaxConnections; i++){
@@ -684,10 +699,15 @@ int getUsrFd(long fd){
     return -1;
 }
 
-/*
- * @return -1 se non ci sono posizioni libere
- *          altrimenti restituisce la prima posizione libera
- */
+
+/**
+  * @function getPosizioneLibera
+  * @brief Funzione che restituisce prima posizione libera all'interno dell'array dei connessi
+  *
+  * @param fd fd da cercare
+  *
+  * @return La posizone in caso di successo. -1 altrimenti
+  */
 int getPosizioneLibera(){
     int i;
     for(i=0; i<configurazione->MaxConnections; i++){
@@ -697,7 +717,14 @@ int getPosizioneLibera(){
     }
     return -1; // Non potrà mai succedere visto che verrà bloccato prima dal listener
 }
-
+/**
+  * @function copyMessage
+  * @brief Funzione che esegue la copia di un messaggio
+  *
+  * @param m Messaggio da copiare
+  *
+  * @return Nuovo messaggio in caso di successo. NULL altrimenti
+  */
 message_t * copyMessage(message_t m){ // TODO controllare errore quando si chiama
     message_t * toAdd;
     if((toAdd = malloc(sizeof(message_t))) == NULL) return NULL;
@@ -705,21 +732,41 @@ message_t * copyMessage(message_t m){ // TODO controllare errore quando si chiam
     setData(&(toAdd->data), m.data.hdr.receiver, strdup(m.data.buf), m.data.hdr.len);
     return toAdd;
 }
-
+/**
+  * @function registrato
+  * @brief Funzione boolena che controlla s eun determinato nickname è presente nella hash table dei registrati
+  *
+  * @param nickname Nickname da controllare
+  *
+  * @return 1 nel caso in cui sia registrato. 0 altrimenti
+  */
 int registrato(char * nickname){
     return icl_hash_find(utentiRegistrati->hash, (void *)nickname) != NULL;
 }
-
-char * getOnlyFileName(char * path){ // Prende in input un path e restituisce il nome del file associato al path
+/**
+  * @function getOnlyFileName
+  * @brief Funzione che dato un path, restituisce il nome del file associato al path
+  *
+  * @param path Path da controllare
+  *
+  * @return Nome del file associato al path
+  */
+char * getOnlyFileName(char * path){
     char * token, * last;
     last = token = strtok(path, "/");
     while((token = strtok(NULL, "/")) != NULL) last = token;
     return last;
 }
-
-char * makeListUsr(){
+/**
+  * @function makeListUsr
+  * @brief Funzione che restiruisce la lista degli utenti connessi
+  *
+  * @return Lista utenti connessi
+  */
+char * makeListUsr(){ // TODO controllare errore quando si chiama
     int i = 0;
-    char * r = malloc(sizeof(char) * ((MAX_NAME_LENGTH + 1) * utentiConnessi->nConnessi)); // TODO controllare errore
+    char * r;
+    if((r = malloc(sizeof(char) * ((MAX_NAME_LENGTH + 1) * utentiConnessi->nConnessi))) == NULL) return NULL;
     if(!r) {
         printf("Errore calloc\n");
         exit(-1);

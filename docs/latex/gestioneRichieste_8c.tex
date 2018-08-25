@@ -11,30 +11,20 @@ Include dependency graph for gestione\+Richieste.\+c\+:
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{gestioneRichieste_8c_aea85560fdb24ac34b39c6014c25b5ab2}\label{gestioneRichieste_8c_aea85560fdb24ac34b39c6014c25b5ab2}} 
-char $\ast$ {\bfseries make\+List\+Usr} ()
-\item 
-\mbox{\Hypertarget{gestioneRichieste_8c_aed6092ef717047485c83a3abe299d1b5}\label{gestioneRichieste_8c_aed6092ef717047485c83a3abe299d1b5}} 
-int {\bfseries registrato} (char $\ast$nickname)
-\item 
-\mbox{\Hypertarget{gestioneRichieste_8c_aad5e379113758e746716a81727902636}\label{gestioneRichieste_8c_aad5e379113758e746716a81727902636}} 
-\hyperlink{structmessage__t}{message\+\_\+t} $\ast$ {\bfseries copy\+Message} (\hyperlink{structmessage__t}{message\+\_\+t} m)
-\item 
-\mbox{\Hypertarget{gestioneRichieste_8c_a739b75490f8ef84d3bc08735536c873c}\label{gestioneRichieste_8c_a739b75490f8ef84d3bc08735536c873c}} 
-char $\ast$ {\bfseries int\+To\+String} (int n)
-\item 
-\mbox{\Hypertarget{gestioneRichieste_8c_a063bf005b990deb8193ae41b56a4955a}\label{gestioneRichieste_8c_a063bf005b990deb8193ae41b56a4955a}} 
-int {\bfseries get\+Usr\+Nickname} (char $\ast$nickname)
-\item 
-\mbox{\Hypertarget{gestioneRichieste_8c_a8e3c0ed150e76c0c8ee0a7d49da72c70}\label{gestioneRichieste_8c_a8e3c0ed150e76c0c8ee0a7d49da72c70}} 
-int {\bfseries get\+Usr\+Fd} (long fd)
-\item 
-\mbox{\Hypertarget{gestioneRichieste_8c_a46f5335fac8b81da30af7aaa196beea1}\label{gestioneRichieste_8c_a46f5335fac8b81da30af7aaa196beea1}} 
-char $\ast$ {\bfseries get\+Only\+File\+Name} (char $\ast$path)
-\item 
-\mbox{\Hypertarget{gestioneRichieste_8c_a7e05b770e237a58c677fde0a96aff694}\label{gestioneRichieste_8c_a7e05b770e237a58c677fde0a96aff694}} 
-int {\bfseries get\+Posizione\+Libera} ()
-\item 
+char $\ast$ \hyperlink{gestioneRichieste_8c_aea85560fdb24ac34b39c6014c25b5ab2}{make\+List\+Usr} ()
+\begin{DoxyCompactList}\small\item\em Funzione che restiruisce la lista degli utenti connessi. \end{DoxyCompactList}\item 
+int \hyperlink{gestioneRichieste_8c_aed6092ef717047485c83a3abe299d1b5}{registrato} (char $\ast$nickname)
+\begin{DoxyCompactList}\small\item\em Funzione boolena che controlla s eun determinato nickname è presente nella hash table dei registrati. \end{DoxyCompactList}\item 
+\hyperlink{structmessage__t}{message\+\_\+t} $\ast$ \hyperlink{gestioneRichieste_8c_aad5e379113758e746716a81727902636}{copy\+Message} (\hyperlink{structmessage__t}{message\+\_\+t} m)
+\begin{DoxyCompactList}\small\item\em Funzione che esegue la copia di un messaggio. \end{DoxyCompactList}\item 
+int \hyperlink{gestioneRichieste_8c_a063bf005b990deb8193ae41b56a4955a}{get\+Usr\+Nickname} (char $\ast$nickname)
+\begin{DoxyCompactList}\small\item\em Funzione che restituisce la posizione di un nickname all\textquotesingle{}interno dell\textquotesingle{}array dei connessi. \end{DoxyCompactList}\item 
+int \hyperlink{gestioneRichieste_8c_a8e3c0ed150e76c0c8ee0a7d49da72c70}{get\+Usr\+Fd} (long fd)
+\begin{DoxyCompactList}\small\item\em Funzione che restituisce la posizione di un fd all\textquotesingle{}interno dell\textquotesingle{}array dei connessi. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{gestioneRichieste_8c_a46f5335fac8b81da30af7aaa196beea1}{get\+Only\+File\+Name} (char $\ast$path)
+\begin{DoxyCompactList}\small\item\em Funzione che dato un path, restituisce il nome del file associato al path. \end{DoxyCompactList}\item 
+int \hyperlink{gestioneRichieste_8c_a7e05b770e237a58c677fde0a96aff694}{get\+Posizione\+Libera} ()
+\begin{DoxyCompactList}\small\item\em Funzione che restituisce prima posizione libera all\textquotesingle{}interno dell\textquotesingle{}array dei connessi. \end{DoxyCompactList}\item 
 int \hyperlink{gestioneRichieste_8c_a25c2822a5b02b73d5423615ed1c06f20}{register\+\_\+op} (long fd, \hyperlink{structmessage__t}{message\+\_\+t} m)
 \begin{DoxyCompactList}\small\item\em Funzione che gestisce la richiesta di registrazione di un client. Il client verrà automaticamente connesso e riceverà la lista degli utenti online. \end{DoxyCompactList}\item 
 int \hyperlink{gestioneRichieste_8c_a379adb31da260c88051f5b11d0a9a6d6}{connect\+\_\+op} (long fd, \hyperlink{structmessage__t}{message\+\_\+t} m, int atomica)
@@ -88,6 +78,24 @@ connect\+\_\+op
 \begin{DoxyReturn}{Returns}
 0 in caso di successo -\/1 in caso di errore 
 \end{DoxyReturn}
+\mbox{\Hypertarget{gestioneRichieste_8c_aad5e379113758e746716a81727902636}\label{gestioneRichieste_8c_aad5e379113758e746716a81727902636}} 
+\index{gestione\+Richieste.\+c@{gestione\+Richieste.\+c}!copy\+Message@{copy\+Message}}
+\index{copy\+Message@{copy\+Message}!gestione\+Richieste.\+c@{gestione\+Richieste.\+c}}
+\subsubsection{\texorpdfstring{copy\+Message()}{copyMessage()}}
+{\footnotesize\ttfamily \hyperlink{structmessage__t}{message\+\_\+t} $\ast$ copy\+Message (\begin{DoxyParamCaption}\item[{\hyperlink{structmessage__t}{message\+\_\+t}}]{m }\end{DoxyParamCaption})}
+
+
+
+Funzione che esegue la copia di un messaggio. 
+
+copy\+Message 
+\begin{DoxyParams}{Parameters}
+{\em m} & Messaggio da copiare\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Nuovo messaggio in caso di successo. N\+U\+LL altrimenti 
+\end{DoxyReturn}
 \mbox{\Hypertarget{gestioneRichieste_8c_acc40e1f89d52de70e54517e41ed6793e}\label{gestioneRichieste_8c_acc40e1f89d52de70e54517e41ed6793e}} 
 \index{gestione\+Richieste.\+c@{gestione\+Richieste.\+c}!disconnect\+\_\+op@{disconnect\+\_\+op}}
 \index{disconnect\+\_\+op@{disconnect\+\_\+op}!gestione\+Richieste.\+c@{gestione\+Richieste.\+c}}
@@ -128,6 +136,42 @@ getfile\+\_\+op
 \begin{DoxyReturn}{Returns}
 0 in caso di successo -\/1 in caso di errore 
 \end{DoxyReturn}
+\mbox{\Hypertarget{gestioneRichieste_8c_a46f5335fac8b81da30af7aaa196beea1}\label{gestioneRichieste_8c_a46f5335fac8b81da30af7aaa196beea1}} 
+\index{gestione\+Richieste.\+c@{gestione\+Richieste.\+c}!get\+Only\+File\+Name@{get\+Only\+File\+Name}}
+\index{get\+Only\+File\+Name@{get\+Only\+File\+Name}!gestione\+Richieste.\+c@{gestione\+Richieste.\+c}}
+\subsubsection{\texorpdfstring{get\+Only\+File\+Name()}{getOnlyFileName()}}
+{\footnotesize\ttfamily char $\ast$ get\+Only\+File\+Name (\begin{DoxyParamCaption}\item[{char $\ast$}]{path }\end{DoxyParamCaption})}
+
+
+
+Funzione che dato un path, restituisce il nome del file associato al path. 
+
+get\+Only\+File\+Name 
+\begin{DoxyParams}{Parameters}
+{\em path} & Path da controllare\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Nome del file associato al path 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gestioneRichieste_8c_a7e05b770e237a58c677fde0a96aff694}\label{gestioneRichieste_8c_a7e05b770e237a58c677fde0a96aff694}} 
+\index{gestione\+Richieste.\+c@{gestione\+Richieste.\+c}!get\+Posizione\+Libera@{get\+Posizione\+Libera}}
+\index{get\+Posizione\+Libera@{get\+Posizione\+Libera}!gestione\+Richieste.\+c@{gestione\+Richieste.\+c}}
+\subsubsection{\texorpdfstring{get\+Posizione\+Libera()}{getPosizioneLibera()}}
+{\footnotesize\ttfamily int get\+Posizione\+Libera (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che restituisce prima posizione libera all\textquotesingle{}interno dell\textquotesingle{}array dei connessi. 
+
+get\+Posizione\+Libera 
+\begin{DoxyParams}{Parameters}
+{\em fd} & fd da cercare\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+La posizone in caso di successo. -\/1 altrimenti 
+\end{DoxyReturn}
 \mbox{\Hypertarget{gestioneRichieste_8c_af861d94ca1c51d1e273d1103b1367bf1}\label{gestioneRichieste_8c_af861d94ca1c51d1e273d1103b1367bf1}} 
 \index{gestione\+Richieste.\+c@{gestione\+Richieste.\+c}!getprevmsgs\+\_\+op@{getprevmsgs\+\_\+op}}
 \index{getprevmsgs\+\_\+op@{getprevmsgs\+\_\+op}!gestione\+Richieste.\+c@{gestione\+Richieste.\+c}}
@@ -147,6 +191,55 @@ getprevmsgs\+\_\+op
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
 0 in caso di successo -\/1 in caso di errore 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gestioneRichieste_8c_a8e3c0ed150e76c0c8ee0a7d49da72c70}\label{gestioneRichieste_8c_a8e3c0ed150e76c0c8ee0a7d49da72c70}} 
+\index{gestione\+Richieste.\+c@{gestione\+Richieste.\+c}!get\+Usr\+Fd@{get\+Usr\+Fd}}
+\index{get\+Usr\+Fd@{get\+Usr\+Fd}!gestione\+Richieste.\+c@{gestione\+Richieste.\+c}}
+\subsubsection{\texorpdfstring{get\+Usr\+Fd()}{getUsrFd()}}
+{\footnotesize\ttfamily int get\+Usr\+Fd (\begin{DoxyParamCaption}\item[{long}]{fd }\end{DoxyParamCaption})}
+
+
+
+Funzione che restituisce la posizione di un fd all\textquotesingle{}interno dell\textquotesingle{}array dei connessi. 
+
+get\+Usr\+Fd 
+\begin{DoxyParams}{Parameters}
+{\em fd} & fd da cercare\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Se esiste un utente connesso con quel fd, restituisce la sua posizone. -\/1 altrimenti 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gestioneRichieste_8c_a063bf005b990deb8193ae41b56a4955a}\label{gestioneRichieste_8c_a063bf005b990deb8193ae41b56a4955a}} 
+\index{gestione\+Richieste.\+c@{gestione\+Richieste.\+c}!get\+Usr\+Nickname@{get\+Usr\+Nickname}}
+\index{get\+Usr\+Nickname@{get\+Usr\+Nickname}!gestione\+Richieste.\+c@{gestione\+Richieste.\+c}}
+\subsubsection{\texorpdfstring{get\+Usr\+Nickname()}{getUsrNickname()}}
+{\footnotesize\ttfamily int get\+Usr\+Nickname (\begin{DoxyParamCaption}\item[{char $\ast$}]{nickname }\end{DoxyParamCaption})}
+
+
+
+Funzione che restituisce la posizione di un nickname all\textquotesingle{}interno dell\textquotesingle{}array dei connessi. 
+
+get\+Usr\+Nickname 
+\begin{DoxyParams}{Parameters}
+{\em nickname} & Nickname da cercare\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Se esiste un utente connesso con quel nickname, restituisce la sua posizone. -\/1 altrimenti 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gestioneRichieste_8c_aea85560fdb24ac34b39c6014c25b5ab2}\label{gestioneRichieste_8c_aea85560fdb24ac34b39c6014c25b5ab2}} 
+\index{gestione\+Richieste.\+c@{gestione\+Richieste.\+c}!make\+List\+Usr@{make\+List\+Usr}}
+\index{make\+List\+Usr@{make\+List\+Usr}!gestione\+Richieste.\+c@{gestione\+Richieste.\+c}}
+\subsubsection{\texorpdfstring{make\+List\+Usr()}{makeListUsr()}}
+{\footnotesize\ttfamily char $\ast$ make\+List\+Usr (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Funzione che restiruisce la lista degli utenti connessi. 
+
+make\+List\+Usr \begin{DoxyReturn}{Returns}
+Lista utenti connessi 
 \end{DoxyReturn}
 \mbox{\Hypertarget{gestioneRichieste_8c_a7b0c5d59733a6f35eb9d60f1f7019c31}\label{gestioneRichieste_8c_a7b0c5d59733a6f35eb9d60f1f7019c31}} 
 \index{gestione\+Richieste.\+c@{gestione\+Richieste.\+c}!postfile\+\_\+op@{postfile\+\_\+op}}
@@ -227,6 +320,24 @@ register\+\_\+op
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
 0 in caso di successo -\/1 in caso di errore 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gestioneRichieste_8c_aed6092ef717047485c83a3abe299d1b5}\label{gestioneRichieste_8c_aed6092ef717047485c83a3abe299d1b5}} 
+\index{gestione\+Richieste.\+c@{gestione\+Richieste.\+c}!registrato@{registrato}}
+\index{registrato@{registrato}!gestione\+Richieste.\+c@{gestione\+Richieste.\+c}}
+\subsubsection{\texorpdfstring{registrato()}{registrato()}}
+{\footnotesize\ttfamily int registrato (\begin{DoxyParamCaption}\item[{char $\ast$}]{nickname }\end{DoxyParamCaption})}
+
+
+
+Funzione boolena che controlla s eun determinato nickname è presente nella hash table dei registrati. 
+
+registrato 
+\begin{DoxyParams}{Parameters}
+{\em nickname} & Nickname da controllare\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1 nel caso in cui sia registrato. 0 altrimenti 
 \end{DoxyReturn}
 \mbox{\Hypertarget{gestioneRichieste_8c_a81614c50af29bdf3938aa45aec62d139}\label{gestioneRichieste_8c_a81614c50af29bdf3938aa45aec62d139}} 
 \index{gestione\+Richieste.\+c@{gestione\+Richieste.\+c}!unregister\+\_\+op@{unregister\+\_\+op}}

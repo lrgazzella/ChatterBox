@@ -30,7 +30,6 @@
 #include "./struttureCondivise.h"
 #include "./parser.h"
 #include "./lib/GestioneQueue/queue.h"
-#include "./lib/GestioneListe/list.h"
 #include "./lib/GestioneHashTable/icl_hash.h"
 #include "./stats.h"
 #include "./utility.h"

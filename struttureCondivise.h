@@ -11,7 +11,6 @@
 #include <pthread.h>
 #include <string.h>
 #include "./lib/GestioneQueue/queue.h"
-#include "./lib/GestioneListe/list.h"
 #include "./lib/GestioneHashTable/icl_hash.h"
 #include "./lib/GestioneHistory/codaCircolare.h"
 #include "./message.h"

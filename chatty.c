@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
     /* Inizializzazione */
     ec_null(configurazione = malloc(sizeof(config)), "Errore. Spazio in memoria insufficiente");
-    ec_null_c(initParseCheck(pathFileConf, configurazione), "Errore parsing file", free(configurazione));
+    ec_meno1_c(initParseCheck(pathFileConf, configurazione), "Errore parsing file", free(configurazione));
     atexit(cleanupConfigurazione);
     ec_meno1(initDirFile(), "Errore inizializzazione directory file");
     ec_null(richieste = initQueue(), "Errore inizializzazione coda richieste");

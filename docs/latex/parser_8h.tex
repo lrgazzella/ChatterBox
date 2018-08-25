@@ -1,0 +1,192 @@
+\hypertarget{parser_8h}{}\section{parser.\+h File Reference}
+\label{parser_8h}\index{parser.\+h@{parser.\+h}}
+
+
+File che contiene tutte le funzioni necessarie al parsing di un file di configurazione Si dichiara che il contenuto di questo file e\textquotesingle{} in ogni sua parte opera originale dell\textquotesingle{}autore.  
+
+
+This graph shows which files directly or indirectly include this file\+:
+% FIG 0
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structconfig__s}{config\+\_\+s}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{parser_8h_a4473b5227787415097004fd39f55185e}\label{parser_8h_a4473b5227787415097004fd39f55185e}} 
+typedef struct \hyperlink{structconfig__s}{config\+\_\+s} {\bfseries config}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{parser_8h_a162fd2cd54e4eaa4175e98f87e776398}{parse} (char $\ast$nome\+File, \hyperlink{structconfig__s}{config} $\ast$configs)
+\begin{DoxyCompactList}\small\item\em Prende un file e inserisce in configs tutte le configurazioni presenti nel file. Se ci sono due parametri uguali nello stesso file di configurazione, verrà preso il valore dell\textquotesingle{}ultimo. \end{DoxyCompactList}\item 
+int \hyperlink{parser_8h_a9f20eaee0fb4e98e3d9f708a1b45e3e1}{make\+Config} (char $\ast$parametro, char $\ast$value, \hyperlink{structconfig__s}{config} $\ast$configs)
+\begin{DoxyCompactList}\small\item\em Funzione setta a un certo campo della struct un determinato valore. \end{DoxyCompactList}\item 
+void \hyperlink{parser_8h_aa0e8ffda70f1a72400c8f0662b8c003a}{Remove\+Spaces} (char $\ast$source)
+\begin{DoxyCompactList}\small\item\em Funzione che elimina gli tutti gli spazi, gli \textquotesingle{}\textquotesingle{} e gli \textquotesingle{}~\newline
+\textquotesingle{} da una determinata stringa. \end{DoxyCompactList}\item 
+int \hyperlink{parser_8h_ac82221b571173e0aabeb0aac4c2caa69}{init\+Parse\+Check} (char $\ast$path\+File, \hyperlink{structconfig__s}{config} $\ast$configs)
+\begin{DoxyCompactList}\small\item\em Funzione che chiama in ordine\+: init, parse, check. \end{DoxyCompactList}\item 
+int \hyperlink{parser_8h_a1eb5f0ae6982141a59b0e8d7c7bfcd1d}{check} (\hyperlink{structconfig__s}{config} $\ast$configs)
+\begin{DoxyCompactList}\small\item\em Funzione che controlla se i valori contenuti in una struct sono validi. \end{DoxyCompactList}\item 
+void \hyperlink{parser_8h_abc202611a5a89c94bc7d0056bb948827}{init} (\hyperlink{structconfig__s}{config} $\ast$configs)
+\begin{DoxyCompactList}\small\item\em Funzione che inizializza i valori di una determinata structs. \end{DoxyCompactList}\item 
+void \hyperlink{parser_8h_a12ca67852f959e9d4a4cfee613c06cd6}{Free\+Config} (\hyperlink{structconfig__s}{config} $\ast$configs)
+\begin{DoxyCompactList}\small\item\em Funzionen che libera un\textquotesingle{}intera struct config. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File che contiene tutte le funzioni necessarie al parsing di un file di configurazione Si dichiara che il contenuto di questo file e\textquotesingle{} in ogni sua parte opera originale dell\textquotesingle{}autore. 
+
+\begin{DoxyAuthor}{Author}
+Lorenzo Gazzella 546890 
+\end{DoxyAuthor}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{parser_8h_a1eb5f0ae6982141a59b0e8d7c7bfcd1d}\label{parser_8h_a1eb5f0ae6982141a59b0e8d7c7bfcd1d}} 
+\index{parser.\+h@{parser.\+h}!check@{check}}
+\index{check@{check}!parser.\+h@{parser.\+h}}
+\subsubsection{\texorpdfstring{check()}{check()}}
+{\footnotesize\ttfamily int check (\begin{DoxyParamCaption}\item[{\hyperlink{structconfig__s}{config} $\ast$}]{configs }\end{DoxyParamCaption})}
+
+
+
+Funzione che controlla se i valori contenuti in una struct sono validi. 
+
+check
+
+
+\begin{DoxyParams}{Parameters}
+{\em configs} & Struct che si vuole controllare \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 se non ci sono stati errori -\/1 se ci sono stati errori 
+\end{DoxyReturn}
+\mbox{\Hypertarget{parser_8h_a12ca67852f959e9d4a4cfee613c06cd6}\label{parser_8h_a12ca67852f959e9d4a4cfee613c06cd6}} 
+\index{parser.\+h@{parser.\+h}!Free\+Config@{Free\+Config}}
+\index{Free\+Config@{Free\+Config}!parser.\+h@{parser.\+h}}
+\subsubsection{\texorpdfstring{Free\+Config()}{FreeConfig()}}
+{\footnotesize\ttfamily void Free\+Config (\begin{DoxyParamCaption}\item[{\hyperlink{structconfig__s}{config} $\ast$}]{configs }\end{DoxyParamCaption})}
+
+
+
+Funzionen che libera un\textquotesingle{}intera struct config. 
+
+Free\+Config
+
+
+\begin{DoxyParams}{Parameters}
+{\em configs} & Struct che si vuole liberare \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{parser_8h_abc202611a5a89c94bc7d0056bb948827}\label{parser_8h_abc202611a5a89c94bc7d0056bb948827}} 
+\index{parser.\+h@{parser.\+h}!init@{init}}
+\index{init@{init}!parser.\+h@{parser.\+h}}
+\subsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily void init (\begin{DoxyParamCaption}\item[{\hyperlink{structconfig__s}{config} $\ast$}]{configs }\end{DoxyParamCaption})}
+
+
+
+Funzione che inizializza i valori di una determinata structs. 
+
+init
+
+
+\begin{DoxyParams}{Parameters}
+{\em configs} & Struct che si vuole inizializzare \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{parser_8h_ac82221b571173e0aabeb0aac4c2caa69}\label{parser_8h_ac82221b571173e0aabeb0aac4c2caa69}} 
+\index{parser.\+h@{parser.\+h}!init\+Parse\+Check@{init\+Parse\+Check}}
+\index{init\+Parse\+Check@{init\+Parse\+Check}!parser.\+h@{parser.\+h}}
+\subsubsection{\texorpdfstring{init\+Parse\+Check()}{initParseCheck()}}
+{\footnotesize\ttfamily int init\+Parse\+Check (\begin{DoxyParamCaption}\item[{char $\ast$}]{path\+File,  }\item[{\hyperlink{structconfig__s}{config} $\ast$}]{configs }\end{DoxyParamCaption})}
+
+
+
+Funzione che chiama in ordine\+: init, parse, check. 
+
+init\+Parse\+Check
+
+
+\begin{DoxyParams}{Parameters}
+{\em path\+File} & Path del file che si vuole parsare \\
+\hline
+{\em configs} & Struct che si vuole modificare \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 se non ci sono stati errori -\/1 se ci sono stati errori 
+\end{DoxyReturn}
+\mbox{\Hypertarget{parser_8h_a9f20eaee0fb4e98e3d9f708a1b45e3e1}\label{parser_8h_a9f20eaee0fb4e98e3d9f708a1b45e3e1}} 
+\index{parser.\+h@{parser.\+h}!make\+Config@{make\+Config}}
+\index{make\+Config@{make\+Config}!parser.\+h@{parser.\+h}}
+\subsubsection{\texorpdfstring{make\+Config()}{makeConfig()}}
+{\footnotesize\ttfamily int make\+Config (\begin{DoxyParamCaption}\item[{char $\ast$}]{parametro,  }\item[{char $\ast$}]{value,  }\item[{\hyperlink{structconfig__s}{config} $\ast$}]{configs }\end{DoxyParamCaption})}
+
+
+
+Funzione setta a un certo campo della struct un determinato valore. 
+
+make\+Config
+
+
+\begin{DoxyParams}{Parameters}
+{\em parametro} & Campo della struct che si vuole modificare \\
+\hline
+{\em value} & Valore che si vuole settare al campo \\
+\hline
+{\em configs} & Struct che si vuole modificare \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 se non ci sono stati errori -\/1 se ci sono stati errori 
+\end{DoxyReturn}
+\mbox{\Hypertarget{parser_8h_a162fd2cd54e4eaa4175e98f87e776398}\label{parser_8h_a162fd2cd54e4eaa4175e98f87e776398}} 
+\index{parser.\+h@{parser.\+h}!parse@{parse}}
+\index{parse@{parse}!parser.\+h@{parser.\+h}}
+\subsubsection{\texorpdfstring{parse()}{parse()}}
+{\footnotesize\ttfamily int parse (\begin{DoxyParamCaption}\item[{char $\ast$}]{nome\+File,  }\item[{\hyperlink{structconfig__s}{config} $\ast$}]{configs }\end{DoxyParamCaption})}
+
+
+
+Prende un file e inserisce in configs tutte le configurazioni presenti nel file. Se ci sono due parametri uguali nello stesso file di configurazione, verrà preso il valore dell\textquotesingle{}ultimo. 
+
+parse
+
+
+\begin{DoxyParams}{Parameters}
+{\em nome\+File} & Path del file che si vuole parsare \\
+\hline
+{\em configs} & Struttura dati su cui si vogliono memorizzare i valori parsati\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 se non ci sono stati errori -\/1 se ci sono stati errori 
+\end{DoxyReturn}
+\mbox{\Hypertarget{parser_8h_aa0e8ffda70f1a72400c8f0662b8c003a}\label{parser_8h_aa0e8ffda70f1a72400c8f0662b8c003a}} 
+\index{parser.\+h@{parser.\+h}!Remove\+Spaces@{Remove\+Spaces}}
+\index{Remove\+Spaces@{Remove\+Spaces}!parser.\+h@{parser.\+h}}
+\subsubsection{\texorpdfstring{Remove\+Spaces()}{RemoveSpaces()}}
+{\footnotesize\ttfamily void Remove\+Spaces (\begin{DoxyParamCaption}\item[{char $\ast$}]{source }\end{DoxyParamCaption})}
+
+
+
+Funzione che elimina gli tutti gli spazi, gli \textquotesingle{}\textquotesingle{} e gli \textquotesingle{}~\newline
+\textquotesingle{} da una determinata stringa. 
+
+check
+
+
+\begin{DoxyParams}{Parameters}
+{\em configs} & Struct che si vuole controllare \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 se non ci sono stati errori -\/1 se ci sono stati errori 
+\end{DoxyReturn}

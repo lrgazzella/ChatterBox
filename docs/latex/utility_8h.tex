@@ -1,0 +1,141 @@
+\hypertarget{utility_8h}{}\section{utility.\+h File Reference}
+\label{utility_8h}\index{utility.\+h@{utility.\+h}}
+
+
+Contiene alcune funzioni di utilità. Si dichiara che il contenuto di questo file e\textquotesingle{} in ogni sua parte opera originale dell\textquotesingle{}autore.  
+
+
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+Include dependency graph for utility.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{utility_8h_ae726c7608739c224218e40fdaa82ed97}{ec\+\_\+meno1}(s,  m)
+\begin{DoxyCompactList}\small\item\em Macro che controlla se un certo valore s è uguale a -\/1. Se è uguale stampa un messaggio di errore e termina. \end{DoxyCompactList}\item 
+\#define \hyperlink{utility_8h_a058b057a0e23dd35494af34d9920f70d}{ec\+\_\+null}(s,  m)
+\begin{DoxyCompactList}\small\item\em Macro che controlla se un certo valore s è uguale a N\+U\+LL. Se è uguale stampa un messaggio di errore e termina. \end{DoxyCompactList}\item 
+\#define \hyperlink{utility_8h_ade09ad73d986c1cf72899b02fa9a82d5}{ec\+\_\+null\+\_\+return}(s,  m)
+\begin{DoxyCompactList}\small\item\em Macro che controlla se un certo valore s è uguale a N\+U\+LL. Se è uguale stampa un messaggio di errore e ritorna -\/1. \end{DoxyCompactList}\item 
+\#define \hyperlink{utility_8h_ad503ca1f309793615d669d3f44ca9a92}{ec\+\_\+meno1\+\_\+return}(s,  m)
+\begin{DoxyCompactList}\small\item\em Macro che controlla se un certo valore s è uguale a -\/1. Se è uguale stampa un messaggio di errore e ritorna -\/1. \end{DoxyCompactList}\item 
+\#define \hyperlink{utility_8h_a8f8bcd865c0b58ed5194fd742ff8da1b}{ec\+\_\+meno1\+\_\+c}(s,  m,  c)
+\begin{DoxyCompactList}\small\item\em Macro che controlla se un certo valore s è uguale a -\/1. Se è uguale stampa un messaggio di errore, esegue un comando e termina. \end{DoxyCompactList}\item 
+\#define \hyperlink{utility_8h_a5ea83378d92f0ae812ef6d60f919f0d2}{ec\+\_\+null\+\_\+c}(s,  m,  c)
+\begin{DoxyCompactList}\small\item\em Macro che controlla se un certo valore s è uguale a N\+U\+LL. Se è uguale stampa un messaggio di errore, esegue un comando e termina. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Contiene alcune funzioni di utilità. Si dichiara che il contenuto di questo file e\textquotesingle{} in ogni sua parte opera originale dell\textquotesingle{}autore. 
+
+\begin{DoxyAuthor}{Author}
+Lorenzo Gazzella 546890 
+\end{DoxyAuthor}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{utility_8h_ae726c7608739c224218e40fdaa82ed97}\label{utility_8h_ae726c7608739c224218e40fdaa82ed97}} 
+\index{utility.\+h@{utility.\+h}!ec\+\_\+meno1@{ec\+\_\+meno1}}
+\index{ec\+\_\+meno1@{ec\+\_\+meno1}!utility.\+h@{utility.\+h}}
+\subsubsection{\texorpdfstring{ec\+\_\+meno1}{ec\_meno1}}
+{\footnotesize\ttfamily \#define ec\+\_\+meno1(\begin{DoxyParamCaption}\item[{}]{s,  }\item[{}]{m }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{if} ((s) == - 1) \{\(\backslash\)
+    perror(m);\(\backslash\)
+    exit(EXIT\_FAILURE);\(\backslash\)
+\}
+\end{DoxyCode}
+
+
+Macro che controlla se un certo valore s è uguale a -\/1. Se è uguale stampa un messaggio di errore e termina. 
+
+\mbox{\Hypertarget{utility_8h_a8f8bcd865c0b58ed5194fd742ff8da1b}\label{utility_8h_a8f8bcd865c0b58ed5194fd742ff8da1b}} 
+\index{utility.\+h@{utility.\+h}!ec\+\_\+meno1\+\_\+c@{ec\+\_\+meno1\+\_\+c}}
+\index{ec\+\_\+meno1\+\_\+c@{ec\+\_\+meno1\+\_\+c}!utility.\+h@{utility.\+h}}
+\subsubsection{\texorpdfstring{ec\+\_\+meno1\+\_\+c}{ec\_meno1\_c}}
+{\footnotesize\ttfamily \#define ec\+\_\+meno1\+\_\+c(\begin{DoxyParamCaption}\item[{}]{s,  }\item[{}]{m,  }\item[{}]{c }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{if} ((s) == -1) \{\(\backslash\)
+    perror(m);\(\backslash\)
+    c;\(\backslash\)
+\}
+\end{DoxyCode}
+
+
+Macro che controlla se un certo valore s è uguale a -\/1. Se è uguale stampa un messaggio di errore, esegue un comando e termina. 
+
+\mbox{\Hypertarget{utility_8h_ad503ca1f309793615d669d3f44ca9a92}\label{utility_8h_ad503ca1f309793615d669d3f44ca9a92}} 
+\index{utility.\+h@{utility.\+h}!ec\+\_\+meno1\+\_\+return@{ec\+\_\+meno1\+\_\+return}}
+\index{ec\+\_\+meno1\+\_\+return@{ec\+\_\+meno1\+\_\+return}!utility.\+h@{utility.\+h}}
+\subsubsection{\texorpdfstring{ec\+\_\+meno1\+\_\+return}{ec\_meno1\_return}}
+{\footnotesize\ttfamily \#define ec\+\_\+meno1\+\_\+return(\begin{DoxyParamCaption}\item[{}]{s,  }\item[{}]{m }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{if} ((s) == -1) \{\(\backslash\)
+    perror(m);\(\backslash\)
+    return -1;\(\backslash\)
+\}
+\end{DoxyCode}
+
+
+Macro che controlla se un certo valore s è uguale a -\/1. Se è uguale stampa un messaggio di errore e ritorna -\/1. 
+
+\mbox{\Hypertarget{utility_8h_a058b057a0e23dd35494af34d9920f70d}\label{utility_8h_a058b057a0e23dd35494af34d9920f70d}} 
+\index{utility.\+h@{utility.\+h}!ec\+\_\+null@{ec\+\_\+null}}
+\index{ec\+\_\+null@{ec\+\_\+null}!utility.\+h@{utility.\+h}}
+\subsubsection{\texorpdfstring{ec\+\_\+null}{ec\_null}}
+{\footnotesize\ttfamily \#define ec\+\_\+null(\begin{DoxyParamCaption}\item[{}]{s,  }\item[{}]{m }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{if} ((s) == NULL) \{\(\backslash\)
+    perror(m);\(\backslash\)
+    exit(EXIT\_FAILURE);\(\backslash\)
+\}
+\end{DoxyCode}
+
+
+Macro che controlla se un certo valore s è uguale a N\+U\+LL. Se è uguale stampa un messaggio di errore e termina. 
+
+\mbox{\Hypertarget{utility_8h_a5ea83378d92f0ae812ef6d60f919f0d2}\label{utility_8h_a5ea83378d92f0ae812ef6d60f919f0d2}} 
+\index{utility.\+h@{utility.\+h}!ec\+\_\+null\+\_\+c@{ec\+\_\+null\+\_\+c}}
+\index{ec\+\_\+null\+\_\+c@{ec\+\_\+null\+\_\+c}!utility.\+h@{utility.\+h}}
+\subsubsection{\texorpdfstring{ec\+\_\+null\+\_\+c}{ec\_null\_c}}
+{\footnotesize\ttfamily \#define ec\+\_\+null\+\_\+c(\begin{DoxyParamCaption}\item[{}]{s,  }\item[{}]{m,  }\item[{}]{c }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{if} ((s) == NULL) \{\(\backslash\)
+    perror(m);\(\backslash\)
+    c;\(\backslash\)
+\}
+\end{DoxyCode}
+
+
+Macro che controlla se un certo valore s è uguale a N\+U\+LL. Se è uguale stampa un messaggio di errore, esegue un comando e termina. 
+
+\mbox{\Hypertarget{utility_8h_ade09ad73d986c1cf72899b02fa9a82d5}\label{utility_8h_ade09ad73d986c1cf72899b02fa9a82d5}} 
+\index{utility.\+h@{utility.\+h}!ec\+\_\+null\+\_\+return@{ec\+\_\+null\+\_\+return}}
+\index{ec\+\_\+null\+\_\+return@{ec\+\_\+null\+\_\+return}!utility.\+h@{utility.\+h}}
+\subsubsection{\texorpdfstring{ec\+\_\+null\+\_\+return}{ec\_null\_return}}
+{\footnotesize\ttfamily \#define ec\+\_\+null\+\_\+return(\begin{DoxyParamCaption}\item[{}]{s,  }\item[{}]{m }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{if} ((s) == NULL) \{\(\backslash\)
+    perror(m);\(\backslash\)
+    return -1;\(\backslash\)
+\}
+\end{DoxyCode}
+
+
+Macro che controlla se un certo valore s è uguale a N\+U\+LL. Se è uguale stampa un messaggio di errore e ritorna -\/1. 
+

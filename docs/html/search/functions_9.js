@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['unregister_5fop',['unregister_op',['../gestioneRichieste_8c.html#a81614c50af29bdf3938aa45aec62d139',1,'unregister_op(long fd, message_t m):&#160;gestioneRichieste.c'],['../gestioneRichieste_8h.html#a81614c50af29bdf3938aa45aec62d139',1,'unregister_op(long fd, message_t m):&#160;gestioneRichieste.c']]],
-  ['usrlist_5fop',['usrlist_op',['../gestioneRichieste_8c.html#aed4f52e3a3c624d8f7f7fc734289f5c9',1,'usrlist_op(long fd, message_t m, int atomica):&#160;gestioneRichieste.c'],['../gestioneRichieste_8h.html#aed4f52e3a3c624d8f7f7fc734289f5c9',1,'usrlist_op(long fd, message_t m, int atomica):&#160;gestioneRichieste.c']]]
+  ['makeconfig',['makeConfig',['../parser_8h.html#a9f20eaee0fb4e98e3d9f708a1b45e3e1',1,'parser.c']]],
+  ['makelistusr',['makeListUsr',['../gestioneRichieste_8c.html#aea85560fdb24ac34b39c6014c25b5ab2',1,'gestioneRichieste.c']]]
 ];

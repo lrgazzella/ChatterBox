@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['stat_5fstruct',['stat_struct',['../structstat__struct.html',1,'']]],
-  ['statistics',['statistics',['../structstatistics.html',1,'']]]
+  ['utente_5fconnesso',['utente_connesso',['../structutente__connesso.html',1,'']]]
 ];

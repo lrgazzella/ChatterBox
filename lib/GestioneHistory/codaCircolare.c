@@ -20,7 +20,7 @@ int lung(coda_circolare_s * c){
     return c->lung;
 }
 
-int inserisci(coda_circolare_s * c, void * elem){ // inserisce un elemento in fondo alla coda
+int inserisci(coda_circolare_s * c, void * elem){
     if(!c) return 0;
     if(c->lung == c->maxlung){
         elimina(c);
@@ -30,7 +30,7 @@ int inserisci(coda_circolare_s * c, void * elem){ // inserisce un elemento in fo
     return 1;
 }
 
-int elimina(coda_circolare_s * c){ // elimina un elemento in testa alla coda
+int elimina(coda_circolare_s * c){ 
     if(!c) return 0;
 
     if(!vuota(c)){

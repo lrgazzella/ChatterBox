@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "./codaCircolare.h"
+#include "./../lib/GestioneHistory/codaCircolare.h"
 
 typedef struct conta{
     int c;

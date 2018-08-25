@@ -1,0 +1,20 @@
+digraph "lib/GestioneHistory/codaCircolare.h"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node2 [label="lib/GestioneHistory\l/codaCircolare.h",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node3 [label="struttureCondivise.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$struttureCondivise_8h.html",tooltip="File che contiene tutte le trutture dati utilizzate dal server Si dichiara che il contenuto di questo..."];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node4 [label="chatty.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chatty_8h.html",tooltip="File che contiene la dichiarazione di tutte le funzioni utilizzate nel file chatty.c Si dichiara che il contenuto di questo file e&#39; in ogni sua parte opera originale dell&#39;autore. "];
+  Node4 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node5 [label="chatty.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$chatty_8c.html",tooltip="File principale del server chatterbox Si dichiara che il contenuto di questo file e&#39; in ogni sua part..."];
+  Node4 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node6 [label="gestioneRichieste.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gestioneRichieste_8h.html",tooltip="Contiene la dichiarazione di tutti i metodi per la gestione delle singole operazioni che il server ge..."];
+  Node6 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node6 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node6 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node7 [label="gestioneRichieste.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gestioneRichieste_8c.html",tooltip="Contiene l&#39;implementazione di tutti i metodi per la gestione delle singole operazioni che il server g..."];
+  Node3 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node2 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+}

@@ -1,6 +1,12 @@
+/** @file parser.h
+  * @author Lorenzo Gazzella 546890
+  * @brief File che contiene tutte le funzioni necessarie al parsing di un file di configurazione
+  * Si dichiara che il contenuto di questo file e' in ogni sua parte opera
+  * originale dell'autore
+  */
+
 #ifndef PARSER_H_
 #define PARSER_H_
-
 
 typedef struct config_s{
     char * UnixPath;

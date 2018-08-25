@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['hash',['hash',['../structhash.html',1,'']]],
-  ['header',['header',['../structheader.html',1,'']]]
+  ['freeconfig',['FreeConfig',['../parser_8h.html#a12ca67852f959e9d4a4cfee613c06cd6',1,'parser.c']]]
 ];

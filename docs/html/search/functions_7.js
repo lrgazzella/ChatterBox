@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['register_5fop',['register_op',['../gestioneRichieste_8c.html#a25c2822a5b02b73d5423615ed1c06f20',1,'register_op(long fd, message_t m):&#160;gestioneRichieste.c'],['../gestioneRichieste_8h.html#a25c2822a5b02b73d5423615ed1c06f20',1,'register_op(long fd, message_t m):&#160;gestioneRichieste.c']]]
+  ['joinallthread',['joinAllThread',['../chatty_8c.html#a76db2dbced18d80ff2d884bc1be46e8b',1,'joinAllThread():&#160;chatty.c'],['../chatty_8h.html#a76db2dbced18d80ff2d884bc1be46e8b',1,'joinAllThread():&#160;chatty.c']]]
 ];

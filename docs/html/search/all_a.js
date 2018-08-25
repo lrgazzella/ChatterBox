@@ -1,7 +1,11 @@
 var searchData=
 [
-  ['op_5fok',['OP_OK',['../ops_8h.html#ac6fa1b34da8872e34c2936391332f44cacc156be86a1cb4bfc0e21d8c72e4971c',1,'ops.h']]],
-  ['op_5ft',['op_t',['../ops_8h.html#ac6fa1b34da8872e34c2936391332f44c',1,'ops.h']]],
-  ['operation_5ft',['operation_t',['../structoperation__t.html',1,'']]],
-  ['ops_2eh',['ops.h',['../ops_8h.html',1,'']]]
+  ['makeconfig',['makeConfig',['../parser_8h.html#a9f20eaee0fb4e98e3d9f708a1b45e3e1',1,'parser.c']]],
+  ['makelistusr',['makeListUsr',['../gestioneRichieste_8c.html#aea85560fdb24ac34b39c6014c25b5ab2',1,'gestioneRichieste.c']]],
+  ['message_2eh',['message.h',['../message_8h.html',1,'']]],
+  ['message_5fdata_5fhdr_5ft',['message_data_hdr_t',['../structmessage__data__hdr__t.html',1,'']]],
+  ['message_5fdata_5ft',['message_data_t',['../structmessage__data__t.html',1,'']]],
+  ['message_5fhdr_5ft',['message_hdr_t',['../structmessage__hdr__t.html',1,'']]],
+  ['message_5ft',['message_t',['../structmessage__t.html',1,'']]],
+  ['messaggio',['messaggio',['../structmessaggio.html',1,'']]]
 ];
