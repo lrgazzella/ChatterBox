@@ -127,3 +127,10 @@ GENERATE_LATEX         = YES
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
 LATEX_OUTPUT           = latex
+
+# If the value of the INPUT tag contains directories, you can use the EXCLUDE_PATTERNS
+# tag to specify one or more wildcard patterns to exclude certain files from those directories.
+# Note that the wildcards are matched against the file with absolute path, so to exclude all
+# test directories for example use the pattern */test/*
+
+EXCLUDE_PATTERNS       = */tests/*

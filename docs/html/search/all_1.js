@@ -19,7 +19,6 @@ var searchData=
   ['config_5fs',['config_s',['../structconfig__s.html',1,'']]],
   ['connect_5fop',['CONNECT_OP',['../ops_8h.html#ac6fa1b34da8872e34c2936391332f44cab602ddf0795d3c4dc2fd0b4b957ba988',1,'CONNECT_OP():&#160;ops.h'],['../gestioneRichieste_8c.html#a379adb31da260c88051f5b11d0a9a6d6',1,'connect_op(long fd, message_t m, int atomica):&#160;gestioneRichieste.c'],['../gestioneRichieste_8h.html#a379adb31da260c88051f5b11d0a9a6d6',1,'connect_op(long fd, message_t m, int atomica):&#160;gestioneRichieste.c']]],
   ['connessi',['connessi',['../structconnessi.html',1,'']]],
-  ['conta',['conta',['../structconta.html',1,'']]],
   ['copymessage',['copyMessage',['../gestioneRichieste_8c.html#aad5e379113758e746716a81727902636',1,'gestioneRichieste.c']]],
   ['createsocket',['createSocket',['../chatty_8c.html#a5ece610682861d1713357ebe3d61997f',1,'createSocket():&#160;chatty.c'],['../chatty_8h.html#a5ece610682861d1713357ebe3d61997f',1,'createSocket():&#160;chatty.c']]]
 ];

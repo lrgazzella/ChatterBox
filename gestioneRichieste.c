@@ -301,6 +301,7 @@ int posttxt_op(long fd, message_t m){
         LOCKfd(posSender);
         if(strcmp(m.hdr.sender, utentiConnessi->arr[posSender].nickname) != 0 || utentiConnessi->arr[posSender].fd != fd){ // è stato disconnesso
             UNLOCKfd(posSender);
+            ADDStat("nerrors", 1);
             return -1;
         }
         setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
@@ -465,17 +466,12 @@ int posttxtall_op(long fd, message_t m){
 }
 
 int postfile_op(long fd, message_t m){// m.data.hdr.len tiene già conto dello '\0'
-    message_t r; 
-    int posSender, posReceiver, equal = 1;
+    message_t r, file;
+    int posSender, posReceiver;
 
     LOCKRegistrati(m.hdr.sender);
-    if(getIndexLockHash(m.hdr.sender) != getIndexLockHash(m.data.hdr.receiver)){
-        LOCKRegistrati(m.data.hdr.receiver);
-        equal = 0;
-    }
     if(!registrato(m.hdr.sender)){
         UNLOCKRegistrati(m.hdr.sender);
-        if(!equal) UNLOCKRegistrati(m.data.hdr.receiver);
         setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
         sendHeader(fd, &(r.hdr));
         ADDStat("nerrors", 1);
@@ -486,29 +482,16 @@ int postfile_op(long fd, message_t m){// m.data.hdr.len tiene già conto dello '
     if((posSender = getUsrNickname(m.hdr.sender)) == -1){
         UNLOCKConnessi();
         UNLOCKRegistrati(m.hdr.sender);
-        if(!equal) UNLOCKRegistrati(m.data.hdr.receiver);
         setHeader(&(r.hdr), OP_FAIL, "");
         sendHeader(fd, &(r.hdr));
         ADDStat("nerrors", 1);
         return -1;
     }
     LOCKfd(posSender);
+    UNLOCKConnessi();
+    UNLOCKRegistrati(m.hdr.sender);
 
-    /* Controllo se il receiver è registrato */
-    coda_circolare_s * h;
-    if((h = (coda_circolare_s *)icl_hash_find(utentiRegistrati->hash, m.data.hdr.receiver)) == NULL){
-        UNLOCKRegistrati(m.hdr.sender);
-        if(!equal) UNLOCKRegistrati(m.data.hdr.receiver);
-        UNLOCKConnessi();
-        setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
-        sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
-        UNLOCKfd(posSender);
-        ADDStat("nerrors", 1);
-        return -1;
-    }
-
-    /* Leggo il file */
-    message_t file;
+    /* Lettura file */
     char * fileName = getOnlyFileName(m.data.buf);
 
     char * path = calloc(sizeof(char), (strlen(configurazione->DirName) + 1 + strlen(fileName) + 1));
@@ -516,14 +499,10 @@ int postfile_op(long fd, message_t m){// m.data.hdr.len tiene già conto dello '
     strcat(path, configurazione->DirName);
     strcat(path, "/");
     strcat(path, fileName);
-
     readData(fd, &(file.data)); // Leggo il file vero e proprio
 
     // file.data.hdr.len corrisponde alla dimensione del file in byte
     if((file.data.hdr.len / 1024) > configurazione->MaxFileSize){
-        UNLOCKRegistrati(m.hdr.sender);
-        UNLOCKRegistrati(m.data.hdr.receiver);
-        UNLOCKConnessi();
         setHeader(&(r.hdr), OP_MSG_TOOLONG, "");
         sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
         UNLOCKfd(posSender);
@@ -532,13 +511,32 @@ int postfile_op(long fd, message_t m){// m.data.hdr.len tiene già conto dello '
         ADDStat("nerrors", 1);
         return -1;
     }
-    int fdNewFile;
+    UNLOCKfd(posSender);
 
-    if((fdNewFile = open(path, O_CREAT | O_WRONLY | O_TRUNC, 0777)) == -1){
-        UNLOCKRegistrati(m.hdr.sender);
+    /* Controllo se il receiver è registrato */
+    coda_circolare_s * h;
+    LOCKRegistrati(m.data.hdr.receiver);
+    if((h = (coda_circolare_s *)icl_hash_find(utentiRegistrati->hash, m.data.hdr.receiver)) == NULL){
         UNLOCKRegistrati(m.data.hdr.receiver);
-        UNLOCKConnessi();
+        setHeader(&(r.hdr), OP_NICK_UNKNOWN, "");
+        LOCKfd(posSender);
+        if(strcmp(m.hdr.sender, utentiConnessi->arr[posSender].nickname) != 0 || utentiConnessi->arr[posSender].fd != fd){ // è stato disconnesso
+            UNLOCKfd(posSender);
+            ADDStat("nerrors", 1);
+            return -1;
+        }
+        sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
         UNLOCKfd(posSender);
+        ADDStat("nerrors", 1);
+        return -1;
+    }
+
+    /* Qui sono sicuro che il receiver sia registrato e ho la relativa lock sulla hash */
+    // OSS: Non posso rilasciar la lock sui registrati relativa al receiver, altrimenti potrebbero deregistrarlo
+
+    int fdNewFile;
+    if((fdNewFile = open(path, O_CREAT | O_WRONLY | O_TRUNC, 0777)) == -1){
+        UNLOCKRegistrati(m.data.hdr.receiver);
         free(file.data.buf);
         free(path);
         perror("Errore creazione file");
@@ -554,9 +552,9 @@ int postfile_op(long fd, message_t m){// m.data.hdr.len tiene già conto dello '
     /* Lo comunico all'utente*/
     message_t toSend;
     setHeader(&(toSend.hdr), FILE_MESSAGE, m.hdr.sender);
-    setData(&(toSend.data), "", strdup(fileName), strlen(fileName)); // m.data.buf contiene il nome del file
+    setData(&(toSend.data), "", strdup(fileName), strlen(fileName)); // m.data.buf contiene il path. Io invece devo comunicare il nome del file. Allora comunico fileName
 
-    //LOCKConnessi(); // Attenzione al deadlock, non posso rilasciarlo sopra. Dovrei tenermi la lock sull'fd del sender senza avere quella dei connessi. Quando ora farei la lock sui connessi rischierei di andare in deadlock. Così mantengo le lock ordinate
+    LOCKConnessi();
     if((posReceiver = getUsrNickname(m.data.hdr.receiver)) != -1){ // se è connesso gli mando subito un messaggio
         LOCKfd(posReceiver);
         sendRequest(utentiConnessi->arr[posReceiver].fd, &toSend);
@@ -566,14 +564,18 @@ int postfile_op(long fd, message_t m){// m.data.hdr.len tiene già conto dello '
         ADDStat("nfilenotdelivered", 1);
     }
     UNLOCKConnessi();
-    if(!equal) UNLOCKRegistrati(m.hdr.sender);
 
     // In ogni caso lo aggiungo sulla sua history
-
     inserisci(h, copyMessage(toSend));
     free(toSend.data.buf);
     UNLOCKRegistrati(m.data.hdr.receiver);
     setHeader(&(r.hdr), OP_OK, "");
+    LOCKfd(posSender);
+    if(strcmp(m.hdr.sender, utentiConnessi->arr[posSender].nickname) != 0 || utentiConnessi->arr[posSender].fd != fd){ // è stato disconnesso
+        UNLOCKfd(posSender);
+        free(path);
+        return 0;
+    }
     sendHeader(utentiConnessi->arr[posSender].fd, &(r.hdr));
     UNLOCKfd(posSender);
     free(path);
