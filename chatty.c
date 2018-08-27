@@ -30,6 +30,236 @@ stat_s * statistiche;
 pthread_t * allThread;
 int ** pfds;
 
+/* FUNZIONI STATICHE*/
+
+/**
+  * @function compareString
+  * @brief  Funzione di comparazione usata nella tabella hash
+  */
+static inline int compareString( void *key1, void *key2  ) {
+    return !strcmp((char *) key1, (char *) key2);
+}
+
+/**
+  * @function usage
+  * @brief  Funzione che stampa il corretto avviamento del server
+  */
+static void usage(const char *progname) {
+    fprintf(stderr, "Il server va lanciato con il seguente comando:\n");
+    fprintf(stderr, "  %s -f conffile\n", progname);
+}
+
+/**
+  * @function pool
+  * @brief Funzione eseguita dai thread del pool. Ha lo scopo di gestire una richiesta del client.
+  *        In particolare preleva dalla coda delle richiste una richiesta e la gestisce
+  *
+  * @param p Pipe con la quale può comunicare con il thread listener
+  */
+static void * pool(void * p){
+    int * fd;
+    int pipe = *((int *)p);
+    int ris, r;
+    message_t msg;
+    while(1){
+        fd = (int *)pop(richieste);
+        if(*fd == -1){
+            free(fd);
+            pthread_exit((void *)0);
+        }
+        r = readMsg(*fd, &msg);
+        if(r <= 0){
+            // Vuol dire che o c'è stato un errore oppure l'utente ha chiuso la socket. In ogni caso
+            // devo chiudere la connessione e eliminare l'utente dagli utenti connessi
+            // è come se mi mandasse un messaggio con operazione DISCONNECT_OP
+            // oss: Devo controllare se esiste nella lista degli utenti un utente_connesso_s->fd = *fd
+
+            disconnect_op(*fd); // rimuovo l'utente dalla lista degli utenti connessi (se esisite)
+            close(*fd); // Chiudo la socket. Non controllo errori dato che qualli che ci sono non si possono verificare
+            LOCKnSock();
+            nSock->contatore --;
+            UNLOCKnSock();
+            // Quindi non ho letto nulla e non devo liberare niente
+        }else{
+            printf("Ricevuta op: %d da: %s con fd: %d\n", msg.hdr.op, msg.hdr.sender, *fd);
+            switch(msg.hdr.op){
+                case REGISTER_OP:
+                    ris = register_op(*fd, msg);
+                    printRisOP(msg, ris);
+                    break;
+                case CONNECT_OP:
+                    ris = connect_op(*fd, msg, 0);
+                    printRisOP(msg, ris);
+                    break;
+                case POSTTXT_OP:
+                    ris = posttxt_op(*fd, msg);
+                    printRisOP(msg, ris);
+                    break;
+                case POSTTXTALL_OP:
+                    ris = posttxtall_op(*fd, msg);
+                    printRisOP(msg, ris);
+                    break;
+                case POSTFILE_OP:
+                    ris = postfile_op(*fd, msg);
+                    printRisOP(msg, ris);
+                    break;
+                case GETFILE_OP:
+                    ris = getfile_op(*fd, msg);
+                    printRisOP(msg, ris);
+                    break;
+                case GETPREVMSGS_OP:
+                    ris = getprevmsgs_op(*fd, msg);
+                    printRisOP(msg, ris);
+                    break;
+                case USRLIST_OP:
+                    ris = usrlist_op(*fd, msg, 0);
+                    printRisOP(msg, ris);
+                    break;
+                case UNREGISTER_OP:
+                    ris = unregister_op(*fd, msg);
+                    printRisOP(msg, ris);
+                    break;
+                default: printf("Ricevuto messaggio non valido\n");
+            }
+            if(writen(pipe, fd, sizeof(int)) == -1){
+                perror("Errore comunicazione fd al listener");
+                stopAllThread(1, 1, configurazione->ThreadsInPool - 1); // Se sono arrivato a questo punto vuol dire che c'è stata una richiesta -> th listener è attivo -> fermo anche lui
+                pthread_exit((void *)-1);
+            }
+            if(msg.data.hdr.len > 0)
+                free(msg.data.buf);
+        }
+        free(fd);
+    }
+}
+
+/**
+  * @function listener
+  * @brief Funzione eseguita da un thread. Ha lo scopo di gestire l'interazione con i client.
+  *        In particolare gestisce la connessione e disconnessione (della socket) di un client.
+  *        Quando rivela che un client vuole fare una richiesta, questa verrà aggiunta alla coda delle richieste
+  *
+  * @param arrayPipe Array di pipe usate per la comunicazione con il pool.
+  *                  Ogni posizione dell'array contiene la pipe per comunicare con un determinato pool.
+  *                  In particolare conterrà ThreadsInPool pipe.
+  */
+static void * listener(void * arrayPipe){
+    int fd_skt, fd_num = 0;
+    int i;
+    fd_set rdset, set;
+    if((fd_skt = createSocket()) == -1){
+        printf("Errore creazione socket\n");
+        stopAllThread(1, 0, configurazione->ThreadsInPool);
+        pthread_exit((void *)-1);
+    }
+    int **pfds = (int **)arrayPipe;
+    FD_ZERO(&set);
+    for(i=0; i<configurazione->ThreadsInPool; i++){
+        FD_SET(pfds[i][0], &set);
+        if(pfds[i][0] > fd_num) fd_num = pfds[i][0];
+    }
+    FD_SET(fd_skt,&set);
+    if(fd_skt > fd_num) fd_num = fd_skt;
+    while (1) {
+        rdset = set;
+        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+        if (select(fd_num+1,&rdset,NULL,NULL,NULL) == -1) {
+            perror("Errore select");
+            stopAllThread(1, 0, configurazione->ThreadsInPool);
+            pthread_exit((void *)-1);
+        } else {
+            pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+            int fd;
+            for (fd = 0; fd<=fd_num;fd++) {
+                if (FD_ISSET(fd, &rdset)) {
+                    if (fd == fd_skt) { /* sock connect pronto */
+                        int fd_c = accept(fd_skt, NULL, 0);
+                        LOCKnSock();
+                        if(nSock->contatore >= configurazione->MaxConnections){
+                            UNLOCKnSock();
+                            message_t m;
+                            setHeader(&(m.hdr), OP_FAIL, "");
+                            setData(&(m.data), "", "Troppi utenti collegati", 24);
+                            sendRequest(fd_c, &m);
+                            close(fd_c);
+                        } else {
+                            nSock->contatore ++;
+                            UNLOCKnSock();
+                            FD_SET(fd_c, &set);
+                            if (fd_c > fd_num) fd_num = fd_c;
+                        }
+                    } else {
+                        int p;
+                        if((p = isPipe(fd)) == 1){ // un thread del pool mi sta comunicando che un fd è di nuovo disponibile
+                            int fd_c;
+                            if(readn(fd, &fd_c, sizeof(int)) == -1){
+                                perror("Errore lettura fd da riaggiungere");
+                                stopAllThread(1, 0, configurazione->ThreadsInPool);
+                                pthread_exit((void *)-1);
+                            }
+                            FD_SET(fd_c, &set);
+                            if (fd_c > fd_num) fd_num = fd_c;
+                        }else if(p == 0){ // un client mi sta mandando una richiesta
+                            int * toPush;
+                            if((toPush = malloc(sizeof(int))) == NULL){
+                                perror("Errore. Spazio in memoria insufficiente");
+                                stopAllThread(1, 0, configurazione->ThreadsInPool);
+                                pthread_exit((void *)-1);
+                            }
+                            *toPush = fd;
+                            push(richieste, toPush);
+                            printf("Inserito fd: %d\n", fd);
+                            FD_CLR(fd, &set);
+                            fd_num = aggiorna(&set, fd_num);
+                        }else{
+                            perror("Errore stat nel fd da riaggiungere");
+                            stopAllThread(1, 0, configurazione->ThreadsInPool);
+                            pthread_exit((void *)-1);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+  * @function segnali
+  * @brief Funzione eseguita dai un pool. Ha lo scopo di gestire i segnali del server.
+  *        In particolare si mette in attesa di un segnale.
+  *        Se il segnale arrivato è di tipo SIGUSR1 aggiorna il file delle statistiche
+  *        Se il segnale arrivato è di tipo SIGQUIT, SIGTERM o SIGINT libera tutte le risorse in uso e fa terminare il server
+  *
+  * @param sgn_set Insieme dei segnali.
+  */
+static void * segnali(void * sgn_set){
+    sigset_t toHandle = *((sigset_t *)sgn_set);
+    int sigRicevuto;
+
+    while(sigwait(&toHandle, &sigRicevuto) == 0){ // non ci sono errori
+        pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+        printf("Ricevuto segnale: %d\n", sigRicevuto);
+        if(sigRicevuto == SIGUSR1){
+            if(strlen(configurazione->StatFileName) > 0){
+                FILE * fileStat;
+                if((fileStat = fopen(configurazione->StatFileName, "a")) == NULL){ // "a" nella fopen corrisponde a O_WRONLY | O_CREAT | O_APPEND nella open
+                    perror("Errore apertura file stat");
+                    exit(-1);
+                }
+                LOCKStat();
+                printStats(fileStat, statistiche->stat);
+                UNLOCKStat();
+                fclose(fileStat);
+            }
+        }else{ // Ho ricevuto o SIGQUIT o SIGTERM o SIGINT
+            printf("LIBERO TUTTO\n");
+            stopAllThread(0, 1, configurazione->ThreadsInPool);
+            pthread_exit((void *)0);
+        }
+        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+    }
+}
+
 
 int main(int argc, char *argv[]) {
     /* Prendo il file di configurazione */
@@ -343,83 +573,6 @@ void stopPool(int nThreadAttivi){
     }
 }
 
-static void * pool(void * p){
-    int * fd;
-    int pipe = *((int *)p);
-    int ris, r;
-    message_t msg;
-    while(1){
-        fd = (int *)pop(richieste);
-        if(*fd == -1){
-            free(fd);
-            pthread_exit((void *)0);
-        }
-        r = readMsg(*fd, &msg);
-        if(r <= 0){
-            // Vuol dire che o c'è stato un errore oppure l'utente ha chiuso la socket. In ogni caso
-            // devo chiudere la connessione e eliminare l'utente dagli utenti connessi
-            // è come se mi mandasse un messaggio con operazione DISCONNECT_OP
-            // oss: Devo controllare se esiste nella lista degli utenti un utente_connesso_s->fd = *fd
-
-            disconnect_op(*fd); // rimuovo l'utente dalla lista degli utenti connessi (se esisite)
-            close(*fd); // Chiudo la socket. Non controllo errori dato che qualli che ci sono non si possono verificare
-            LOCKnSock();
-            nSock->contatore --;
-            UNLOCKnSock();
-            // Quindi non ho letto nulla e non devo liberare niente
-        }else{
-            printf("Ricevuta op: %d da: %s con fd: %d\n", msg.hdr.op, msg.hdr.sender, *fd);
-            switch(msg.hdr.op){
-                case REGISTER_OP:
-                    ris = register_op(*fd, msg);
-                    printRisOP(msg, ris);
-                    break;
-                case CONNECT_OP:
-                    ris = connect_op(*fd, msg, 0);
-                    printRisOP(msg, ris);
-                    break;
-                case POSTTXT_OP:
-                    ris = posttxt_op(*fd, msg);
-                    printRisOP(msg, ris);
-                    break;
-                case POSTTXTALL_OP:
-                    ris = posttxtall_op(*fd, msg);
-                    printRisOP(msg, ris);
-                    break;
-                case POSTFILE_OP:
-                    ris = postfile_op(*fd, msg);
-                    printRisOP(msg, ris);
-                    break;
-                case GETFILE_OP:
-                    ris = getfile_op(*fd, msg);
-                    printRisOP(msg, ris);
-                    break;
-                case GETPREVMSGS_OP:
-                    ris = getprevmsgs_op(*fd, msg);
-                    printRisOP(msg, ris);
-                    break;
-                case USRLIST_OP:
-                    ris = usrlist_op(*fd, msg, 0);
-                    printRisOP(msg, ris);
-                    break;
-                case UNREGISTER_OP:
-                    ris = unregister_op(*fd, msg);
-                    printRisOP(msg, ris);
-                    break;
-                default: printf("Ricevuto messaggio non valido\n");
-            }
-            if(writen(pipe, fd, sizeof(int)) == -1){
-                perror("Errore comunicazione fd al listener");
-                stopAllThread(1, 1, configurazione->ThreadsInPool - 1); // Se sono arrivato a questo punto vuol dire che c'è stata una richiesta -> th listener è attivo -> fermo anche lui
-                pthread_exit((void *)-1);
-            }
-            if(msg.data.hdr.len > 0)
-                free(msg.data.buf);
-        }
-        free(fd);
-    }
-}
-
 void printRisOP(message_t m, int ok){
     switch(m.hdr.op){
         case REGISTER_OP:
@@ -458,114 +611,6 @@ void printRisOP(message_t m, int ok){
             if(ok == 0) printf("POSTFILE_OP OK: %s\n", m.hdr.sender);
             else printf("POSTFILE_OP ERRORE: %s\n", m.hdr.sender);
             break;
-    }
-}
-
-static void * listener(void * arrayPipe){
-    int fd_skt, fd_num = 0;
-    int i;
-    fd_set rdset, set;
-    if((fd_skt = createSocket()) == -1){
-        printf("Errore creazione socket\n");
-        stopAllThread(1, 0, configurazione->ThreadsInPool);
-        pthread_exit((void *)-1);
-    }
-    int **pfds = (int **)arrayPipe;
-    FD_ZERO(&set);
-    for(i=0; i<configurazione->ThreadsInPool; i++){
-        FD_SET(pfds[i][0], &set);
-        if(pfds[i][0] > fd_num) fd_num = pfds[i][0];
-    }
-    FD_SET(fd_skt,&set);
-    if(fd_skt > fd_num) fd_num = fd_skt;
-    while (1) {
-        rdset = set;
-        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-        if (select(fd_num+1,&rdset,NULL,NULL,NULL) == -1) {
-            perror("Errore select");
-            stopAllThread(1, 0, configurazione->ThreadsInPool);
-            pthread_exit((void *)-1);
-        } else {
-            pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
-            int fd;
-            for (fd = 0; fd<=fd_num;fd++) {
-                if (FD_ISSET(fd, &rdset)) {
-                    if (fd == fd_skt) { /* sock connect pronto */
-                        int fd_c = accept(fd_skt, NULL, 0);
-                        LOCKnSock();
-                        if(nSock->contatore >= configurazione->MaxConnections){
-                            UNLOCKnSock();
-                            message_t m;
-                            setHeader(&(m.hdr), OP_FAIL, "");
-                            setData(&(m.data), "", "Troppi utenti collegati", 24);
-                            sendRequest(fd_c, &m);
-                            close(fd_c);
-                        } else {
-                            nSock->contatore ++;
-                            UNLOCKnSock();
-                            FD_SET(fd_c, &set);
-                            if (fd_c > fd_num) fd_num = fd_c;
-                        }
-                    } else {
-                        int p;
-                        if((p = isPipe(fd)) == 1){ // un thread del pool mi sta comunicando che un fd è di nuovo disponibile
-                            int fd_c;
-                            if(readn(fd, &fd_c, sizeof(int)) == -1){
-                                perror("Errore lettura fd da riaggiungere");
-                                stopAllThread(1, 0, configurazione->ThreadsInPool);
-                                pthread_exit((void *)-1);
-                            }
-                            FD_SET(fd_c, &set);
-                            if (fd_c > fd_num) fd_num = fd_c;
-                        }else if(p == 0){ // un client mi sta mandando una richiesta
-                            int * toPush;
-                            if((toPush = malloc(sizeof(int))) == NULL){
-                                perror("Errore. Spazio in memoria insufficiente");
-                                stopAllThread(1, 0, configurazione->ThreadsInPool);
-                                pthread_exit((void *)-1);
-                            }
-                            *toPush = fd;
-                            push(richieste, toPush);
-                            printf("Inserito fd: %d\n", fd);
-                            FD_CLR(fd, &set);
-                            fd_num = aggiorna(&set, fd_num);
-                        }else{
-                            perror("Errore stat nel fd da riaggiungere");
-                            stopAllThread(1, 0, configurazione->ThreadsInPool);
-                            pthread_exit((void *)-1);
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-static void * segnali(void * sgn_set){
-    sigset_t toHandle = *((sigset_t *)sgn_set);
-    int sigRicevuto;
-
-    while(sigwait(&toHandle, &sigRicevuto) == 0){ // non ci sono errori
-        pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
-        printf("Ricevuto segnale: %d\n", sigRicevuto);
-        if(sigRicevuto == SIGUSR1){
-            if(strlen(configurazione->StatFileName) > 0){
-                FILE * fileStat;
-                if((fileStat = fopen(configurazione->StatFileName, "a")) == NULL){ // "a" nella fopen corrisponde a O_WRONLY | O_CREAT | O_APPEND nella open
-                    perror("Errore apertura file stat");
-                    exit(-1);
-                }
-                LOCKStat();
-                printStats(fileStat, statistiche->stat);
-                UNLOCKStat();
-                fclose(fileStat);
-            }
-        }else{ // Ho ricevuto o SIGQUIT o SIGTERM o SIGINT
-            printf("LIBERO TUTTO\n");
-            stopAllThread(0, 1, configurazione->ThreadsInPool);
-            pthread_exit((void *)0);
-        }
-        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
     }
 }
 

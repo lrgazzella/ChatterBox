@@ -28,6 +28,7 @@
 #include <pthread.h>
 #include <getopt.h>
 #include "./struttureCondivise.h"
+#include "./gestioneRichieste.h"
 #include "./parser.h"
 #include "./lib/GestioneQueue/queue.h"
 #include "./lib/GestioneHashTable/icl_hash.h"
@@ -35,37 +36,8 @@
 #include "./utility.h"
 #include "./connections.h"
 #include "./config.h"
-#include "./gestioneRichieste.h"
 
-/**
-  * @function listener
-  * @brief Funzione eseguita da un thread. Ha lo scopo di gestire l'interazione con i client.
-  *        In particolare gestisce la connessione e disconnessione (della socket) di un client.
-  *        Quando rivela che un client vuole fare una richiesta, questa verrà aggiunta alla coda delle richieste
-  *
-  * @param arrayPipe Array di pipe usate per la comunicazione con il pool.
-  *                  Ogni posizione dell'array contiene la pipe per comunicare con un determinato pool.
-  *                  In particolare conterrà ThreadsInPool pipe.
-  */
-static void * listener(void * arrayPipe);
-/**
-  * @function pool
-  * @brief Funzione eseguita dai thread del pool. Ha lo scopo di gestire una richiesta del client.
-  *        In particolare preleva dalla coda delle richiste una richiesta e la gestisce
-  *
-  * @param p Pipe con la quale può comunicare con il thread listener
-  */
-static void * pool(void * p);
-/**
-  * @function segnali
-  * @brief Funzione eseguita dai un pool. Ha lo scopo di gestire i segnali del server.
-  *        In particolare si mette in attesa di un segnale.
-  *        Se il segnale arrivato è di tipo SIGUSR1 aggiorna il file delle statistiche
-  *        Se il segnale arrivato è di tipo SIGQUIT, SIGTERM o SIGINT libera tutte le risorse in uso e fa terminare il server
-  *
-  * @param sgn_set Insieme dei segnali.
-  */
-static void * segnali(void * sgn_set);
+
 /**
   * @function createSocket
   * @brief  Funzione che si occupa della creazione della socket.
@@ -94,6 +66,7 @@ int aggiorna(fd_set * set, int max);
   *           0 altrimenti
   */
 int isPipe(int fd);
+//TODO
 void printRisOP(message_t m, int ok);
 /**
   * @function stopAllThread
@@ -202,21 +175,6 @@ void cleanupPipe();
   */
 void cleanupThreadId();
 
-/**
-  * @function compareString
-  * @brief  Funzione di comparazione usata nella tabella hash
-  */
-static inline int compareString( void *key1, void *key2  ) {
-    return !strcmp((char *) key1, (char *) key2);
-}
 
-/**
-  * @function usage
-  * @brief  Funzione che stampa il corretto avviamento del server
-  */
-static void usage(const char *progname) {
-    fprintf(stderr, "Il server va lanciato con il seguente comando:\n");
-    fprintf(stderr, "  %s -f conffile\n", progname);
-}
 
 #endif

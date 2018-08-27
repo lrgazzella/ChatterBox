@@ -317,6 +317,12 @@ int posttxt_op(long fd, message_t m){
     }
 
     message_t * toSend = copyMessage(m);
+    if(toSend == NULL){
+        UNLOCKRegistrati(m.data.hdr.receiver);
+        perror("Errore creazione file");
+        stopAllThread(1, 1, configurazione->ThreadsInPool);
+        return -1;
+    }
     toSend->hdr.op = TXT_MESSAGE;
     LOCKConnessi();
     if((posReceiver = getUsrNickname(m.data.hdr.receiver)) != -1){ // receiver connesso -> gli invio il messaggio
@@ -382,7 +388,7 @@ int getprevmsgs_op(long fd, message_t m){
     message_t * toSend;
     if(it){ // Se la history è vuota initIteratore(h) torna NULL
         while((toSend = (message_t *)next(it)) != NULL){
-            sendRequest(utentiConnessi->arr[pos].fd, toSend); // TODO controllare errori
+            sendRequest(utentiConnessi->arr[pos].fd, toSend);
         }
     }
     UNLOCKRegistrati(m.hdr.sender); // Visto che sto usando un elemento della hash, non posso rilasciarla prima la lock
@@ -453,7 +459,15 @@ int posttxtall_op(long fd, message_t m){
                     ADDStat("nnotdelivered", 1);
                 }
                 // In ogni caso aggiungo il messaggio alla sua history
-                inserisci((coda_circolare_s *)currUsr->data, copyMessage(m));
+                message_t * s = copyMessage(m);
+                if(s == NULL){
+                    UNLOCKConnessi();
+                    UNLOCKPosRegistrati(i);
+                    perror("Errore creazione file");
+                    stopAllThread(1, 1, configurazione->ThreadsInPool);
+                    return -1;
+                }
+                inserisci((coda_circolare_s *)currUsr->data, s);
             }
         }
         UNLOCKConnessi();
@@ -571,7 +585,14 @@ int postfile_op(long fd, message_t m){// m.data.hdr.len tiene già conto dello '
     UNLOCKConnessi();
 
     // In ogni caso lo aggiungo sulla sua history
-    inserisci(h, copyMessage(toSend));
+    message_t * s = copyMessage(toSend);
+    if(s == NULL){
+        UNLOCKRegistrati(m.data.hdr.receiver);
+        perror("Errore creazione file");
+        stopAllThread(1, 1, configurazione->ThreadsInPool);
+        return -1;
+    }
+    inserisci(h, s);
     free(toSend.data.buf);
     UNLOCKRegistrati(m.data.hdr.receiver);
     setHeader(&(r.hdr), OP_OK, "");
@@ -732,7 +753,7 @@ int getPosizioneLibera(){
   *
   * @return Nuovo messaggio in caso di successo. NULL altrimenti
   */
-message_t * copyMessage(message_t m){ // TODO controllare errore quando si chiama
+message_t * copyMessage(message_t m){
     message_t * toAdd;
     if((toAdd = malloc(sizeof(message_t))) == NULL) return NULL;
     setHeader(&(toAdd->hdr), m.hdr.op, m.hdr.sender);

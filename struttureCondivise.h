@@ -103,7 +103,7 @@ static int getIndexLockHash(char * key){
  *
  * @param pos Indice di buca
  */
-static void LOCKPosRegistrati(int pos){
+static inline void LOCKPosRegistrati(int pos){
     pthread_mutex_lock(&(utentiRegistrati->hash_m[pos % (HASHSIZE/HASHGROUPSIZE)]));
 }
 
@@ -113,7 +113,7 @@ static void LOCKPosRegistrati(int pos){
  *
  * @param pos Indice di buca
  */
-static void UNLOCKPosRegistrati(int pos){
+static inline void UNLOCKPosRegistrati(int pos){
     pthread_mutex_unlock(&(utentiRegistrati->hash_m[pos % (HASHSIZE/HASHGROUPSIZE)]));
 }
 /**
@@ -122,7 +122,7 @@ static void UNLOCKPosRegistrati(int pos){
  *
  * @param nick Nickname
  */
-static void LOCKRegistrati (char * nick){
+static inline void LOCKRegistrati (char * nick){
     int indiceLock = getIndexLockHash(nick);
     pthread_mutex_lock(&(utentiRegistrati->hash_m[indiceLock]));
 }
@@ -132,7 +132,7 @@ static void LOCKRegistrati (char * nick){
  *
  * @param nick Nickname
  */
-static void UNLOCKRegistrati (char * nick){
+static inline void UNLOCKRegistrati (char * nick){
     int indiceLock = getIndexLockHash(nick);
     pthread_mutex_unlock(&(utentiRegistrati->hash_m[indiceLock]));
 }
@@ -141,7 +141,7 @@ static void UNLOCKRegistrati (char * nick){
  * @brief Funzione che prende la lock sull'array degli utenti connessi
  *
  */
-static void LOCKConnessi (){
+static inline void LOCKConnessi (){
     pthread_mutex_lock(&(utentiConnessi->arr_m));
 }
 /**
@@ -149,7 +149,7 @@ static void LOCKConnessi (){
  * @brief Funzione che rilascia la lock sull'array degli utenti connessi
  *
  */
-static void UNLOCKConnessi (){
+static inline void UNLOCKConnessi (){
     pthread_mutex_unlock(&(utentiConnessi->arr_m));
 }
 /**
@@ -157,7 +157,7 @@ static void UNLOCKConnessi (){
  * @brief Funzione che prende la lock sul contatore delle socket attive
  *
  */
-static void LOCKnSock(){
+static inline void LOCKnSock(){
     pthread_mutex_lock(&(nSock->contatore_m));
 }
 /**
@@ -165,7 +165,7 @@ static void LOCKnSock(){
  * @brief Funzione che rilascia la lock sul contatore delle socket attive
  *
  */
-static void UNLOCKnSock(){
+static inline void UNLOCKnSock(){
     pthread_mutex_unlock(&(nSock->contatore_m));
 }
 /**
@@ -173,7 +173,7 @@ static void UNLOCKnSock(){
  * @brief Funzione che prende la lock sull fd in posizione i
  *
  */
-static void LOCKfd(int i){ // Prende la lock sull'fd dell'utente in posizione i
+static inline void LOCKfd(int i){ // Prende la lock sull'fd dell'utente in posizione i
     pthread_mutex_lock(&(utentiConnessi->arr[i].fd_m));
 }
 /**
@@ -181,7 +181,7 @@ static void LOCKfd(int i){ // Prende la lock sull'fd dell'utente in posizione i
  * @brief Funzione che rilascia la lock sull fd in posizione i
  *
  */
-static void UNLOCKfd(int i){
+static inline void UNLOCKfd(int i){
     pthread_mutex_unlock(&(utentiConnessi->arr[i].fd_m));
 }
 /**
@@ -207,7 +207,7 @@ static void UNLOCKStat(){
  * @param stat Campo della struct da modificare
  * @param s Valore da sommare (anche negativo)
  */
-static void ADDStat(char * stat, int s){ // somma s alla statistica stat
+static inline void ADDStat(char * stat, int s){ // somma s alla statistica stat
     LOCKStat();
     if(strcmp(stat, "nusers") == 0){
         statistiche->stat.nusers += s;
@@ -241,7 +241,7 @@ static void freeCoda(void * c){
  *
  * @param a Messaggio che si vuole liberare
  */
-static void freeMessage_t(void * a){
+static inline void freeMessage_t(void * a){
     message_t * m = (message_t *)a;
     free(m->data.buf);
     free(m);
