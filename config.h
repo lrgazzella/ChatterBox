@@ -15,8 +15,8 @@
 
 #define MAX_NAME_LENGTH                  32
 
-#define HASHSIZE 1000
-#define HASHGROUPSIZE 250
+#define HASHSIZE 1500
+#define HASHGROUPSIZE 100
 
 
 

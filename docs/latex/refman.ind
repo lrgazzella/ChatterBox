@@ -1,0 +1,327 @@
+\begin{theindex}
+
+  \item {aggiorna}
+    \subitem {chatty.\+h}, \hyperpage{15}
+  \item {array\+\_\+struct}, \hyperpage{5}
+
+  \indexspace
+
+  \item {chatty.\+c}, \hyperpage{13}
+  \item {chatty.\+h}, \hyperpage{13}
+    \subitem {aggiorna}, \hyperpage{15}
+    \subitem {cleanup\+Configurazione}, \hyperpage{15}
+    \subitem {cleanup\+Connessi}, \hyperpage{15}
+    \subitem {cleanup\+N\+Sock}, \hyperpage{15}
+    \subitem {cleanup\+Pipe}, \hyperpage{16}
+    \subitem {cleanup\+Registrati}, \hyperpage{16}
+    \subitem {cleanup\+Richieste}, \hyperpage{16}
+    \subitem {cleanup\+Stat}, \hyperpage{16}
+    \subitem {cleanup\+Thread\+Id}, \hyperpage{16}
+    \subitem {create\+Socket}, \hyperpage{16}
+    \subitem {init\+Connessi}, \hyperpage{17}
+    \subitem {init\+Dir\+File}, \hyperpage{17}
+    \subitem {init\+Hash\+Lock}, \hyperpage{17}
+    \subitem {init\+N\+Sock}, \hyperpage{17}
+    \subitem {init\+Registrati}, \hyperpage{18}
+    \subitem {init\+Stat}, \hyperpage{18}
+    \subitem {is\+Pipe}, \hyperpage{18}
+    \subitem {join\+All\+Thread}, \hyperpage{19}
+    \subitem {stop\+All\+Thread}, \hyperpage{19}
+    \subitem {stop\+Pool}, \hyperpage{19}
+  \item {check}
+    \subitem {parser.\+h}, \hyperpage{49}
+  \item {cleanup\+Configurazione}
+    \subitem {chatty.\+h}, \hyperpage{15}
+  \item {cleanup\+Connessi}
+    \subitem {chatty.\+h}, \hyperpage{15}
+  \item {cleanup\+N\+Sock}
+    \subitem {chatty.\+h}, \hyperpage{15}
+  \item {cleanup\+Pipe}
+    \subitem {chatty.\+h}, \hyperpage{16}
+  \item {cleanup\+Registrati}
+    \subitem {chatty.\+h}, \hyperpage{16}
+  \item {cleanup\+Richieste}
+    \subitem {chatty.\+h}, \hyperpage{16}
+  \item {cleanup\+Stat}
+    \subitem {chatty.\+h}, \hyperpage{16}
+  \item {cleanup\+Thread\+Id}
+    \subitem {chatty.\+h}, \hyperpage{16}
+  \item {client.\+c}, \hyperpage{20}
+  \item {coda\+\_\+circolare}, \hyperpage{5}
+  \item {coda\+\_\+circolare\+\_\+iteratore}, \hyperpage{6}
+  \item {coda\+Circolare.\+h}
+    \subitem {elimina}, \hyperpage{43}
+    \subitem {elimina\+Coda}, \hyperpage{44}
+    \subitem {elimina\+Iteratore}, \hyperpage{44}
+    \subitem {init\+Coda\+Circolare}, \hyperpage{44}
+    \subitem {init\+Iteratore}, \hyperpage{45}
+    \subitem {inserisci}, \hyperpage{45}
+    \subitem {lung}, \hyperpage{46}
+    \subitem {next}, \hyperpage{46}
+    \subitem {vuota}, \hyperpage{46}
+  \item {config.\+h}, \hyperpage{20}
+  \item {config\+\_\+s}, \hyperpage{6}
+  \item {connect\+\_\+op}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{22}
+    \subitem {gestione\+Richieste.\+h}, \hyperpage{30}
+  \item {connessi}, \hyperpage{6}
+  \item {copy\+Message}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{22}
+  \item {create\+Socket}
+    \subitem {chatty.\+h}, \hyperpage{16}
+
+  \indexspace
+
+  \item {data}, \hyperpage{7}
+  \item {disconnect\+\_\+op}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{23}
+    \subitem {gestione\+Richieste.\+h}, \hyperpage{32}
+
+  \indexspace
+
+  \item {ec\+\_\+meno1}
+    \subitem {utility.\+h}, \hyperpage{54}
+  \item {ec\+\_\+meno1\+\_\+c}
+    \subitem {utility.\+h}, \hyperpage{54}
+  \item {ec\+\_\+meno1\+\_\+return}
+    \subitem {utility.\+h}, \hyperpage{54}
+  \item {ec\+\_\+null}
+    \subitem {utility.\+h}, \hyperpage{55}
+  \item {ec\+\_\+null\+\_\+c}
+    \subitem {utility.\+h}, \hyperpage{55}
+  \item {ec\+\_\+null\+\_\+return}
+    \subitem {utility.\+h}, \hyperpage{55}
+  \item {elimina}
+    \subitem {coda\+Circolare.\+h}, \hyperpage{43}
+  \item {elimina\+Coda}
+    \subitem {coda\+Circolare.\+h}, \hyperpage{44}
+  \item {elimina\+Iteratore}
+    \subitem {coda\+Circolare.\+h}, \hyperpage{44}
+
+  \indexspace
+
+  \item {Free\+Config}
+    \subitem {parser.\+h}, \hyperpage{50}
+
+  \indexspace
+
+  \item {gestione\+Richieste.\+c}, \hyperpage{21}
+    \subitem {connect\+\_\+op}, \hyperpage{22}
+    \subitem {copy\+Message}, \hyperpage{22}
+    \subitem {disconnect\+\_\+op}, \hyperpage{23}
+    \subitem {get\+Only\+File\+Name}, \hyperpage{24}
+    \subitem {get\+Posizione\+Libera}, \hyperpage{24}
+    \subitem {get\+Usr\+Fd}, \hyperpage{25}
+    \subitem {get\+Usr\+Nickname}, \hyperpage{25}
+    \subitem {getfile\+\_\+op}, \hyperpage{23}
+    \subitem {getprevmsgs\+\_\+op}, \hyperpage{24}
+    \subitem {make\+List\+Usr}, \hyperpage{26}
+    \subitem {postfile\+\_\+op}, \hyperpage{26}
+    \subitem {posttxt\+\_\+op}, \hyperpage{26}
+    \subitem {posttxtall\+\_\+op}, \hyperpage{27}
+    \subitem {register\+\_\+op}, \hyperpage{27}
+    \subitem {registrato}, \hyperpage{28}
+    \subitem {unregister\+\_\+op}, \hyperpage{28}
+    \subitem {usrlist\+\_\+op}, \hyperpage{29}
+  \item {gestione\+Richieste.\+h}, \hyperpage{29}
+    \subitem {connect\+\_\+op}, \hyperpage{30}
+    \subitem {disconnect\+\_\+op}, \hyperpage{32}
+    \subitem {getfile\+\_\+op}, \hyperpage{32}
+    \subitem {getprevmsgs\+\_\+op}, \hyperpage{33}
+    \subitem {postfile\+\_\+op}, \hyperpage{33}
+    \subitem {posttxt\+\_\+op}, \hyperpage{33}
+    \subitem {posttxtall\+\_\+op}, \hyperpage{34}
+    \subitem {register\+\_\+op}, \hyperpage{34}
+    \subitem {unregister\+\_\+op}, \hyperpage{35}
+    \subitem {usrlist\+\_\+op}, \hyperpage{35}
+  \item {get\+Only\+File\+Name}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{24}
+  \item {get\+Posizione\+Libera}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{24}
+  \item {get\+Usr\+Fd}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{25}
+  \item {get\+Usr\+Nickname}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{25}
+  \item {getfile\+\_\+op}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{23}
+    \subitem {gestione\+Richieste.\+h}, \hyperpage{32}
+  \item {getprevmsgs\+\_\+op}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{24}
+    \subitem {gestione\+Richieste.\+h}, \hyperpage{33}
+
+  \indexspace
+
+  \item {hash}, \hyperpage{7}
+  \item {header}, \hyperpage{8}
+
+  \indexspace
+
+  \item {icl\+\_\+entry\+\_\+s}, \hyperpage{8}
+  \item {icl\+\_\+hash.\+c}
+    \subitem {icl\+\_\+hash\+\_\+create}, \hyperpage{37}
+    \subitem {icl\+\_\+hash\+\_\+delete}, \hyperpage{37}
+    \subitem {icl\+\_\+hash\+\_\+destroy}, \hyperpage{37}
+    \subitem {icl\+\_\+hash\+\_\+dump}, \hyperpage{38}
+    \subitem {icl\+\_\+hash\+\_\+find}, \hyperpage{38}
+    \subitem {icl\+\_\+hash\+\_\+insert}, \hyperpage{39}
+  \item {icl\+\_\+hash.\+h}
+    \subitem {icl\+\_\+hash\+\_\+create}, \hyperpage{40}
+    \subitem {icl\+\_\+hash\+\_\+delete}, \hyperpage{41}
+    \subitem {icl\+\_\+hash\+\_\+dump}, \hyperpage{41}
+    \subitem {icl\+\_\+hash\+\_\+find}, \hyperpage{42}
+    \subitem {icl\+\_\+hash\+\_\+foreach}, \hyperpage{40}
+    \subitem {icl\+\_\+hash\+\_\+insert}, \hyperpage{42}
+  \item {icl\+\_\+hash\+\_\+create}
+    \subitem {icl\+\_\+hash.\+c}, \hyperpage{37}
+    \subitem {icl\+\_\+hash.\+h}, \hyperpage{40}
+  \item {icl\+\_\+hash\+\_\+delete}
+    \subitem {icl\+\_\+hash.\+c}, \hyperpage{37}
+    \subitem {icl\+\_\+hash.\+h}, \hyperpage{41}
+  \item {icl\+\_\+hash\+\_\+destroy}
+    \subitem {icl\+\_\+hash.\+c}, \hyperpage{37}
+  \item {icl\+\_\+hash\+\_\+dump}
+    \subitem {icl\+\_\+hash.\+c}, \hyperpage{38}
+    \subitem {icl\+\_\+hash.\+h}, \hyperpage{41}
+  \item {icl\+\_\+hash\+\_\+find}
+    \subitem {icl\+\_\+hash.\+c}, \hyperpage{38}
+    \subitem {icl\+\_\+hash.\+h}, \hyperpage{42}
+  \item {icl\+\_\+hash\+\_\+foreach}
+    \subitem {icl\+\_\+hash.\+h}, \hyperpage{40}
+  \item {icl\+\_\+hash\+\_\+insert}
+    \subitem {icl\+\_\+hash.\+c}, \hyperpage{39}
+    \subitem {icl\+\_\+hash.\+h}, \hyperpage{42}
+  \item {icl\+\_\+hash\+\_\+s}, \hyperpage{8}
+  \item {init}
+    \subitem {parser.\+h}, \hyperpage{50}
+  \item {init\+Coda\+Circolare}
+    \subitem {coda\+Circolare.\+h}, \hyperpage{44}
+  \item {init\+Connessi}
+    \subitem {chatty.\+h}, \hyperpage{17}
+  \item {init\+Dir\+File}
+    \subitem {chatty.\+h}, \hyperpage{17}
+  \item {init\+Hash\+Lock}
+    \subitem {chatty.\+h}, \hyperpage{17}
+  \item {init\+Iteratore}
+    \subitem {coda\+Circolare.\+h}, \hyperpage{45}
+  \item {init\+N\+Sock}
+    \subitem {chatty.\+h}, \hyperpage{17}
+  \item {init\+Parse\+Check}
+    \subitem {parser.\+h}, \hyperpage{50}
+  \item {init\+Registrati}
+    \subitem {chatty.\+h}, \hyperpage{18}
+  \item {init\+Stat}
+    \subitem {chatty.\+h}, \hyperpage{18}
+  \item {inserisci}
+    \subitem {coda\+Circolare.\+h}, \hyperpage{45}
+  \item {is\+Pipe}
+    \subitem {chatty.\+h}, \hyperpage{18}
+
+  \indexspace
+
+  \item {join\+All\+Thread}
+    \subitem {chatty.\+h}, \hyperpage{19}
+
+  \indexspace
+
+  \item {lib/\+Gestione\+Hash\+Table/icl\+\_\+hash.\+c}, \hyperpage{36}
+  \item {lib/\+Gestione\+Hash\+Table/icl\+\_\+hash.\+h}, \hyperpage{39}
+  \item {lib/\+Gestione\+History/coda\+Circolare.\+h}, \hyperpage{42}
+  \item {lung}
+    \subitem {coda\+Circolare.\+h}, \hyperpage{46}
+
+  \indexspace
+
+  \item {make\+Config}
+    \subitem {parser.\+h}, \hyperpage{51}
+  \item {make\+List\+Usr}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{26}
+  \item {message.\+h}, \hyperpage{47}
+  \item {message\+\_\+data\+\_\+hdr\+\_\+t}, \hyperpage{9}
+  \item {message\+\_\+data\+\_\+t}, \hyperpage{9}
+  \item {message\+\_\+hdr\+\_\+t}, \hyperpage{9}
+  \item {message\+\_\+t}, \hyperpage{9}
+  \item {messaggio}, \hyperpage{10}
+
+  \indexspace
+
+  \item {next}
+    \subitem {coda\+Circolare.\+h}, \hyperpage{46}
+  \item {Node}, \hyperpage{10}
+
+  \indexspace
+
+  \item {op\+\_\+t}
+    \subitem {ops.\+h}, \hyperpage{48}
+  \item {operation\+\_\+t}, \hyperpage{11}
+  \item {ops.\+h}, \hyperpage{47}
+    \subitem {op\+\_\+t}, \hyperpage{48}
+
+  \indexspace
+
+  \item {parse}
+    \subitem {parser.\+h}, \hyperpage{51}
+  \item {parser.\+h}, \hyperpage{48}
+    \subitem {check}, \hyperpage{49}
+    \subitem {Free\+Config}, \hyperpage{50}
+    \subitem {init}, \hyperpage{50}
+    \subitem {init\+Parse\+Check}, \hyperpage{50}
+    \subitem {make\+Config}, \hyperpage{51}
+    \subitem {parse}, \hyperpage{51}
+    \subitem {Remove\+Spaces}, \hyperpage{51}
+  \item {postfile\+\_\+op}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{26}
+    \subitem {gestione\+Richieste.\+h}, \hyperpage{33}
+  \item {posttxt\+\_\+op}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{26}
+    \subitem {gestione\+Richieste.\+h}, \hyperpage{33}
+  \item {posttxtall\+\_\+op}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{27}
+    \subitem {gestione\+Richieste.\+h}, \hyperpage{34}
+
+  \indexspace
+
+  \item {Queue}, \hyperpage{11}
+
+  \indexspace
+
+  \item {register\+\_\+op}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{27}
+    \subitem {gestione\+Richieste.\+h}, \hyperpage{34}
+  \item {registrato}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{28}
+  \item {Remove\+Spaces}
+    \subitem {parser.\+h}, \hyperpage{51}
+
+  \indexspace
+
+  \item {stat\+\_\+struct}, \hyperpage{11}
+  \item {statistics}, \hyperpage{12}
+  \item {stop\+All\+Thread}
+    \subitem {chatty.\+h}, \hyperpage{19}
+  \item {stop\+Pool}
+    \subitem {chatty.\+h}, \hyperpage{19}
+  \item {strutture\+Condivise.\+h}, \hyperpage{52}
+
+  \indexspace
+
+  \item {unregister\+\_\+op}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{28}
+    \subitem {gestione\+Richieste.\+h}, \hyperpage{35}
+  \item {usrlist\+\_\+op}
+    \subitem {gestione\+Richieste.\+c}, \hyperpage{29}
+    \subitem {gestione\+Richieste.\+h}, \hyperpage{35}
+  \item {utente\+\_\+connesso}, \hyperpage{12}
+  \item {utility.\+h}, \hyperpage{53}
+    \subitem {ec\+\_\+meno1}, \hyperpage{54}
+    \subitem {ec\+\_\+meno1\+\_\+c}, \hyperpage{54}
+    \subitem {ec\+\_\+meno1\+\_\+return}, \hyperpage{54}
+    \subitem {ec\+\_\+null}, \hyperpage{55}
+    \subitem {ec\+\_\+null\+\_\+c}, \hyperpage{55}
+    \subitem {ec\+\_\+null\+\_\+return}, \hyperpage{55}
+
+  \indexspace
+
+  \item {vuota}
+    \subitem {coda\+Circolare.\+h}, \hyperpage{46}
+
+\end{theindex}

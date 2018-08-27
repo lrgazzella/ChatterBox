@@ -34,7 +34,7 @@ digraph "chatty.c"
   Node1 -> Node15 [color="midnightblue",fontsize="10",style="solid"];
   Node15 [label="getopt.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
   Node1 -> Node16 [color="midnightblue",fontsize="10",style="solid"];
-  Node16 [label="./struttureCondivise.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$struttureCondivise_8h.html",tooltip="File che contiene tutte le trutture dati utilizzate dal server Si dichiara che il contenuto di questo..."];
+  Node16 [label="./struttureCondivise.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$strutture_condivise_8h.html",tooltip="File che contiene tutte le trutture dati utilizzate dal server Si dichiara che il contenuto di questo..."];
   Node16 -> Node8 [color="midnightblue",fontsize="10",style="solid"];
   Node16 -> Node6 [color="midnightblue",fontsize="10",style="solid"];
   Node16 -> Node17 [color="midnightblue",fontsize="10",style="solid"];
@@ -45,7 +45,7 @@ digraph "chatty.c"
   Node19 [label="./lib/GestioneHashTable\l/icl_hash.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$icl__hash_8h.html"];
   Node19 -> Node2 [color="midnightblue",fontsize="10",style="solid"];
   Node16 -> Node20 [color="midnightblue",fontsize="10",style="solid"];
-  Node20 [label="./lib/GestioneHistory\l/codaCircolare.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$codaCircolare_8h.html",tooltip="File che contiene la dichiarazione delle funzioni per la gestione di una coda circolare Si dichiara c..."];
+  Node20 [label="./lib/GestioneHistory\l/codaCircolare.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$coda_circolare_8h.html",tooltip="File che contiene la dichiarazione delle funzioni per la gestione di una coda circolare Si dichiara c..."];
   Node20 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
   Node16 -> Node21 [color="midnightblue",fontsize="10",style="solid"];
   Node21 [label="./message.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$message_8h.html",tooltip="Contiene il formato del messaggio. "];
@@ -77,7 +77,7 @@ digraph "chatty.c"
   Node29 -> Node21 [color="midnightblue",fontsize="10",style="solid"];
   Node1 -> Node22 [color="midnightblue",fontsize="10",style="solid"];
   Node1 -> Node30 [color="midnightblue",fontsize="10",style="solid"];
-  Node30 [label="./gestioneRichieste.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gestioneRichieste_8h.html",tooltip="Contiene la dichiarazione di tutti i metodi per la gestione delle singole operazioni che il server ge..."];
+  Node30 [label="./gestioneRichieste.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gestione_richieste_8h.html",tooltip="Contiene la dichiarazione di tutti i metodi per la gestione delle singole operazioni che il server ge..."];
   Node30 -> Node2 [color="midnightblue",fontsize="10",style="solid"];
   Node30 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
   Node30 -> Node3 [color="midnightblue",fontsize="10",style="solid"];

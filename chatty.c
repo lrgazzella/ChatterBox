@@ -570,7 +570,6 @@ static void * segnali(void * sgn_set){
     }
 }
 
-
 int isPipe(int fd){
     if(fd < 0) return -1;
     struct stat file;
@@ -578,11 +577,10 @@ int isPipe(int fd){
     return S_ISFIFO(file.st_mode);
 }
 
-void stopAllThread(int segnali, int listener, int nThreadAttivi){ // Stoppa il listener e il pool. Se segnali = 1, stoppa anche il th dei segnali
-    // Eliminare tutti i thread
+void stopAllThread(int segnali, int listener, int nThreadAttivi){
     if(segnali) pthread_cancel(allThread[1]);
-    if(listener) pthread_cancel(allThread[1]); // Fermo subito il listener almeno non possono più arrivare le richieste
-    stopPool(nThreadAttivi); // Fermo tutti i thread del pool
+    if(listener) pthread_cancel(allThread[1]); // Fermo il listener prima del pool almeno non possono più arrivare le richieste
+    stopPool(nThreadAttivi);
 }
 
 int aggiorna(fd_set * set, int max){
@@ -595,7 +593,6 @@ int aggiorna(fd_set * set, int max){
     return r;
 }
 
-// legge file configurazione, eliminare l'eventuale socket vecchia e crea la socket del server
 int createSocket(){
     if(remove(configurazione->UnixPath) == -1){
         if(errno != ENOENT) {// Se errno == ENOENT vuol dire che non esiste un file con quel path

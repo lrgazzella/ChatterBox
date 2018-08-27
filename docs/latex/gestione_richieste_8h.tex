@@ -1,0 +1,275 @@
+\hypertarget{gestione_richieste_8h}{}\section{gestione\+Richieste.\+h File Reference}
+\label{gestione_richieste_8h}\index{gestione\+Richieste.\+h@{gestione\+Richieste.\+h}}
+
+
+Contiene la dichiarazione di tutti i metodi per la gestione delle singole operazioni che il server gestisce. Si dichiara che il contenuto di questo file e\textquotesingle{} in ogni sua parte opera originale dell\textquotesingle{}autore.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$sys/mman.\+h$>$}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+{\ttfamily \#include $<$sys/stat.\+h$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+{\ttfamily \#include $<$strings.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}message.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}ops.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./config.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./strutture\+Condivise.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./gestione\+Richieste.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./chatty.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./parser.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./connections.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./lib/\+Gestione\+History/coda\+Circolare.\+h\char`\"{}}\newline
+Include dependency graph for gestione\+Richieste.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{gestione_richieste_8h_a3024ccd4a9af5109d24e6c57565d74a1}\label{gestione_richieste_8h_a3024ccd4a9af5109d24e6c57565d74a1}} 
+\#define {\bfseries \+\_\+\+P\+O\+S\+I\+X\+\_\+\+C\+\_\+\+S\+O\+U\+R\+CE}~200809L
+\item 
+\mbox{\Hypertarget{gestione_richieste_8h_a369266c24eacffb87046522897a570d5}\label{gestione_richieste_8h_a369266c24eacffb87046522897a570d5}} 
+\#define {\bfseries \+\_\+\+G\+N\+U\+\_\+\+S\+O\+U\+R\+CE}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{gestione_richieste_8h_a25c2822a5b02b73d5423615ed1c06f20}{register\+\_\+op} (long fd, \hyperlink{structmessage__t}{message\+\_\+t} m)
+\begin{DoxyCompactList}\small\item\em Funzione che gestisce la richiesta di registrazione di un client. Il client verrà automaticamente connesso e riceverà la lista degli utenti online. \end{DoxyCompactList}\item 
+int \hyperlink{gestione_richieste_8h_a379adb31da260c88051f5b11d0a9a6d6}{connect\+\_\+op} (long fd, \hyperlink{structmessage__t}{message\+\_\+t} m, int atomica)
+\begin{DoxyCompactList}\small\item\em Funzione che gestisce la richiesta di connessione di un client. Il client riceverà automaticamente la lista degli utenti online. \end{DoxyCompactList}\item 
+int \hyperlink{gestione_richieste_8h_a0e28c89434bfa2111b1ad2bae0dfbbdd}{posttxt\+\_\+op} (long fd, \hyperlink{structmessage__t}{message\+\_\+t} m)
+\begin{DoxyCompactList}\small\item\em Funzione che gestisce la richiesta di invio di un messaggio da parte di un client a un altro. Il messaggio sarà inviato direttamente al client destinatario nel caso in cui sia connesso. In ogni caso il messaggio verrà aggiunto alla history del client destinatario. \end{DoxyCompactList}\item 
+int \hyperlink{gestione_richieste_8h_a3b26ca960f1032ffec7b5f14a5a011a5}{posttxtall\+\_\+op} (long fd, \hyperlink{structmessage__t}{message\+\_\+t} m)
+\begin{DoxyCompactList}\small\item\em Funzione che gestisce la richiesta da parte di un client dell\textquotesingle{}invio a tutti gli utenti registrati di un certo messaggio. L\textquotesingle{}invio del messaggio segue le stesse regole della funzione posttxt\+\_\+op. \end{DoxyCompactList}\item 
+int \hyperlink{gestione_richieste_8h_a7b0c5d59733a6f35eb9d60f1f7019c31}{postfile\+\_\+op} (long fd, \hyperlink{structmessage__t}{message\+\_\+t} m)
+\begin{DoxyCompactList}\small\item\em Funzione che gestisce la richiesta di invio di un file da parte di un client a un altro. Il client destinatario sarà notificato nel caso in cui sia connesso. In ogni caso verrà aggiunto alla history del client destinatario il nome del file. \end{DoxyCompactList}\item 
+int \hyperlink{gestione_richieste_8h_adb730bea65801751de444bbb5125c510}{getfile\+\_\+op} (long fd, \hyperlink{structmessage__t}{message\+\_\+t} m)
+\begin{DoxyCompactList}\small\item\em Funzione che gestisce la richiesta da parte di un client del download di un file. \end{DoxyCompactList}\item 
+int \hyperlink{gestione_richieste_8h_af861d94ca1c51d1e273d1103b1367bf1}{getprevmsgs\+\_\+op} (long fd, \hyperlink{structmessage__t}{message\+\_\+t} m)
+\begin{DoxyCompactList}\small\item\em Funzione che gestisce l\textquotesingle{}invio della history relativa al client che ne ha fatto richiesta. \end{DoxyCompactList}\item 
+int \hyperlink{gestione_richieste_8h_aed4f52e3a3c624d8f7f7fc734289f5c9}{usrlist\+\_\+op} (long fd, \hyperlink{structmessage__t}{message\+\_\+t} m, int atomica)
+\begin{DoxyCompactList}\small\item\em Funzione che invia la lista degli utenti connessi al client che ne fa richiesta. \end{DoxyCompactList}\item 
+int \hyperlink{gestione_richieste_8h_a81614c50af29bdf3938aa45aec62d139}{unregister\+\_\+op} (long fd, \hyperlink{structmessage__t}{message\+\_\+t} m)
+\begin{DoxyCompactList}\small\item\em Funzione che gestisce la richiesta di deregistrazione da parte di un client. \end{DoxyCompactList}\item 
+int \hyperlink{gestione_richieste_8h_acc40e1f89d52de70e54517e41ed6793e}{disconnect\+\_\+op} (long fd)
+\begin{DoxyCompactList}\small\item\em Funzione che gestisce la richiesta di disconnessione da parte di un client. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Contiene la dichiarazione di tutti i metodi per la gestione delle singole operazioni che il server gestisce. Si dichiara che il contenuto di questo file e\textquotesingle{} in ogni sua parte opera originale dell\textquotesingle{}autore. 
+
+\begin{DoxyAuthor}{Author}
+Lorenzo Gazzella 546890 
+\end{DoxyAuthor}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{gestione_richieste_8h_a379adb31da260c88051f5b11d0a9a6d6}\label{gestione_richieste_8h_a379adb31da260c88051f5b11d0a9a6d6}} 
+\index{gestione\+Richieste.\+h@{gestione\+Richieste.\+h}!connect\+\_\+op@{connect\+\_\+op}}
+\index{connect\+\_\+op@{connect\+\_\+op}!gestione\+Richieste.\+h@{gestione\+Richieste.\+h}}
+\subsubsection{\texorpdfstring{connect\+\_\+op()}{connect\_op()}}
+{\footnotesize\ttfamily int connect\+\_\+op (\begin{DoxyParamCaption}\item[{long}]{fd,  }\item[{\hyperlink{structmessage__t}{message\+\_\+t}}]{m,  }\item[{int}]{atomica }\end{DoxyParamCaption})}
+
+
+
+Funzione che gestisce la richiesta di connessione di un client. Il client riceverà automaticamente la lista degli utenti online. 
+
+connect\+\_\+op 
+\begin{DoxyParams}{Parameters}
+{\em fd} & Fd del client che sta facendo la richiesta \\
+\hline
+{\em m} & Messaggio inviato dal client \\
+\hline
+{\em atomica} & Variabile booleana. Deve valere 1 se si invoca con la lock sulla hash degli utenti registrati, 0 altirmenti.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 in caso di successo -\/1 in caso di errore 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gestione_richieste_8h_acc40e1f89d52de70e54517e41ed6793e}\label{gestione_richieste_8h_acc40e1f89d52de70e54517e41ed6793e}} 
+\index{gestione\+Richieste.\+h@{gestione\+Richieste.\+h}!disconnect\+\_\+op@{disconnect\+\_\+op}}
+\index{disconnect\+\_\+op@{disconnect\+\_\+op}!gestione\+Richieste.\+h@{gestione\+Richieste.\+h}}
+\subsubsection{\texorpdfstring{disconnect\+\_\+op()}{disconnect\_op()}}
+{\footnotesize\ttfamily int disconnect\+\_\+op (\begin{DoxyParamCaption}\item[{long}]{fd }\end{DoxyParamCaption})}
+
+
+
+Funzione che gestisce la richiesta di disconnessione da parte di un client. 
+
+register\+\_\+op 
+\begin{DoxyParams}{Parameters}
+{\em fd} & Fd del client che sta facendo la richiesta \\
+\hline
+{\em m} & Messaggio inviato dal client\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 in caso di successo -\/1 in caso di errore 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gestione_richieste_8h_adb730bea65801751de444bbb5125c510}\label{gestione_richieste_8h_adb730bea65801751de444bbb5125c510}} 
+\index{gestione\+Richieste.\+h@{gestione\+Richieste.\+h}!getfile\+\_\+op@{getfile\+\_\+op}}
+\index{getfile\+\_\+op@{getfile\+\_\+op}!gestione\+Richieste.\+h@{gestione\+Richieste.\+h}}
+\subsubsection{\texorpdfstring{getfile\+\_\+op()}{getfile\_op()}}
+{\footnotesize\ttfamily int getfile\+\_\+op (\begin{DoxyParamCaption}\item[{long}]{fd,  }\item[{\hyperlink{structmessage__t}{message\+\_\+t}}]{m }\end{DoxyParamCaption})}
+
+
+
+Funzione che gestisce la richiesta da parte di un client del download di un file. 
+
+getfile\+\_\+op 
+\begin{DoxyParams}{Parameters}
+{\em fd} & Fd del client che sta facendo la richiesta \\
+\hline
+{\em m} & Messaggio inviato dal client\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 in caso di successo -\/1 in caso di errore 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gestione_richieste_8h_af861d94ca1c51d1e273d1103b1367bf1}\label{gestione_richieste_8h_af861d94ca1c51d1e273d1103b1367bf1}} 
+\index{gestione\+Richieste.\+h@{gestione\+Richieste.\+h}!getprevmsgs\+\_\+op@{getprevmsgs\+\_\+op}}
+\index{getprevmsgs\+\_\+op@{getprevmsgs\+\_\+op}!gestione\+Richieste.\+h@{gestione\+Richieste.\+h}}
+\subsubsection{\texorpdfstring{getprevmsgs\+\_\+op()}{getprevmsgs\_op()}}
+{\footnotesize\ttfamily int getprevmsgs\+\_\+op (\begin{DoxyParamCaption}\item[{long}]{fd,  }\item[{\hyperlink{structmessage__t}{message\+\_\+t}}]{m }\end{DoxyParamCaption})}
+
+
+
+Funzione che gestisce l\textquotesingle{}invio della history relativa al client che ne ha fatto richiesta. 
+
+getprevmsgs\+\_\+op 
+\begin{DoxyParams}{Parameters}
+{\em fd} & Fd del client che sta facendo la richiesta \\
+\hline
+{\em m} & Messaggio inviato dal client\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 in caso di successo -\/1 in caso di errore 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gestione_richieste_8h_a7b0c5d59733a6f35eb9d60f1f7019c31}\label{gestione_richieste_8h_a7b0c5d59733a6f35eb9d60f1f7019c31}} 
+\index{gestione\+Richieste.\+h@{gestione\+Richieste.\+h}!postfile\+\_\+op@{postfile\+\_\+op}}
+\index{postfile\+\_\+op@{postfile\+\_\+op}!gestione\+Richieste.\+h@{gestione\+Richieste.\+h}}
+\subsubsection{\texorpdfstring{postfile\+\_\+op()}{postfile\_op()}}
+{\footnotesize\ttfamily int postfile\+\_\+op (\begin{DoxyParamCaption}\item[{long}]{fd,  }\item[{\hyperlink{structmessage__t}{message\+\_\+t}}]{m }\end{DoxyParamCaption})}
+
+
+
+Funzione che gestisce la richiesta di invio di un file da parte di un client a un altro. Il client destinatario sarà notificato nel caso in cui sia connesso. In ogni caso verrà aggiunto alla history del client destinatario il nome del file. 
+
+postfile\+\_\+op 
+\begin{DoxyParams}{Parameters}
+{\em fd} & Fd del client che sta facendo la richiesta \\
+\hline
+{\em m} & Messaggio inviato dal client\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 in caso di successo -\/1 in caso di errore 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gestione_richieste_8h_a0e28c89434bfa2111b1ad2bae0dfbbdd}\label{gestione_richieste_8h_a0e28c89434bfa2111b1ad2bae0dfbbdd}} 
+\index{gestione\+Richieste.\+h@{gestione\+Richieste.\+h}!posttxt\+\_\+op@{posttxt\+\_\+op}}
+\index{posttxt\+\_\+op@{posttxt\+\_\+op}!gestione\+Richieste.\+h@{gestione\+Richieste.\+h}}
+\subsubsection{\texorpdfstring{posttxt\+\_\+op()}{posttxt\_op()}}
+{\footnotesize\ttfamily int posttxt\+\_\+op (\begin{DoxyParamCaption}\item[{long}]{fd,  }\item[{\hyperlink{structmessage__t}{message\+\_\+t}}]{m }\end{DoxyParamCaption})}
+
+
+
+Funzione che gestisce la richiesta di invio di un messaggio da parte di un client a un altro. Il messaggio sarà inviato direttamente al client destinatario nel caso in cui sia connesso. In ogni caso il messaggio verrà aggiunto alla history del client destinatario. 
+
+posttxt\+\_\+op 
+\begin{DoxyParams}{Parameters}
+{\em fd} & Fd del client che sta facendo la richiesta \\
+\hline
+{\em m} & Messaggio inviato dal client\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 in caso di successo -\/1 in caso di errore 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gestione_richieste_8h_a3b26ca960f1032ffec7b5f14a5a011a5}\label{gestione_richieste_8h_a3b26ca960f1032ffec7b5f14a5a011a5}} 
+\index{gestione\+Richieste.\+h@{gestione\+Richieste.\+h}!posttxtall\+\_\+op@{posttxtall\+\_\+op}}
+\index{posttxtall\+\_\+op@{posttxtall\+\_\+op}!gestione\+Richieste.\+h@{gestione\+Richieste.\+h}}
+\subsubsection{\texorpdfstring{posttxtall\+\_\+op()}{posttxtall\_op()}}
+{\footnotesize\ttfamily int posttxtall\+\_\+op (\begin{DoxyParamCaption}\item[{long}]{fd,  }\item[{\hyperlink{structmessage__t}{message\+\_\+t}}]{m }\end{DoxyParamCaption})}
+
+
+
+Funzione che gestisce la richiesta da parte di un client dell\textquotesingle{}invio a tutti gli utenti registrati di un certo messaggio. L\textquotesingle{}invio del messaggio segue le stesse regole della funzione posttxt\+\_\+op. 
+
+posttxtall\+\_\+op 
+\begin{DoxyParams}{Parameters}
+{\em fd} & Fd del client che sta facendo la richiesta \\
+\hline
+{\em m} & Messaggio inviato dal client\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 in caso di successo -\/1 in caso di errore 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gestione_richieste_8h_a25c2822a5b02b73d5423615ed1c06f20}\label{gestione_richieste_8h_a25c2822a5b02b73d5423615ed1c06f20}} 
+\index{gestione\+Richieste.\+h@{gestione\+Richieste.\+h}!register\+\_\+op@{register\+\_\+op}}
+\index{register\+\_\+op@{register\+\_\+op}!gestione\+Richieste.\+h@{gestione\+Richieste.\+h}}
+\subsubsection{\texorpdfstring{register\+\_\+op()}{register\_op()}}
+{\footnotesize\ttfamily int register\+\_\+op (\begin{DoxyParamCaption}\item[{long}]{fd,  }\item[{\hyperlink{structmessage__t}{message\+\_\+t}}]{m }\end{DoxyParamCaption})}
+
+
+
+Funzione che gestisce la richiesta di registrazione di un client. Il client verrà automaticamente connesso e riceverà la lista degli utenti online. 
+
+register\+\_\+op 
+\begin{DoxyParams}{Parameters}
+{\em fd} & Fd del client che sta facendo la richiesta \\
+\hline
+{\em m} & Messaggio inviato dal client\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 in caso di successo -\/1 in caso di errore 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gestione_richieste_8h_a81614c50af29bdf3938aa45aec62d139}\label{gestione_richieste_8h_a81614c50af29bdf3938aa45aec62d139}} 
+\index{gestione\+Richieste.\+h@{gestione\+Richieste.\+h}!unregister\+\_\+op@{unregister\+\_\+op}}
+\index{unregister\+\_\+op@{unregister\+\_\+op}!gestione\+Richieste.\+h@{gestione\+Richieste.\+h}}
+\subsubsection{\texorpdfstring{unregister\+\_\+op()}{unregister\_op()}}
+{\footnotesize\ttfamily int unregister\+\_\+op (\begin{DoxyParamCaption}\item[{long}]{fd,  }\item[{\hyperlink{structmessage__t}{message\+\_\+t}}]{m }\end{DoxyParamCaption})}
+
+
+
+Funzione che gestisce la richiesta di deregistrazione da parte di un client. 
+
+register\+\_\+op 
+\begin{DoxyParams}{Parameters}
+{\em fd} & Fd del client che sta facendo la richiesta \\
+\hline
+{\em m} & Messaggio inviato dal client\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 in caso di successo -\/1 in caso di errore 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gestione_richieste_8h_aed4f52e3a3c624d8f7f7fc734289f5c9}\label{gestione_richieste_8h_aed4f52e3a3c624d8f7f7fc734289f5c9}} 
+\index{gestione\+Richieste.\+h@{gestione\+Richieste.\+h}!usrlist\+\_\+op@{usrlist\+\_\+op}}
+\index{usrlist\+\_\+op@{usrlist\+\_\+op}!gestione\+Richieste.\+h@{gestione\+Richieste.\+h}}
+\subsubsection{\texorpdfstring{usrlist\+\_\+op()}{usrlist\_op()}}
+{\footnotesize\ttfamily int usrlist\+\_\+op (\begin{DoxyParamCaption}\item[{long}]{fd,  }\item[{\hyperlink{structmessage__t}{message\+\_\+t}}]{m,  }\item[{int}]{atomica }\end{DoxyParamCaption})}
+
+
+
+Funzione che invia la lista degli utenti connessi al client che ne fa richiesta. 
+
+usrlist\+\_\+op 
+\begin{DoxyParams}{Parameters}
+{\em fd} & Fd del client che sta facendo la richiesta \\
+\hline
+{\em m} & Messaggio inviato dal client \\
+\hline
+{\em atomica} & Variabile booleana. Deve valere 1 se si invoca con la lock sulla hash degli utenti registrati, con la lock sull\textquotesingle{}array degli utenti connessi e con la lock sull\textquotesingle{}fd, 0 altirmenti.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 in caso di successo -\/1 in caso di errore 
+\end{DoxyReturn}

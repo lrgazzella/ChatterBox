@@ -9,7 +9,7 @@ var searchData=
   ['cleanuprichieste',['cleanupRichieste',['../chatty_8c.html#a2e1ae9ecb3dcef089d578627891ef20a',1,'cleanupRichieste():&#160;chatty.c'],['../chatty_8h.html#a2e1ae9ecb3dcef089d578627891ef20a',1,'cleanupRichieste():&#160;chatty.c']]],
   ['cleanupstat',['cleanupStat',['../chatty_8c.html#a6896c6367d89aad456d07321e933a6c0',1,'cleanupStat():&#160;chatty.c'],['../chatty_8h.html#a6896c6367d89aad456d07321e933a6c0',1,'cleanupStat():&#160;chatty.c']]],
   ['cleanupthreadid',['cleanupThreadId',['../chatty_8c.html#a5190ec49d24282426465e3731a34c20f',1,'cleanupThreadId():&#160;chatty.c'],['../chatty_8h.html#a5190ec49d24282426465e3731a34c20f',1,'cleanupThreadId():&#160;chatty.c']]],
-  ['connect_5fop',['connect_op',['../gestioneRichieste_8c.html#a379adb31da260c88051f5b11d0a9a6d6',1,'connect_op(long fd, message_t m, int atomica):&#160;gestioneRichieste.c'],['../gestioneRichieste_8h.html#a379adb31da260c88051f5b11d0a9a6d6',1,'connect_op(long fd, message_t m, int atomica):&#160;gestioneRichieste.c']]],
-  ['copymessage',['copyMessage',['../gestioneRichieste_8c.html#aad5e379113758e746716a81727902636',1,'gestioneRichieste.c']]],
+  ['connect_5fop',['connect_op',['../gestione_richieste_8c.html#a379adb31da260c88051f5b11d0a9a6d6',1,'connect_op(long fd, message_t m, int atomica):&#160;gestioneRichieste.c'],['../gestione_richieste_8h.html#a379adb31da260c88051f5b11d0a9a6d6',1,'connect_op(long fd, message_t m, int atomica):&#160;gestioneRichieste.c']]],
+  ['copymessage',['copyMessage',['../gestione_richieste_8c.html#aad5e379113758e746716a81727902636',1,'gestioneRichieste.c']]],
   ['createsocket',['createSocket',['../chatty_8c.html#a5ece610682861d1713357ebe3d61997f',1,'createSocket():&#160;chatty.c'],['../chatty_8h.html#a5ece610682861d1713357ebe3d61997f',1,'createSocket():&#160;chatty.c']]]
 ];

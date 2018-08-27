@@ -61,7 +61,7 @@ int \hyperlink{chatty_8c_a5ece610682861d1713357ebe3d61997f}{create\+Socket} ()
 \begin{DoxyCompactItemize}
 \item 
 \mbox{\Hypertarget{chatty_8c_a1afc6192c4b6af2de66f3409243c270c}\label{chatty_8c_a1afc6192c4b6af2de66f3409243c270c}} 
-\hyperlink{structQueue}{Queue\+\_\+t} $\ast$ {\bfseries richieste}
+\hyperlink{struct_queue}{Queue\+\_\+t} $\ast$ {\bfseries richieste}
 \item 
 \mbox{\Hypertarget{chatty_8c_ab958ac6b569893c2c75b7f5a1fedabff}\label{chatty_8c_ab958ac6b569893c2c75b7f5a1fedabff}} 
 \hyperlink{structconfig__s}{config} $\ast$ {\bfseries configurazione}
