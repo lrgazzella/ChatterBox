@@ -35,7 +35,7 @@ if [[ $? != 0 ]]; then
     exit 1
 fi
 # quarto
-./client -l $1 -k qui -S "ciao a tutti":
+./client -l $1 -k qui -S "ciao a tutti": 
 if [[ $? != 0 ]]; then
     exit 1
 fi
@@ -63,7 +63,7 @@ OP_NICK_ALREADY=26
 ./client -l $1 -c pippo
 e=$?
 if [[ $((256-e)) != $OP_NICK_ALREADY ]]; then
-    echo "Errore non corrispondente $e"
+    echo "Errore non corrispondente $e" 
     exit 1
 fi
 
@@ -122,3 +122,5 @@ fi
 
 echo "Test OK!"
 exit 0
+
+

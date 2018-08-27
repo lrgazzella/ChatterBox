@@ -205,7 +205,7 @@ consegna:
 	sleep 3
 	make test5
 	sleep 3
-	#tar -cvf $(TARNAME)_$(CORSO)_chatty.tar $(FILE_DA_CONSEGNARE)
+	tar -cvf $(TARNAME)_$(CORSO)_chatty.tar $(FILE_DA_CONSEGNARE)
 	@echo "*** TAR PRONTO $(TARNAME)_$(CORSO)_chatty.tar "
 	@echo "Per la consegna seguire le istruzioni specificate nella pagina del progetto:"
 	@echo " http://didawiki.di.unipi.it/doku.php/informatica/sol/laboratorio17/progetto"

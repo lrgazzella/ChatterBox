@@ -32,11 +32,11 @@ typedef enum {
     UNREGISTER_OP    = 8,   /// richiesta di deregistrazione di un nickname o groupname
     DISCONNECT_OP    = 9,   /// richiesta di disconnessione
 
-    /*  la gestione dei gruppi e' opzionale 
+    /*  la gestione dei gruppi e' opzionale */
     CREATEGROUP_OP   = 10,  /// richiesta di creazione di un gruppo
     ADDGROUP_OP      = 11,  /// richiesta di aggiunta ad un gruppo
     DELGROUP_OP      = 12,  /// richiesta di rimozione da un gruppo
-    */
+
 
     /* NOTA: la richiesta di cancellazione di un gruppo e' lasciata come task opzionale */
 
