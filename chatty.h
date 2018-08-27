@@ -7,6 +7,7 @@
 
 #ifndef CHATTY_
 #define CHATTY_
+#define DEBUG 1
 
 #define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
@@ -66,7 +67,11 @@ int aggiorna(fd_set * set, int max);
   *           0 altrimenti
   */
 int isPipe(int fd);
-//TODO
+/**
+  * @function printRisOP
+  * @brief Funzione che in base alla richiesta e al valore ritornato dalla funzione che l'ha gestista, stampa un determinato output
+  *        La funzione stampa un messaggio solo se la macro DEBUG è stata definita.
+  */
 void printRisOP(message_t m, int ok);
 /**
   * @function stopAllThread

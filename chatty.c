@@ -81,7 +81,6 @@ static void * pool(void * p){
             UNLOCKnSock();
             // Quindi non ho letto nulla e non devo liberare niente
         }else{
-            printf("Ricevuta op: %d da: %s con fd: %d\n", msg.hdr.op, msg.hdr.sender, *fd);
             switch(msg.hdr.op){
                 case REGISTER_OP:
                     ris = register_op(*fd, msg);
@@ -208,7 +207,6 @@ static void * listener(void * arrayPipe){
                             }
                             *toPush = fd;
                             push(richieste, toPush);
-                            printf("Inserito fd: %d\n", fd);
                             FD_CLR(fd, &set);
                             fd_num = aggiorna(&set, fd_num);
                         }else{
@@ -238,7 +236,6 @@ static void * segnali(void * sgn_set){
 
     while(sigwait(&toHandle, &sigRicevuto) == 0){ // non ci sono errori
         pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
-        printf("Ricevuto segnale: %d\n", sigRicevuto);
         if(sigRicevuto == SIGUSR1){
             if(strlen(configurazione->StatFileName) > 0){
                 FILE * fileStat;
@@ -252,7 +249,6 @@ static void * segnali(void * sgn_set){
                 fclose(fileStat);
             }
         }else{ // Ho ricevuto o SIGQUIT o SIGTERM o SIGINT
-            printf("LIBERO TUTTO\n");
             stopAllThread(0, 1, configurazione->ThreadsInPool);
             pthread_exit((void *)0);
         }
@@ -574,44 +570,46 @@ void stopPool(int nThreadAttivi){
 }
 
 void printRisOP(message_t m, int ok){
-    switch(m.hdr.op){
-        case REGISTER_OP:
-            if(ok == 0) printf("REGISTER_OP OK: %s\n", m.hdr.sender);
-            else printf("REGISTER_OP ERRORE: %s\n", m.hdr.sender);
-            break;
-        case CONNECT_OP:
-            if(ok == 0) printf("CONNECT_OP OK: %s\n", m.hdr.sender);
-            else printf("CONNECT_OP ERRORE: %s\n", m.hdr.sender);
-            break;
-        case USRLIST_OP:
-            if(ok == 0) printf("USRLIST_OP OK: %s\n", m.hdr.sender);
-            else printf("USRLIST_OP ERRORE: %s\n", m.hdr.sender);
-            break;
-        case UNREGISTER_OP:
-            if(ok == 0) printf("UNREGISTER_OP OK: %s\n", m.hdr.sender);
-            else printf("UNREGISTER_OP ERRORE: %s\n", m.hdr.sender);
-            break;
-        case POSTTXT_OP:
-            if(ok == 0) printf("POSTTXT_OP OK: %s\n", m.hdr.sender);
-            else printf("POSTTXT_OP ERRORE: %s\n", m.hdr.sender);
-            break;
-        case GETPREVMSGS_OP:
-            if(ok == 0) printf("GETPREVMSGS_OP OK: %s\n", m.hdr.sender);
-            else printf("GETPREVMSGS_OP ERRORE: %s\n", m.hdr.sender);
-            break;
-        case POSTTXTALL_OP:
-            if(ok == 0) printf("POSTTXTALL_OP OK: %s\n", m.hdr.sender);
-            else printf("POSTTXTALL_OP ERRORE: %s\n", m.hdr.sender);
-            break;
-        case GETFILE_OP:
-            if(ok == 0) printf("GETFILE_OP OK: %s\n", m.hdr.sender);
-            else printf("GETFILE_OP ERRORE: %s\n", m.hdr.sender);
-            break;
-        case POSTFILE_OP:
-            if(ok == 0) printf("POSTFILE_OP OK: %s\n", m.hdr.sender);
-            else printf("POSTFILE_OP ERRORE: %s\n", m.hdr.sender);
-            break;
-    }
+    #ifdef DEBUG
+        switch(m.hdr.op){
+            case REGISTER_OP:
+                if(ok == 0) printf("REGISTER_OP OK: %s\n", m.hdr.sender);
+                else printf("REGISTER_OP ERRORE: %s\n", m.hdr.sender);
+                break;
+            case CONNECT_OP:
+                if(ok == 0) printf("CONNECT_OP OK: %s\n", m.hdr.sender);
+                else printf("CONNECT_OP ERRORE: %s\n", m.hdr.sender);
+                break;
+            case USRLIST_OP:
+                if(ok == 0) printf("USRLIST_OP OK: %s\n", m.hdr.sender);
+                else printf("USRLIST_OP ERRORE: %s\n", m.hdr.sender);
+                break;
+            case UNREGISTER_OP:
+                if(ok == 0) printf("UNREGISTER_OP OK: %s\n", m.hdr.sender);
+                else printf("UNREGISTER_OP ERRORE: %s\n", m.hdr.sender);
+                break;
+            case POSTTXT_OP:
+                if(ok == 0) printf("POSTTXT_OP OK: %s\n", m.hdr.sender);
+                else printf("POSTTXT_OP ERRORE: %s\n", m.hdr.sender);
+                break;
+            case GETPREVMSGS_OP:
+                if(ok == 0) printf("GETPREVMSGS_OP OK: %s\n", m.hdr.sender);
+                else printf("GETPREVMSGS_OP ERRORE: %s\n", m.hdr.sender);
+                break;
+            case POSTTXTALL_OP:
+                if(ok == 0) printf("POSTTXTALL_OP OK: %s\n", m.hdr.sender);
+                else printf("POSTTXTALL_OP ERRORE: %s\n", m.hdr.sender);
+                break;
+            case GETFILE_OP:
+                if(ok == 0) printf("GETFILE_OP OK: %s\n", m.hdr.sender);
+                else printf("GETFILE_OP ERRORE: %s\n", m.hdr.sender);
+                break;
+            case POSTFILE_OP:
+                if(ok == 0) printf("POSTFILE_OP OK: %s\n", m.hdr.sender);
+                else printf("POSTFILE_OP ERRORE: %s\n", m.hdr.sender);
+                break;
+        }
+    #endif
 }
 
 int isPipe(int fd){

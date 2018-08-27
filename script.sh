@@ -23,12 +23,10 @@ if ! [ -e $1 ]; then
 fi
 
 
-
-
 # Parso tutto il file
 i=0
 while read line; do
-  if [[ "$line" =~ ^[^#]*= ]]; then
+  if [[ "$line" =~ ^[^\#]*= ]]; then
     name[i]=${line%% =*} # ${<var>%%<pattern>}: se <pattern> occorre alla fine di $<var> ritorna la stringa ottenuta eliminando da  $<var> la più lunga occorrenza finale  di <pattern>
     value[i]=${line#*= } # ${<var>#<pattern>}:  se <pattern> occorre all’inizio di $<var> ritorna la stringa ottenuta eliminando da $<var> la più corta occorrenza iniziale di <pattern>
     ((i++))
