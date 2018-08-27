@@ -162,6 +162,11 @@ int usrlist_op(long fd, message_t m, int atomica){
         }
     }else{
         char * listStr = makeListUsr(); // ho la lock sui registrati, sui connessi e sull'fd
+        if(listStr == NULL){ // Errore -> fermo il server
+            perror("Errore creazione file");
+            stopAllThread(1, 1, configurazione->ThreadsInPool);
+            return -1;
+        }
         int nUsr = utentiConnessi->nConnessi;
         setHeader(&(r.hdr), OP_OK, "");
         setData(&(r.data), "", listStr, (MAX_NAME_LENGTH + 1) * nUsr);
@@ -763,15 +768,15 @@ char * getOnlyFileName(char * path){
   * @function makeListUsr
   * @brief Funzione che restiruisce la lista degli utenti connessi
   *
-  * @return Lista utenti connessi
+  * @return Lista utenti connessi in caso di successo. NULL altrimenti
   */
-char * makeListUsr(){ // TODO controllare errore quando si chiama
+char * makeListUsr(){
     int i = 0;
     char * r;
     if((r = malloc(sizeof(char) * ((MAX_NAME_LENGTH + 1) * utentiConnessi->nConnessi))) == NULL) return NULL;
     if(!r) {
         printf("Errore calloc\n");
-        exit(-1);
+        return NULL;
     }
     memset(r, 0, sizeof(char) * ((MAX_NAME_LENGTH + 1) * utentiConnessi->nConnessi));
     char * tmp = r;

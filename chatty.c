@@ -355,10 +355,9 @@ static void * pool(void * p){
             pthread_exit((void *)0);
         }
         r = readMsg(*fd, &msg);
-        if(r < 0){ // Non termino il server. Potrebbe essere che stavo leggendo mentre il client ha chiuso la socket. Non posso terminare l'intero server per un client che ha chiuso la socket
-            printf("Errore lettura messaggio");
-        }else if(r == 0){
-            // vuol dire che il client ha finito di comunicare, allora devo chiudere la connessione e eliminare l'utente dagli utenti connessi
+        if(r <= 0){
+            // Vuol dire che o c'è stato un errore oppure l'utente ha chiuso la socket. In ogni caso
+            // devo chiudere la connessione e eliminare l'utente dagli utenti connessi
             // è come se mi mandasse un messaggio con operazione DISCONNECT_OP
             // oss: Devo controllare se esiste nella lista degli utenti un utente_connesso_s->fd = *fd
 
