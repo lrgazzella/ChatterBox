@@ -1,3 +1,8 @@
+/** @file testListener.c
+  * @author Lorenzo Gazzella 546890
+  * Si dichiara che il contenuto di questo file e' in ogni sua parte opera
+  * originale dell'autore
+  */
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -20,7 +25,7 @@ int main(int argc, char** argv) {
 
     message_t m1, m2;
     m2.hdr.op = -1;
-    setHeader(&(m1.hdr), REGISTER_OP, "Lorenzo"); 
+    setHeader(&(m1.hdr), REGISTER_OP, "Lorenzo");
     setData(&(m1.data), "", NULL, 0);
     sendRequest(fd, &m1);
     readMsg(fd, &m2);

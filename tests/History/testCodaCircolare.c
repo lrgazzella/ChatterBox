@@ -1,3 +1,8 @@
+/** @file testCodaCircolare.c
+  * @author Lorenzo Gazzella 546890
+  * Si dichiara che il contenuto di questo file e' in ogni sua parte opera
+  * originale dell'autore
+  */
 #include <stdio.h>
 #include "./../lib/GestioneHistory/codaCircolare.h"
 

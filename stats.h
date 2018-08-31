@@ -5,6 +5,12 @@
  * Docenti: Prencipe, Torquati
  *
  */
+/**
+  * @file  stats.h
+  * @author Lorenzo Gazzella 546890
+  * Si dichiara che il contenuto di questo file e' in ogni sua parte opera
+  * originale dell'autore
+  */
 #if !defined(MEMBOX_STATS_)
 #define MEMBOX_STATS_
 

@@ -8,6 +8,12 @@
 # * match 0 or more of the preceding token
 # = mathca solo le righe che contengono il simbolo uguale
 
+#/** @file script.sh
+#  * @author Lorenzo Gazzella 546890
+#  * Si dichiara che il contenuto di questo file e' in ogni sua parte opera
+#  * originale dell'autore
+#  */
+
 case $@ in  *"--help"*)
 	echo "Usa $0 file_conf t"
 	exit 1 ;; esac

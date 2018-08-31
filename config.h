@@ -5,10 +5,12 @@
  * Docenti: Prencipe, Torquati
  *
  */
-/**
- * @file config.h
- * @brief File contenente alcune define con valori massimi utilizzabili
- */
+/** @file config.h
+  * @author Lorenzo Gazzella 546890
+  * @brief File contenente alcune define con valori massimi utilizzabili
+  * Si dichiara che il contenuto di questo file e' in ogni sua parte opera
+  * originale dell'autore
+  */
 
 #if !defined(CONFIG_H_)
 #define CONFIG_H_

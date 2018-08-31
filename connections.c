@@ -1,3 +1,9 @@
+/** @file connections.c
+  * @author Lorenzo Gazzella 546890
+  * Si dichiara che il contenuto di questo file e' in ogni sua parte opera
+  * originale dell'autore
+  */
+
 #define _POSIX_C_SOURCE 199309L
 #include "connections.h"
 #include <sys/types.h>

@@ -3,7 +3,7 @@
  *
  * Dipartimento di Informatica Università di Pisa
  * Docenti: Prencipe, Torquati
- * 
+ *
  */
 
 #if !defined(OPS_H_)
@@ -12,6 +12,9 @@
 /**
  * @file  ops.h
  * @brief Contiene i codici delle operazioni di richiesta e risposta
+ * @author Lorenzo Gazzella 546890
+ * Si dichiara che il contenuto di questo file e' in ogni sua parte opera
+ * originale dell'autore
  */
 
 
@@ -24,7 +27,7 @@ typedef enum {
 
     CONNECT_OP       = 1,   /// richiesta di connessione di un client
     POSTTXT_OP       = 2,   /// richiesta di invio di un messaggio testuale ad un nickname o groupname
-    POSTTXTALL_OP    = 3,   /// richiesta di invio di un messaggio testuale a tutti gli utenti 
+    POSTTXTALL_OP    = 3,   /// richiesta di invio di un messaggio testuale a tutti gli utenti
     POSTFILE_OP      = 4,   /// richiesta di invio di un file ad un nickname o groupname
     GETFILE_OP       = 5,   /// richiesta di recupero di un file
     GETPREVMSGS_OP   = 6,   /// richiesta di recupero della history dei messaggi
@@ -40,15 +43,15 @@ typedef enum {
 
     /* NOTA: la richiesta di cancellazione di un gruppo e' lasciata come task opzionale */
 
-    /* 
-     * aggiungere qui eltre operazioni che si vogliono implementare 
+    /*
+     * aggiungere qui eltre operazioni che si vogliono implementare
      */
 
     /* ------------------------------------------ */
     /*    messaggi inviati dal server             */
     /* ------------------------------------------ */
 
-    OP_OK           = 20,  // operazione eseguita con successo    
+    OP_OK           = 20,  // operazione eseguita con successo
     TXT_MESSAGE     = 21,  // notifica di messaggio testuale
     FILE_MESSAGE    = 22,  // notifica di messaggio "file disponibile"
 
@@ -57,15 +60,15 @@ typedef enum {
     OP_NICK_UNKNOWN = 27,  // nickname non riconosciuto
     OP_MSG_TOOLONG  = 28,  // messaggio con size troppo lunga
     OP_NO_SUCH_FILE = 29,  // il file richiesto non esiste
-    
 
-    /* 
-     * aggiungere qui altri messaggi di ritorno che possono servire 
+
+    /*
+     * aggiungere qui altri messaggi di ritorno che possono servire
      */
 
     OP_END          = 100 // limite superiore agli id usati per le operazioni
 
 } op_t;
-    
+
 
 #endif /* OPS_H_ */

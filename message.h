@@ -5,6 +5,7 @@
  * Docenti: Prencipe, Torquati
  *
  */
+
 #ifndef MESSAGE_H_
 #define MESSAGE_H_
 
@@ -16,6 +17,9 @@
 /**
  * @file  message.h
  * @brief Contiene il formato del messaggio
+ * @author Lorenzo Gazzella 546890
+ * Si dichiara che il contenuto di questo file e' in ogni sua parte opera
+ * originale dell'autore
  */
 
 

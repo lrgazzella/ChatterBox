@@ -1,3 +1,9 @@
+/** @file codaCircolare.c
+  * @author Lorenzo Gazzella 546890
+  * Si dichiara che il contenuto di questo file e' in ogni sua parte opera
+  * originale dell'autore
+  */
+
 #include <stdio.h>
 #include "./codaCircolare.h"
 
@@ -30,7 +36,7 @@ int inserisci(coda_circolare_s * c, void * elem){
     return 1;
 }
 
-int elimina(coda_circolare_s * c){ 
+int elimina(coda_circolare_s * c){
     if(!c) return 0;
 
     if(!vuota(c)){

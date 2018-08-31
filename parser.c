@@ -1,3 +1,8 @@
+/** @file parser.c
+  * @author Lorenzo Gazzella 546890
+  * Si dichiara che il contenuto di questo file e' in ogni sua parte opera
+  * originale dell'autore
+  */
 #define _POSIX_C_SOURCE 200809L
 #define _GNU_SOURCE
 #include "parser.h"
