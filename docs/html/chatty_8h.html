@@ -83,14 +83,14 @@ $(function() {
 <code>#include &lt;sys/select.h&gt;</code><br />
 <code>#include &lt;getopt.h&gt;</code><br />
 <code>#include &quot;<a class="el" href="strutture_condivise_8h_source.html">./struttureCondivise.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="gestione_richieste_8h_source.html">./gestioneRichieste.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="parser_8h_source.html">./parser.h</a>&quot;</code><br />
 <code>#include &quot;./lib/GestioneQueue/queue.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="icl__hash_8h_source.html">./lib/GestioneHashTable/icl_hash.h</a>&quot;</code><br />
-<code>#include &quot;./stats.h&quot;</code><br />
+<code>#include &quot;<a class="el" href="stats_8h_source.html">./stats.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="utility_8h_source.html">./utility.h</a>&quot;</code><br />
-<code>#include &quot;./connections.h&quot;</code><br />
+<code>#include &quot;<a class="el" href="connections_8h_source.html">./connections.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="config_8h_source.html">./config.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="gestione_richieste_8h_source.html">./gestioneRichieste.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for chatty.h:</div>
 <div class="dyncontent">
@@ -108,6 +108,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:ad72dbcf6d0153db1b8d8a58001feed83"><td class="memItemLeft" align="right" valign="top"><a id="ad72dbcf6d0153db1b8d8a58001feed83"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>DEBUG</b>&#160;&#160;&#160;1</td></tr>
+<tr class="separator:ad72dbcf6d0153db1b8d8a58001feed83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3024ccd4a9af5109d24e6c57565d74a1"><td class="memItemLeft" align="right" valign="top"><a id="a3024ccd4a9af5109d24e6c57565d74a1"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>_POSIX_C_SOURCE</b>&#160;&#160;&#160;200809L</td></tr>
 <tr class="separator:a3024ccd4a9af5109d24e6c57565d74a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -123,8 +126,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a8509726415161d5a6944a64e31b511ac"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chatty_8h.html#a8509726415161d5a6944a64e31b511ac">isPipe</a> (int fd)</td></tr>
 <tr class="memdesc:a8509726415161d5a6944a64e31b511ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Funzione che verifica se un fd è una pipe.  <a href="#a8509726415161d5a6944a64e31b511ac">More...</a><br /></td></tr>
 <tr class="separator:a8509726415161d5a6944a64e31b511ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e499099f562e203205fc3a172ce7351"><td class="memItemLeft" align="right" valign="top"><a id="a0e499099f562e203205fc3a172ce7351"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>printRisOP</b> (<a class="el" href="structmessage__t.html">message_t</a> m, int ok)</td></tr>
+<tr class="memitem:a0e499099f562e203205fc3a172ce7351"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chatty_8h.html#a0e499099f562e203205fc3a172ce7351">printRisOP</a> (<a class="el" href="structmessage__t.html">message_t</a> m, int ok)</td></tr>
+<tr class="memdesc:a0e499099f562e203205fc3a172ce7351"><td class="mdescLeft">&#160;</td><td class="mdescRight">Funzione che in base alla richiesta e al valore ritornato dalla funzione che l'ha gestista, stampa un determinato output La funzione stampa un messaggio solo se la macro DEBUG è stata definita.  <a href="#a0e499099f562e203205fc3a172ce7351">More...</a><br /></td></tr>
 <tr class="separator:a0e499099f562e203205fc3a172ce7351"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03070d47a810d44ac351b8f5fd5000f6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chatty_8h.html#a03070d47a810d44ac351b8f5fd5000f6">stopAllThread</a> (int segnali, int listener, int nThreadAttivi)</td></tr>
 <tr class="memdesc:a03070d47a810d44ac351b8f5fd5000f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Funzione che stoppa i thread indicati dai parametri.  <a href="#a03070d47a810d44ac351b8f5fd5000f6">More...</a><br /></td></tr>
@@ -564,6 +567,37 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>printRisOP</b> (<a cl
 
 <p>Funzione effettua le join di tutti i thread del server. </p>
 <p>joinAllThread </p>
+
+</div>
+</div>
+<a id="a0e499099f562e203205fc3a172ce7351"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e499099f562e203205fc3a172ce7351">&#9670;&nbsp;</a></span>printRisOP()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void printRisOP </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structmessage__t.html">message_t</a>&#160;</td>
+          <td class="paramname"><em>m</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ok</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Funzione che in base alla richiesta e al valore ritornato dalla funzione che l'ha gestista, stampa un determinato output La funzione stampa un messaggio solo se la macro DEBUG è stata definita. </p>
+<p>printRisOP </p>
 
 </div>
 </div>

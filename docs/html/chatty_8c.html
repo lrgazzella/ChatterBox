@@ -130,8 +130,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>main</b> (int argc, ch
 <tr class="memitem:abba8289f04610be41e390483374e8cbe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chatty_8c.html#abba8289f04610be41e390483374e8cbe">stopPool</a> (int nThreadAttivi)</td></tr>
 <tr class="memdesc:abba8289f04610be41e390483374e8cbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Funzione che stoppa un certo numero di thread del pool.  <a href="#abba8289f04610be41e390483374e8cbe">More...</a><br /></td></tr>
 <tr class="separator:abba8289f04610be41e390483374e8cbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e499099f562e203205fc3a172ce7351"><td class="memItemLeft" align="right" valign="top"><a id="a0e499099f562e203205fc3a172ce7351"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>printRisOP</b> (<a class="el" href="structmessage__t.html">message_t</a> m, int ok)</td></tr>
+<tr class="memitem:a0e499099f562e203205fc3a172ce7351"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chatty_8c.html#a0e499099f562e203205fc3a172ce7351">printRisOP</a> (<a class="el" href="structmessage__t.html">message_t</a> m, int ok)</td></tr>
+<tr class="memdesc:a0e499099f562e203205fc3a172ce7351"><td class="mdescLeft">&#160;</td><td class="mdescRight">Funzione che in base alla richiesta e al valore ritornato dalla funzione che l'ha gestista, stampa un determinato output La funzione stampa un messaggio solo se la macro DEBUG è stata definita.  <a href="#a0e499099f562e203205fc3a172ce7351">More...</a><br /></td></tr>
 <tr class="separator:a0e499099f562e203205fc3a172ce7351"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8509726415161d5a6944a64e31b511ac"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chatty_8c.html#a8509726415161d5a6944a64e31b511ac">isPipe</a> (int fd)</td></tr>
 <tr class="memdesc:a8509726415161d5a6944a64e31b511ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Funzione che verifica se un fd è una pipe.  <a href="#a8509726415161d5a6944a64e31b511ac">More...</a><br /></td></tr>
@@ -559,6 +559,37 @@ int **&#160;</td><td class="memItemRight" valign="bottom"><b>pfds</b></td></tr>
 
 <p>Funzione effettua le join di tutti i thread del server. </p>
 <p>joinAllThread </p>
+
+</div>
+</div>
+<a id="a0e499099f562e203205fc3a172ce7351"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e499099f562e203205fc3a172ce7351">&#9670;&nbsp;</a></span>printRisOP()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void printRisOP </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structmessage__t.html">message_t</a>&#160;</td>
+          <td class="paramname"><em>m</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ok</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Funzione che in base alla richiesta e al valore ritornato dalla funzione che l'ha gestista, stampa un determinato output La funzione stampa un messaggio solo se la macro DEBUG è stata definita. </p>
+<p>printRisOP </p>
 
 </div>
 </div>

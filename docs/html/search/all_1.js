@@ -2,7 +2,7 @@ var searchData=
 [
   ['chatty_2ec',['chatty.c',['../chatty_8c.html',1,'']]],
   ['chatty_2eh',['chatty.h',['../chatty_8h.html',1,'']]],
-  ['check',['check',['../parser_8h.html#a1eb5f0ae6982141a59b0e8d7c7bfcd1d',1,'parser.c']]],
+  ['check',['check',['../parser_8c.html#a1eb5f0ae6982141a59b0e8d7c7bfcd1d',1,'check(config *configs):&#160;parser.c'],['../parser_8h.html#a1eb5f0ae6982141a59b0e8d7c7bfcd1d',1,'check(config *configs):&#160;parser.c']]],
   ['cleanupconfigurazione',['cleanupConfigurazione',['../chatty_8c.html#a31218041afb760a2d455019b7e5a978e',1,'cleanupConfigurazione():&#160;chatty.c'],['../chatty_8h.html#a31218041afb760a2d455019b7e5a978e',1,'cleanupConfigurazione():&#160;chatty.c']]],
   ['cleanupconnessi',['cleanupConnessi',['../chatty_8c.html#a212ca8f9d5789c4482757ca3959667ef',1,'cleanupConnessi():&#160;chatty.c'],['../chatty_8h.html#a212ca8f9d5789c4482757ca3959667ef',1,'cleanupConnessi():&#160;chatty.c']]],
   ['cleanupnsock',['cleanupNSock',['../chatty_8c.html#ab480aa59ec403d489123a3e6002477ee',1,'cleanupNSock():&#160;chatty.c'],['../chatty_8h.html#ab480aa59ec403d489123a3e6002477ee',1,'cleanupNSock():&#160;chatty.c']]],
@@ -14,11 +14,15 @@ var searchData=
   ['client_2ec',['client.c',['../client_8c.html',1,'']]],
   ['coda_5fcircolare',['coda_circolare',['../structcoda__circolare.html',1,'']]],
   ['coda_5fcircolare_5fiteratore',['coda_circolare_iteratore',['../structcoda__circolare__iteratore.html',1,'']]],
+  ['codacircolare_2ec',['codaCircolare.c',['../coda_circolare_8c.html',1,'']]],
   ['codacircolare_2eh',['codaCircolare.h',['../coda_circolare_8h.html',1,'']]],
   ['config_2eh',['config.h',['../config_8h.html',1,'']]],
   ['config_5fs',['config_s',['../structconfig__s.html',1,'']]],
   ['connect_5fop',['CONNECT_OP',['../ops_8h.html#ac6fa1b34da8872e34c2936391332f44cab602ddf0795d3c4dc2fd0b4b957ba988',1,'CONNECT_OP():&#160;ops.h'],['../gestione_richieste_8c.html#a379adb31da260c88051f5b11d0a9a6d6',1,'connect_op(long fd, message_t m, int atomica):&#160;gestioneRichieste.c'],['../gestione_richieste_8h.html#a379adb31da260c88051f5b11d0a9a6d6',1,'connect_op(long fd, message_t m, int atomica):&#160;gestioneRichieste.c']]],
+  ['connections_2ec',['connections.c',['../connections_8c.html',1,'']]],
+  ['connections_2eh',['connections.h',['../connections_8h.html',1,'']]],
   ['connessi',['connessi',['../structconnessi.html',1,'']]],
   ['copymessage',['copyMessage',['../gestione_richieste_8c.html#aad5e379113758e746716a81727902636',1,'gestioneRichieste.c']]],
+  ['creategroup_5fop',['CREATEGROUP_OP',['../ops_8h.html#ac6fa1b34da8872e34c2936391332f44ca30840713ad9050c2d275b31ff8404313',1,'ops.h']]],
   ['createsocket',['createSocket',['../chatty_8c.html#a5ece610682861d1713357ebe3d61997f',1,'createSocket():&#160;chatty.c'],['../chatty_8h.html#a5ece610682861d1713357ebe3d61997f',1,'createSocket():&#160;chatty.c']]]
 ];

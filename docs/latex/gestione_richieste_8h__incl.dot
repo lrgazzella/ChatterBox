@@ -26,7 +26,7 @@ digraph "gestioneRichieste.h"
   Node9 -> Node11 [color="midnightblue",fontsize="10",style="solid"];
   Node11 [label="string.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
   Node9 -> Node12 [color="midnightblue",fontsize="10",style="solid"];
-  Node12 [label="config.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$config_8h.html",tooltip="File contenente alcune define con valori massimi utilizzabili. "];
+  Node12 [label="config.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$config_8h.html",tooltip="File contenente alcune define con valori massimi utilizzabili Si dichiara che il contenuto di questo ..."];
   Node9 -> Node13 [color="midnightblue",fontsize="10",style="solid"];
   Node13 [label="ops.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ops_8h.html",tooltip="Contiene i codici delle operazioni di richiesta e risposta. "];
   Node0 -> Node13 [color="midnightblue",fontsize="10",style="solid"];
@@ -51,7 +51,7 @@ digraph "gestioneRichieste.h"
   Node14 -> Node20 [color="midnightblue",fontsize="10",style="solid"];
   Node20 [label="./parser.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$parser_8h.html",tooltip="File che contiene tutte le funzioni necessarie al parsing di un file di configurazione Si dichiara ch..."];
   Node14 -> Node21 [color="midnightblue",fontsize="10",style="solid"];
-  Node21 [label="./stats.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$stats_8h_source.html"];
+  Node21 [label="./stats.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$stats_8h.html"];
   Node21 -> Node1 [color="midnightblue",fontsize="10",style="solid"];
   Node21 -> Node22 [color="midnightblue",fontsize="10",style="solid"];
   Node22 [label="time.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
@@ -79,6 +79,7 @@ digraph "gestioneRichieste.h"
   Node23 -> Node29 [color="midnightblue",fontsize="10",style="solid"];
   Node29 [label="getopt.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
   Node23 -> Node14 [color="midnightblue",fontsize="10",style="solid"];
+  Node23 -> Node0 [color="midnightblue",fontsize="10",style="solid"];
   Node23 -> Node20 [color="midnightblue",fontsize="10",style="solid"];
   Node23 -> Node16 [color="midnightblue",fontsize="10",style="solid"];
   Node23 -> Node18 [color="midnightblue",fontsize="10",style="solid"];
@@ -89,10 +90,9 @@ digraph "gestioneRichieste.h"
   Node31 [label="errno.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
   Node30 -> Node3 [color="midnightblue",fontsize="10",style="solid"];
   Node23 -> Node32 [color="midnightblue",fontsize="10",style="solid"];
-  Node32 [label="./connections.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$connections_8h_source.html"];
+  Node32 [label="./connections.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$connections_8h.html",tooltip="Contiene le funzioni che implementano il protocollo tra i clients ed il server. "];
   Node32 -> Node9 [color="midnightblue",fontsize="10",style="solid"];
   Node23 -> Node12 [color="midnightblue",fontsize="10",style="solid"];
-  Node23 -> Node0 [color="midnightblue",fontsize="10",style="solid"];
   Node0 -> Node20 [color="midnightblue",fontsize="10",style="solid"];
   Node0 -> Node32 [color="midnightblue",fontsize="10",style="solid"];
   Node0 -> Node19 [color="midnightblue",fontsize="10",style="solid"];

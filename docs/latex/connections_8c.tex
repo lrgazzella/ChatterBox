@@ -1,0 +1,190 @@
+\hypertarget{connections_8c}{}\section{connections.\+c File Reference}
+\label{connections_8c}\index{connections.\+c@{connections.\+c}}
+{\ttfamily \#include \char`\"{}connections.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+{\ttfamily \#include $<$sys/socket.\+h$>$}\newline
+{\ttfamily \#include $<$sys/un.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}ops.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}config.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}utility.\+h\char`\"{}}\newline
+Include dependency graph for connections.\+c\+:
+% FIG 0
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{connections_8c_a3024ccd4a9af5109d24e6c57565d74a1}\label{connections_8c_a3024ccd4a9af5109d24e6c57565d74a1}} 
+\#define {\bfseries \+\_\+\+P\+O\+S\+I\+X\+\_\+\+C\+\_\+\+S\+O\+U\+R\+CE}~199309L
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{connections_8c_a93ad31c416b2e2055827e5f684e89daf}{open\+Connection} (char $\ast$path, unsigned int ntimes, unsigned int secs)
+\begin{DoxyCompactList}\small\item\em Apre una connessione A\+F\+\_\+\+U\+N\+IX verso il server. \end{DoxyCompactList}\item 
+int \hyperlink{connections_8c_a166a9f07b57f9684fc9e97863d97ff03}{read\+Header} (long fd, \hyperlink{structmessage__hdr__t}{message\+\_\+hdr\+\_\+t} $\ast$hdr)
+\begin{DoxyCompactList}\small\item\em Legge l\textquotesingle{}header del messaggio. \end{DoxyCompactList}\item 
+int \hyperlink{connections_8c_acf5cb8379636265d11a008d6aa94dc30}{read\+Data} (long fd, \hyperlink{structmessage__data__t}{message\+\_\+data\+\_\+t} $\ast$\hyperlink{structdata}{data})
+\begin{DoxyCompactList}\small\item\em Legge il body del messaggio. \end{DoxyCompactList}\item 
+int \hyperlink{connections_8c_a2fc6b845d44636fb241a848e58c83420}{read\+Msg} (long fd, \hyperlink{structmessage__t}{message\+\_\+t} $\ast$msg)
+\begin{DoxyCompactList}\small\item\em Legge l\textquotesingle{}intero messaggio. \end{DoxyCompactList}\item 
+int \hyperlink{connections_8c_a76519996d7c1c002a8214e8ba40af51c}{send\+Header} (long fd, \hyperlink{structmessage__hdr__t}{message\+\_\+hdr\+\_\+t} $\ast$hdr)
+\begin{DoxyCompactList}\small\item\em Invia l\textquotesingle{}header del messaggio al server. \end{DoxyCompactList}\item 
+int \hyperlink{connections_8c_aa7805c42a47eb013344c0ceb6b3533e8}{send\+Data} (long fd, \hyperlink{structmessage__data__t}{message\+\_\+data\+\_\+t} $\ast$\hyperlink{structdata}{data})
+\begin{DoxyCompactList}\small\item\em Invia il body del messaggio al server. \end{DoxyCompactList}\item 
+int \hyperlink{connections_8c_a3c23eb25de2ae8b5216eb6dd847521c0}{send\+Request} (long fd, \hyperlink{structmessage__t}{message\+\_\+t} $\ast$msg)
+\begin{DoxyCompactList}\small\item\em Invia un messaggio di richiesta al server. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+Lorenzo Gazzella 546890 Si dichiara che il contenuto di questo file e\textquotesingle{} in ogni sua parte opera originale dell\textquotesingle{}autore 
+\end{DoxyAuthor}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{connections_8c_a93ad31c416b2e2055827e5f684e89daf}\label{connections_8c_a93ad31c416b2e2055827e5f684e89daf}} 
+\index{connections.\+c@{connections.\+c}!open\+Connection@{open\+Connection}}
+\index{open\+Connection@{open\+Connection}!connections.\+c@{connections.\+c}}
+\subsubsection{\texorpdfstring{open\+Connection()}{openConnection()}}
+{\footnotesize\ttfamily int open\+Connection (\begin{DoxyParamCaption}\item[{char $\ast$}]{path,  }\item[{unsigned int}]{ntimes,  }\item[{unsigned int}]{secs }\end{DoxyParamCaption})}
+
+
+
+Apre una connessione A\+F\+\_\+\+U\+N\+IX verso il server. 
+
+open\+Connection 
+\begin{DoxyParams}{Parameters}
+{\em path} & Path del socket A\+F\+\_\+\+U\+N\+IX \\
+\hline
+{\em ntimes} & numero massimo di tentativi di retry \\
+\hline
+{\em secs} & tempo di attesa tra due retry consecutive\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+il descrittore associato alla connessione in caso di successo -\/1 in caso di errore 
+\end{DoxyReturn}
+\mbox{\Hypertarget{connections_8c_acf5cb8379636265d11a008d6aa94dc30}\label{connections_8c_acf5cb8379636265d11a008d6aa94dc30}} 
+\index{connections.\+c@{connections.\+c}!read\+Data@{read\+Data}}
+\index{read\+Data@{read\+Data}!connections.\+c@{connections.\+c}}
+\subsubsection{\texorpdfstring{read\+Data()}{readData()}}
+{\footnotesize\ttfamily int read\+Data (\begin{DoxyParamCaption}\item[{long}]{fd,  }\item[{\hyperlink{structmessage__data__t}{message\+\_\+data\+\_\+t} $\ast$}]{data }\end{DoxyParamCaption})}
+
+
+
+Legge il body del messaggio. 
+
+read\+Data 
+\begin{DoxyParams}{Parameters}
+{\em fd} & descrittore della connessione \\
+\hline
+{\em data} & puntatore al body del messaggio\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+$<$=0 se c\textquotesingle{}e\textquotesingle{} stato un errore (se $<$0 errno deve essere settato, se == 0 connessione chiusa) 
+\end{DoxyReturn}
+\mbox{\Hypertarget{connections_8c_a166a9f07b57f9684fc9e97863d97ff03}\label{connections_8c_a166a9f07b57f9684fc9e97863d97ff03}} 
+\index{connections.\+c@{connections.\+c}!read\+Header@{read\+Header}}
+\index{read\+Header@{read\+Header}!connections.\+c@{connections.\+c}}
+\subsubsection{\texorpdfstring{read\+Header()}{readHeader()}}
+{\footnotesize\ttfamily int read\+Header (\begin{DoxyParamCaption}\item[{long}]{connfd,  }\item[{\hyperlink{structmessage__hdr__t}{message\+\_\+hdr\+\_\+t} $\ast$}]{hdr }\end{DoxyParamCaption})}
+
+
+
+Legge l\textquotesingle{}header del messaggio. 
+
+read\+Header 
+\begin{DoxyParams}{Parameters}
+{\em fd} & descrittore della connessione \\
+\hline
+{\em hdr} & puntatore all\textquotesingle{}header del messaggio da ricevere\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+$<$=0 se c\textquotesingle{}e\textquotesingle{} stato un errore (se $<$0 errno deve essere settato, se == 0 connessione chiusa) 
+\end{DoxyReturn}
+\mbox{\Hypertarget{connections_8c_a2fc6b845d44636fb241a848e58c83420}\label{connections_8c_a2fc6b845d44636fb241a848e58c83420}} 
+\index{connections.\+c@{connections.\+c}!read\+Msg@{read\+Msg}}
+\index{read\+Msg@{read\+Msg}!connections.\+c@{connections.\+c}}
+\subsubsection{\texorpdfstring{read\+Msg()}{readMsg()}}
+{\footnotesize\ttfamily int read\+Msg (\begin{DoxyParamCaption}\item[{long}]{fd,  }\item[{\hyperlink{structmessage__t}{message\+\_\+t} $\ast$}]{msg }\end{DoxyParamCaption})}
+
+
+
+Legge l\textquotesingle{}intero messaggio. 
+
+read\+Msg 
+\begin{DoxyParams}{Parameters}
+{\em fd} & descrittore della connessione \\
+\hline
+{\em data} & puntatore al messaggio\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+$<$=0 se c\textquotesingle{}e\textquotesingle{} stato un errore (se $<$0 errno deve essere settato, se == 0 connessione chiusa) 
+\end{DoxyReturn}
+\mbox{\Hypertarget{connections_8c_aa7805c42a47eb013344c0ceb6b3533e8}\label{connections_8c_aa7805c42a47eb013344c0ceb6b3533e8}} 
+\index{connections.\+c@{connections.\+c}!send\+Data@{send\+Data}}
+\index{send\+Data@{send\+Data}!connections.\+c@{connections.\+c}}
+\subsubsection{\texorpdfstring{send\+Data()}{sendData()}}
+{\footnotesize\ttfamily int send\+Data (\begin{DoxyParamCaption}\item[{long}]{fd,  }\item[{\hyperlink{structmessage__data__t}{message\+\_\+data\+\_\+t} $\ast$}]{msg }\end{DoxyParamCaption})}
+
+
+
+Invia il body del messaggio al server. 
+
+send\+Data 
+\begin{DoxyParams}{Parameters}
+{\em fd} & descrittore della connessione \\
+\hline
+{\em msg} & puntatore al messaggio da inviare\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+$<$=0 se c\textquotesingle{}e\textquotesingle{} stato un errore 
+\end{DoxyReturn}
+\mbox{\Hypertarget{connections_8c_a76519996d7c1c002a8214e8ba40af51c}\label{connections_8c_a76519996d7c1c002a8214e8ba40af51c}} 
+\index{connections.\+c@{connections.\+c}!send\+Header@{send\+Header}}
+\index{send\+Header@{send\+Header}!connections.\+c@{connections.\+c}}
+\subsubsection{\texorpdfstring{send\+Header()}{sendHeader()}}
+{\footnotesize\ttfamily int send\+Header (\begin{DoxyParamCaption}\item[{long}]{fd,  }\item[{\hyperlink{structmessage__hdr__t}{message\+\_\+hdr\+\_\+t} $\ast$}]{msg }\end{DoxyParamCaption})}
+
+
+
+Invia l\textquotesingle{}header del messaggio al server. 
+
+send\+Header 
+\begin{DoxyParams}{Parameters}
+{\em fd} & descrittore della connessione \\
+\hline
+{\em msg} & puntatore al messaggio da inviare\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+$<$=0 se c\textquotesingle{}e\textquotesingle{} stato un errore 
+\end{DoxyReturn}
+\mbox{\Hypertarget{connections_8c_a3c23eb25de2ae8b5216eb6dd847521c0}\label{connections_8c_a3c23eb25de2ae8b5216eb6dd847521c0}} 
+\index{connections.\+c@{connections.\+c}!send\+Request@{send\+Request}}
+\index{send\+Request@{send\+Request}!connections.\+c@{connections.\+c}}
+\subsubsection{\texorpdfstring{send\+Request()}{sendRequest()}}
+{\footnotesize\ttfamily int send\+Request (\begin{DoxyParamCaption}\item[{long}]{fd,  }\item[{\hyperlink{structmessage__t}{message\+\_\+t} $\ast$}]{msg }\end{DoxyParamCaption})}
+
+
+
+Invia un messaggio di richiesta al server. 
+
+send\+Request 
+\begin{DoxyParams}{Parameters}
+{\em fd} & descrittore della connessione \\
+\hline
+{\em msg} & puntatore al messaggio da inviare\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+$<$=0 se c\textquotesingle{}e\textquotesingle{} stato un errore 
+\end{DoxyReturn}

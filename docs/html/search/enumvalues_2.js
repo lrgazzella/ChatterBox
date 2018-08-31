@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['getfile_5fop',['GETFILE_OP',['../ops_8h.html#ac6fa1b34da8872e34c2936391332f44cadb9dcac2886dea585d6851db2a02de4b',1,'ops.h']]],
-  ['getprevmsgs_5fop',['GETPREVMSGS_OP',['../ops_8h.html#ac6fa1b34da8872e34c2936391332f44cad40f98fc799cf8b6a8dc25c90464a809',1,'ops.h']]]
+  ['delgroup_5fop',['DELGROUP_OP',['../ops_8h.html#ac6fa1b34da8872e34c2936391332f44cab9abe0fa4dab90183a19f2f56dfe0d49',1,'ops.h']]],
+  ['disconnect_5fop',['DISCONNECT_OP',['../ops_8h.html#ac6fa1b34da8872e34c2936391332f44ca06d81ab3ef58420bbebac2c67dc901e2',1,'ops.h']]]
 ];

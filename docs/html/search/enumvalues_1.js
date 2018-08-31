@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['disconnect_5fop',['DISCONNECT_OP',['../ops_8h.html#ac6fa1b34da8872e34c2936391332f44ca06d81ab3ef58420bbebac2c67dc901e2',1,'ops.h']]]
+  ['connect_5fop',['CONNECT_OP',['../ops_8h.html#ac6fa1b34da8872e34c2936391332f44cab602ddf0795d3c4dc2fd0b4b957ba988',1,'ops.h']]],
+  ['creategroup_5fop',['CREATEGROUP_OP',['../ops_8h.html#ac6fa1b34da8872e34c2936391332f44ca30840713ad9050c2d275b31ff8404313',1,'ops.h']]]
 ];

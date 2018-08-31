@@ -22,17 +22,22 @@ FILE_DA_CONSEGNARE=Makefile \
 			connections.h \
 			connections.c \
 			gestioneRichieste.c \
+			gestioneRichieste.h \
 			parser.c \
 			parser.h \
 			script.sh \
 			struttureCondivise.h \
 			utility.h \
-			lib/GestioneHashTable/icl_hash.c \
-			lib/GestioneHashTable/icl_hash.h \
-			lib/GestioneHistory/codaCircolare.c \
-			lib/GestioneHistory/codaCircolare.h \
-			lib/GestioneQueue/queue.c \
-			lib/GestioneQueue/queue.h
+			lib \
+			tests \
+			docs \
+			chatterbox_documentation \
+			testconf.sh \
+			testfile.sh \
+			testleaks.sh \
+			teststress.sh \
+			Relazione_Chatterbox.pdf
+
 
 # inserire il nome del tarball: es. NinoBixio
 TARNAME=LorenzoGazzella

@@ -144,7 +144,6 @@ int usrlist_op(long fd, message_t m, int atomica){
             LOCKfd(pos);
             UNLOCKConnessi();
 
-            // Devo farla sotto la makeListUsr. L'alternativa sarebbe stata quella di mettere la unlock prima dell'if che controlla se il nickname ottenuto dopo la lock sull'fd è uguale a quello che sto analizzando e di fare la lock dei connessi nella funzione makeListUsr. Avrei però rischiato di andare in deadlock. Io a questo punto ho la lock sull'fd. Se nel frattempo si inseriva una richiesta di unregister, prendeva la lock sui connessi e si metteva in attesa per la lock sull'fd. Ora quando la makeListUsr andava a fare la lock sui connessi restava in attesa dato che al momento è della funzione unregister. Ma la unregister non può andare avanti finchè non termina la usrlist, ovvero fino a quando non termina la makeListUsr.
             setHeader(&(r.hdr), OP_OK, "");
             setData(&(r.data), "", listStr, (MAX_NAME_LENGTH + 1) * nUsr);
             sendRequest(fd, &r);

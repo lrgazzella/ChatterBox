@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['check',['check',['../parser_8h.html#a1eb5f0ae6982141a59b0e8d7c7bfcd1d',1,'parser.c']]],
+  ['check',['check',['../parser_8c.html#a1eb5f0ae6982141a59b0e8d7c7bfcd1d',1,'check(config *configs):&#160;parser.c'],['../parser_8h.html#a1eb5f0ae6982141a59b0e8d7c7bfcd1d',1,'check(config *configs):&#160;parser.c']]],
   ['cleanupconfigurazione',['cleanupConfigurazione',['../chatty_8c.html#a31218041afb760a2d455019b7e5a978e',1,'cleanupConfigurazione():&#160;chatty.c'],['../chatty_8h.html#a31218041afb760a2d455019b7e5a978e',1,'cleanupConfigurazione():&#160;chatty.c']]],
   ['cleanupconnessi',['cleanupConnessi',['../chatty_8c.html#a212ca8f9d5789c4482757ca3959667ef',1,'cleanupConnessi():&#160;chatty.c'],['../chatty_8h.html#a212ca8f9d5789c4482757ca3959667ef',1,'cleanupConnessi():&#160;chatty.c']]],
   ['cleanupnsock',['cleanupNSock',['../chatty_8c.html#ab480aa59ec403d489123a3e6002477ee',1,'cleanupNSock():&#160;chatty.c'],['../chatty_8h.html#ab480aa59ec403d489123a3e6002477ee',1,'cleanupNSock():&#160;chatty.c']]],

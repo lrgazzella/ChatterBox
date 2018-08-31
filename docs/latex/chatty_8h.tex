@@ -20,6 +20,7 @@ File che contiene la dichiarazione di tutte le funzioni utilizzate nel file \hyp
 {\ttfamily \#include $<$sys/select.\+h$>$}\newline
 {\ttfamily \#include $<$getopt.\+h$>$}\newline
 {\ttfamily \#include \char`\"{}./strutture\+Condivise.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./gestione\+Richieste.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}./parser.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}./lib/\+Gestione\+Queue/queue.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}./lib/\+Gestione\+Hash\+Table/icl\+\_\+hash.\+h\char`\"{}}\newline
@@ -27,13 +28,15 @@ File che contiene la dichiarazione di tutte le funzioni utilizzate nel file \hyp
 {\ttfamily \#include \char`\"{}./utility.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}./connections.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}./config.\+h\char`\"{}}\newline
-{\ttfamily \#include \char`\"{}./gestione\+Richieste.\+h\char`\"{}}\newline
 Include dependency graph for chatty.\+h\+:
 % FIG 0
 This graph shows which files directly or indirectly include this file\+:
 % FIG 1
 \subsection*{Macros}
 \begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{chatty_8h_ad72dbcf6d0153db1b8d8a58001feed83}\label{chatty_8h_ad72dbcf6d0153db1b8d8a58001feed83}} 
+\#define {\bfseries D\+E\+B\+UG}~1
 \item 
 \mbox{\Hypertarget{chatty_8h_a3024ccd4a9af5109d24e6c57565d74a1}\label{chatty_8h_a3024ccd4a9af5109d24e6c57565d74a1}} 
 \#define {\bfseries \+\_\+\+P\+O\+S\+I\+X\+\_\+\+C\+\_\+\+S\+O\+U\+R\+CE}~200809L
@@ -47,9 +50,8 @@ int \hyperlink{chatty_8h_aad2eba9dcce98b4a5d1ab4b1cae9a527}{aggiorna} (fd\+\_\+s
 \begin{DoxyCompactList}\small\item\em Funzione che trova file descriptor più grande all\textquotesingle{}intero di un insieme di fd. Verrà chiamata a seguito di una cancellazione di un fd dall\textquotesingle{}insieme degli fd. \end{DoxyCompactList}\item 
 int \hyperlink{chatty_8h_a8509726415161d5a6944a64e31b511ac}{is\+Pipe} (int fd)
 \begin{DoxyCompactList}\small\item\em Funzione che verifica se un fd è una pipe. \end{DoxyCompactList}\item 
-\mbox{\Hypertarget{chatty_8h_a0e499099f562e203205fc3a172ce7351}\label{chatty_8h_a0e499099f562e203205fc3a172ce7351}} 
-void {\bfseries print\+Ris\+OP} (\hyperlink{structmessage__t}{message\+\_\+t} m, int ok)
-\item 
+void \hyperlink{chatty_8h_a0e499099f562e203205fc3a172ce7351}{print\+Ris\+OP} (\hyperlink{structmessage__t}{message\+\_\+t} m, int ok)
+\begin{DoxyCompactList}\small\item\em Funzione che in base alla richiesta e al valore ritornato dalla funzione che l\textquotesingle{}ha gestista, stampa un determinato output La funzione stampa un messaggio solo se la macro D\+E\+B\+UG è stata definita. \end{DoxyCompactList}\item 
 void \hyperlink{chatty_8h_a03070d47a810d44ac351b8f5fd5000f6}{stop\+All\+Thread} (int segnali, int listener, int n\+Thread\+Attivi)
 \begin{DoxyCompactList}\small\item\em Funzione che stoppa i thread indicati dai parametri. \end{DoxyCompactList}\item 
 void \hyperlink{chatty_8h_a76db2dbced18d80ff2d884bc1be46e8b}{join\+All\+Thread} ()
@@ -314,7 +316,17 @@ is\+Pipe
 
 Funzione effettua le join di tutti i thread del server. 
 
-join\+All\+Thread \mbox{\Hypertarget{chatty_8h_a03070d47a810d44ac351b8f5fd5000f6}\label{chatty_8h_a03070d47a810d44ac351b8f5fd5000f6}} 
+join\+All\+Thread \mbox{\Hypertarget{chatty_8h_a0e499099f562e203205fc3a172ce7351}\label{chatty_8h_a0e499099f562e203205fc3a172ce7351}} 
+\index{chatty.\+h@{chatty.\+h}!print\+Ris\+OP@{print\+Ris\+OP}}
+\index{print\+Ris\+OP@{print\+Ris\+OP}!chatty.\+h@{chatty.\+h}}
+\subsubsection{\texorpdfstring{print\+Ris\+O\+P()}{printRisOP()}}
+{\footnotesize\ttfamily void print\+Ris\+OP (\begin{DoxyParamCaption}\item[{\hyperlink{structmessage__t}{message\+\_\+t}}]{m,  }\item[{int}]{ok }\end{DoxyParamCaption})}
+
+
+
+Funzione che in base alla richiesta e al valore ritornato dalla funzione che l\textquotesingle{}ha gestista, stampa un determinato output La funzione stampa un messaggio solo se la macro D\+E\+B\+UG è stata definita. 
+
+print\+Ris\+OP \mbox{\Hypertarget{chatty_8h_a03070d47a810d44ac351b8f5fd5000f6}\label{chatty_8h_a03070d47a810d44ac351b8f5fd5000f6}} 
 \index{chatty.\+h@{chatty.\+h}!stop\+All\+Thread@{stop\+All\+Thread}}
 \index{stop\+All\+Thread@{stop\+All\+Thread}!chatty.\+h@{chatty.\+h}}
 \subsubsection{\texorpdfstring{stop\+All\+Thread()}{stopAllThread()}}

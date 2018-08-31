@@ -46,9 +46,8 @@ int \hyperlink{chatty_8c_a94bb61a938848c72a193879a5a6f89a5}{init\+Hash\+Lock} ()
 \begin{DoxyCompactList}\small\item\em Funzione che inizializza l\textquotesingle{}array (utenti\+Registrati.\+hash\+\_\+m) delle lock della tabella hash. \end{DoxyCompactList}\item 
 void \hyperlink{chatty_8c_abba8289f04610be41e390483374e8cbe}{stop\+Pool} (int n\+Thread\+Attivi)
 \begin{DoxyCompactList}\small\item\em Funzione che stoppa un certo numero di thread del pool. \end{DoxyCompactList}\item 
-\mbox{\Hypertarget{chatty_8c_a0e499099f562e203205fc3a172ce7351}\label{chatty_8c_a0e499099f562e203205fc3a172ce7351}} 
-void {\bfseries print\+Ris\+OP} (\hyperlink{structmessage__t}{message\+\_\+t} m, int ok)
-\item 
+void \hyperlink{chatty_8c_a0e499099f562e203205fc3a172ce7351}{print\+Ris\+OP} (\hyperlink{structmessage__t}{message\+\_\+t} m, int ok)
+\begin{DoxyCompactList}\small\item\em Funzione che in base alla richiesta e al valore ritornato dalla funzione che l\textquotesingle{}ha gestista, stampa un determinato output La funzione stampa un messaggio solo se la macro D\+E\+B\+UG è stata definita. \end{DoxyCompactList}\item 
 int \hyperlink{chatty_8c_a8509726415161d5a6944a64e31b511ac}{is\+Pipe} (int fd)
 \begin{DoxyCompactList}\small\item\em Funzione che verifica se un fd è una pipe. \end{DoxyCompactList}\item 
 void \hyperlink{chatty_8c_a03070d47a810d44ac351b8f5fd5000f6}{stop\+All\+Thread} (int segnali, int listener, int n\+Thread\+Attivi)
@@ -314,7 +313,17 @@ is\+Pipe
 
 Funzione effettua le join di tutti i thread del server. 
 
-join\+All\+Thread \mbox{\Hypertarget{chatty_8c_a03070d47a810d44ac351b8f5fd5000f6}\label{chatty_8c_a03070d47a810d44ac351b8f5fd5000f6}} 
+join\+All\+Thread \mbox{\Hypertarget{chatty_8c_a0e499099f562e203205fc3a172ce7351}\label{chatty_8c_a0e499099f562e203205fc3a172ce7351}} 
+\index{chatty.\+c@{chatty.\+c}!print\+Ris\+OP@{print\+Ris\+OP}}
+\index{print\+Ris\+OP@{print\+Ris\+OP}!chatty.\+c@{chatty.\+c}}
+\subsubsection{\texorpdfstring{print\+Ris\+O\+P()}{printRisOP()}}
+{\footnotesize\ttfamily void print\+Ris\+OP (\begin{DoxyParamCaption}\item[{\hyperlink{structmessage__t}{message\+\_\+t}}]{m,  }\item[{int}]{ok }\end{DoxyParamCaption})}
+
+
+
+Funzione che in base alla richiesta e al valore ritornato dalla funzione che l\textquotesingle{}ha gestista, stampa un determinato output La funzione stampa un messaggio solo se la macro D\+E\+B\+UG è stata definita. 
+
+print\+Ris\+OP \mbox{\Hypertarget{chatty_8c_a03070d47a810d44ac351b8f5fd5000f6}\label{chatty_8c_a03070d47a810d44ac351b8f5fd5000f6}} 
 \index{chatty.\+c@{chatty.\+c}!stop\+All\+Thread@{stop\+All\+Thread}}
 \index{stop\+All\+Thread@{stop\+All\+Thread}!chatty.\+c@{chatty.\+c}}
 \subsubsection{\texorpdfstring{stop\+All\+Thread()}{stopAllThread()}}

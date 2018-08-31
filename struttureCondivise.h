@@ -247,19 +247,6 @@ static inline void freeMessage_t(void * a){
     free(m);
 }
 
-// TODO da riportarlo nella relazione finale
-/*
-  utenti connessi a cosa serve?
-  ogni volta che un utente mi fa una CONNECT_OP lo devo aggiungere alla lista.
-  quando farà una richiesta in cui serve essere connessi, dovrò controllare se è presente
-  quando un altro utente invia un messaggio a un client devo verificare se è connesso, semmai glielo posso mandare.
-    In ogni caso devo aggiungere il messaggio nella history del ricevente
-  quando un utente registrato  si disconnette dovrò toglierlo dalla lista
-  QUINDI:
-      - lettura e scrittura in mutua esclusione
-      - serve una cond? NO
-  OSS: utentiConnessi non sarà mai più grande delle socket attive (MaxConnections)
-*/
 
 
 #endif
